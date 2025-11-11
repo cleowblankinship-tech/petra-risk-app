@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Petra Risk Assessment</title>
+
+  <!-- Adobe Fonts: Brandon Grotesque -->
+  <link rel="stylesheet" href="https://use.typekit.net/zzj8xsy.css">
+
+  <!-- Google Fonts: Crimson Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- UPDATED: Centered hero with subhead and gold rule -->
+        <header class="petra-header page-hero">
+            <h1 class="main-heading center">Risk Alignment Assessment</h1>
+            <p class="subhead">Petra Financial Advisors</p>
+            <hr class="hr-gold narrow">
+        </header>
+
+
+        <!-- UPDATED: Added .cta-buttons wrapper with z-index -->
+        <div id="couplesSetup" class="section" style="text-align: center;">
+            <h3 style="color: var(--petra-charcoal); margin-bottom: 20px;">Who's taking this assessment?</h3>
+            <div class="cta-buttons" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
+                <button onclick="startSolo()" class="mode-btn mode-btn-primary">Just Me</button>
+                <button onclick="startCouple()" class="mode-btn mode-btn-secondary">Me & Partner</button>
+            </div>
+            
+            <div id="coupleNames" style="display: none; max-width: 500px; margin: 20px auto; text-align: left;">
+                <div class="couple-notice">
+                    <strong style="color: #4f46e5;">Important:</strong>
+                    <p style="margin: 8px 0 0 0; color: #3730a3; font-size: 0.9rem;">Each partner will answer the questions independently. Please don't discuss your answers or try to influence each other—honest individual responses give the most accurate results.</p>
+                </div>
+                <h4 style="color: var(--petra-charcoal); margin-bottom: 15px;">Enter both names:</h4>
+                <div style="margin-bottom: 15px;">
+                    <label class="input-label">Person 1:</label>
+                    <input type="text" id="person1Name" placeholder="Your name" class="name-input">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label class="input-label">Person 2:</label>
+                    <input type="text" id="person2Name" placeholder="Partner's name" class="name-input">
+                </div>
+                <button onclick="beginCoupleAssessment()" class="begin-btn">Begin Assessment</button>
+            </div>
+        </div>
+
+        <div id="currentPerson" class="current-person-banner" style="display: none;">
+            <strong style="color: #4f46e5; font-size: 1.1rem;">Currently answering for: <span id="currentPersonName"></span></strong>
+        </div>
+
+        <div id="questionnaire" style="display: none;"></div>
+
+        <button type="button" id="calculateBtn" class="calculate-btn" style="display: none;">Calculate Risk Alignment Score</button>
+
+        <div id="partnerTransition" class="partner-transition" style="display: none;">
+            <h3 style="color: var(--petra-gold); margin-bottom: 20px;">Ready for your partner?</h3>
+            <p style="color: var(--petra-charcoal); margin-bottom: 25px; font-size: 1.1rem;">
+                <span id="person1NameDisplay"></span>'s results have been saved. 
+                <br>Now it's time for <span id="person2NameDisplay"></span> to complete the assessment.
+            </p>
+            <button onclick="startPerson2()" class="partner-start-btn">Start Partner Assessment</button>
+        </div>
+
+        <div id="results" class="results" style="display: none;">
+            <div class="score-display">
+                <div class="main-score" id="mainScore">--</div>
+                <div class="score-label">Risk Alignment Score</div>
+                <div class="risk-band" id="riskBand">--</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="sub-scores">
+                <div class="sub-score">
+                    <div class="sub-score-value" id="behavioralScore">--</div>
+                    <div class="sub-score-label">Behavioral Component (0-60)</div>
+                    <div class="sub-score-description">How you tend to think and feel about risk — your natural reactions to gains, losses, and uncertainty.</div>
+                </div>
+                <div class="sub-score">
+                    <div class="sub-score-value" id="traditionalScore">--</div>
+                    <div class="sub-score-label">Traditional Component (0-40)</div>
+                    <div class="sub-score-description">The practical side — how long you plan to invest, what you've experienced before, and what goals you're prioritizing.</div>
+                </div>
+            </div>
+
+            <div id="scoreInterpretation" class="score-interpretation" style="display: none;">
+                <h3 id="interpretationTitle">Your Risk Profile</h3>
+                <p id="interpretationText"></p>
+            </div>
+
+            <div id="riskScale" class="risk-scale-visualization" style="display: none;">
+                <h4>Risk Profile Scale</h4>
+                <div class="risk-scale-bar">
+                    <div class="risk-scale-segment rs-very-cons" data-range="0-24">
+                        <span class="risk-scale-label">Very Conservative</span>
+                        <span class="risk-scale-range">0-24</span>
+                    </div>
+                    <div class="risk-scale-segment rs-cons" data-range="25-44">
+                        <span class="risk-scale-label">Conservative</span>
+                        <span class="risk-scale-range">25-44</span>
+                    </div>
+                    <div class="risk-scale-segment rs-balanced" data-range="45-59">
+                        <span class="risk-scale-label">Balanced</span>
+                        <span class="risk-scale-range">45-59</span>
+                    </div>
+                    <div class="risk-scale-segment rs-bal-growth" data-range="60-74">
+                        <span class="risk-scale-label">Balanced Growth</span>
+                        <span class="risk-scale-range">60-74</span>
+                    </div>
+                    <div class="risk-scale-segment rs-growth" data-range="75-89">
+                        <span class="risk-scale-label">Growth</span>
+                        <span class="risk-scale-range">75-89</span>
+                    </div>
+                    <div class="risk-scale-segment rs-agg-growth" data-range="90-100">
+                        <span class="risk-scale-label">Aggressive Growth</span>
+                        <span class="risk-scale-range">90-100</span>
+                    </div>
+                </div>
+            </div>
+
+<div id="coupleComparison" class="couple-comparison" style="display: none;">
+    <h3 class="couple-comparison-title">Couple Comparison</h3>
+    
+    <div class="couple-scores-header">
+        <div class="couple-score-card couple-score-card-1">
+            <h4 id="person1ComparisonNameTop"></h4>
+            <div class="couple-main-score" id="person1ComparisonScoreTop"></div>
+            <div class="couple-risk-band" id="person1ComparisonBandTop"></div>
+            <div class="couple-components">
+                <div class="couple-component-item">
+                    <span class="couple-component-label">Behavioral:</span>
+                    <span class="couple-component-value" id="person1ComparisonBehavioralTop"></span>
+                </div>
+                <div class="couple-component-item">
+                    <span class="couple-component-label">Traditional:</span>
+                    <span class="couple-component-value" id="person1ComparisonTraditionalTop"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="couple-score-card couple-score-card-2">
+            <h4 id="person2ComparisonNameTop"></h4>
+            <div class="couple-main-score couple-main-score-2" id="person2ComparisonScoreTop"></div>
+            <div class="couple-risk-band" id="person2ComparisonBandTop"></div>
+            <div class="couple-components">
+                <div class="couple-component-item">
+                    <span class="couple-component-label">Behavioral:</span>
+                    <span class="couple-component-value" id="person2ComparisonBehavioralTop"></span>
+                </div>
+                <div class="couple-component-item">
+                    <span class="couple-component-label">Traditional:</span>
+                    <span class="couple-component-value" id="person2ComparisonTraditionalTop"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="coupleNarrative" class="couple-narrative">
+        <h4>What this means for you as a couple:</h4>
+        <p id="coupleNarrativeText"></p>
+    </div>
+</div>
+                
+                <!-- <div id="coupleNarrative" class="couple-narrative">
+                    <h4>What this means for you as a couple:</h4>
+                    <p id="coupleNarrativeText"></p>
+                </div>
+            </div> -->
+
+           
+<button id="downloadPdfBtn" class="print-btn download-pdf-bottom" onclick="downloadPDF()" style="display: none;">Download PDF Summary</button>
+<button id="printFullBtn" class="print-btn" onclick="printFullAssessment()" style="display: none;">Print Full Assessment</button>
+            <div class="disclosure">
+                <strong>Disclosure:</strong> This assessment is for educational purposes only and should not be considered investment advice.
+            </div>
+
+            <div class="advisor-only" id="advisorSections" style="display: none;">
+                <div class="knowledge-overlay">
+                    <h3>Financial Knowledge (Diagnostic Overlay)</h3>
+                    <p class="knowledge-description">
+                        This section does not affect the Risk Alignment Score. It helps tailor communication and planning recommendations.
+                    </p>
+                    <div class="knowledge-grid">
+                        <div class="knowledge-item">
+                            <div class="knowledge-item-label">Knowledge Index</div>
+                            <div class="knowledge-item-value" id="knowledgeIndex">--</div>
+                        </div>
+                        <div class="knowledge-item">
+                            <div class="knowledge-item-label">Calibration</div>
+                            <div class="knowledge-item-value" id="knowledgeCalibration">--</div>
+                        </div>
+                    </div>
+                    <div id="knowledgeFlags"></div>
+                </div>
+                <h3 class="advisor-title">Advisor View</h3>
+                <div id="advisorDetails" class="advisor-details"></div>
+                <div style="text-align:center;margin:20px 0;">
+                    <button class="print-btn" onclick="copyJSON()" style="background:#059669;">Copy JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<details class="advisor-fab" id="advisorAccess">
+  <summary class="fab-button" aria-label="Advisor access">Advisor</summary>
+
+  <div class="fab-panel card">
+    <label for="passcodeInput" class="label">Enter passcode</label>
+    <input id="passcodeInput" type="password" class="input" placeholder="Enter passcode" />
+    <div class="actions">
+      <button class="btn-primary" onclick="checkPasscode()">Enter</button>
+      <button class="btn-ghost" onclick="document.getElementById('advisorAccess').removeAttribute('open'); document.getElementById('passcodeInput').value=''; return false;">Cancel</button>
+    </div>
+  </div>
+</details>
+
+    <script src="script.js"></script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
