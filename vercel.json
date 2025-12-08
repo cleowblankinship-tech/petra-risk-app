@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/sendResults",
+      "dest": "/api/sendResults.js"
+    },
+    {
+      "src": "/api/getReview",
+      "dest": "/api/getReview.js"
+    },
+    {
+      "src": "/review/(.*)",
+      "dest": "/review/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
