@@ -2,26 +2,28 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.js",
+      "src": "api/*.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/sendResults",
-      "dest": "/api/sendResults.js"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
+
     {
-      "src": "/api/getReview",
-      "dest": "/api/getReview.js"
-    },
-    {
-      "src": "/review/(.*)",
+      "src": "/review",
       "dest": "/review/index.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "src": "/review/",
+      "dest": "/review/index.html"
+    },
+
+    {
+      "src": "/",
+      "dest": "/index.html"
     }
   ],
   "env": {
