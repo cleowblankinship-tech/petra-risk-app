@@ -1,11 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "buildCommand": null,
+  "outputDirectory": null,
   "routes": [
     {
       "src": "/api/sendResults",
@@ -18,13 +14,6 @@
     {
       "src": "/review/(.*)",
       "dest": "/review/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
