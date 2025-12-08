@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Review - Petra Financial Advisors</title>
+  <link rel="stylesheet" href="https://use.typekit.net/zzj8xsy.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style-additions.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="petra-header page-hero">
+      <h1 class="main-heading center">Risk Assessment Review</h1>
+      <p class="subhead">Petra Financial Advisors</p>
+      <hr class="hr-gold narrow">
+    </header>
+
+    <div id="reviewContent" class="section">
+      <div id="loading" style="text-align: center; padding: 40px;">
+        <p>Loading assessment results...</p>
+      </div>
+
+      <div id="expired" style="display: none; text-align: center; padding: 40px;">
+        <h3 style="color: var(--petra-gold); margin-bottom: 20px;">Link Expired</h3>
+        <p>This link has expired. Please reply to your Petra email for a fresh link.</p>
+      </div>
+
+      <div id="resultsDisplay" style="display: none;">
+        <!-- Results will be dynamically inserted here -->
+      </div>
+
+      <div id="actions" style="display: none; text-align: center; margin-top: 30px;">
+        <button onclick="downloadReviewPDF()" class="btn-primary" style="margin-right: 10px;">Download PDF</button>
+        <button onclick="copySummary()" class="btn-outline">Copy Summary</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Extract token from URL
+    const pathParts = window.location.pathname.split('/');
+    const token = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+
+    async function loadReview() {
+      try {
+        const response = await fetch(`/api/getReview?token=${token}`);
+        const data = await response.json();
+
+        if (!response.ok || data.expired) {
+          showExpired();
+          return;
+        }
+
+        displayResults(data);
+      } catch (error) {
+        console.error('Error loading review:', error);
+        showExpired();
+      }
+    }
+
+    function showExpired() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('expired').style.display = 'block';
+    }
+
+    function displayResults(data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('resultsDisplay').style.display = 'block';
+      document.getElementById('actions').style.display = 'block';
+
+      const { client, scores, meta } = data;
+
+      let html = `
+        <div class="score-display" style="margin-bottom: 30px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h3 style="color: var(--petra-charcoal); margin-bottom: 5px;">${client.firstName} ${client.lastName}</h3>
+            <p style="color: var(--petra-warm-600); font-size: 0.9rem;">Assessment Date: ${meta.timestamp}</p>
+          </div>
+          
+          <div class="main-score">${scores.overall}</div>
+          <div class="score-label">Risk Alignment Score</div>
+          <div class="risk-band">${scores.band}</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${scores.overall}%"></div>
+          </div>
+        </div>
+
+        <div class="sub-scores">
+          <div class="sub-score">
+            <div class="sub-score-value">${scores.behavioral}</div>
+            <div class="sub-score-label">Behavioral Component (0-60)</div>
+            <div class="sub-score-description">How you tend to think and feel about risk</div>
+          </div>
+          <div class="sub-score">
+            <div class="sub-score-value">${scores.traditional}</div>
+            <div class="sub-score-label">Traditional Component (0-40)</div>
+            <div class="sub-score-description">Time horizon, experience, and practical considerations</div>
+          </div>
+        </div>
+      `;
+
+      if (data.answers && data.answers.length > 0) {
+        html += `
+          <div class="section" style="margin-top: 30px;">
+            <h3 class="section-title">Full Q&A Summary</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+              <thead>
+                <tr style="background: var(--petra-warm-100); text-align: left;">
+                  <th style="padding: 10px; border: 1px solid var(--petra-warm-200);">#</th>
+                  <th style="padding: 10px; border: 1px solid var(--petra-warm-200);">Question</th>
+                  <th style="padding: 10px; border: 1px solid var(--petra-warm-200);">Answer</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.answers.map((a, i) => `
+                  <tr>
+                    <td style="padding: 10px; border: 1px solid var(--petra-warm-200); font-weight: 600;">${i + 1}</td>
+                    <td style="padding: 10px; border: 1px solid var(--petra-warm-200);">${a.text}</td>
+                    <td style="padding: 10px; border: 1px solid var(--petra-warm-200);">${a.selectedOption}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      document.getElementById('resultsDisplay').innerHTML = html;
+    }
+
+    function downloadReviewPDF() {
+      alert('PDF download functionality - integrate with server-side PDF generation');
+    }
+
+    function copySummary() {
+      // Simple copy to clipboard
+      const text = document.getElementById('resultsDisplay').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Summary copied to clipboard!');
+      });
+    }
+
+    // Load on page load
+    loadReview();
+  </script>
+</body>
+</html>
