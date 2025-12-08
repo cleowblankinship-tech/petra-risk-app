@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": null,
-  "outputDirectory": null,
+  "outputDirectory": ".",
   "routes": [
     {
       "src": "/api/sendResults",
