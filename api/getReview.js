@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
     console.error('Error in getReview:', error);
     return res.status(500).json({ 
       error: 'Internal server error',
-      message: error.message 
+      message: error.message // this is CB making a very small change
     });
   }
 };
