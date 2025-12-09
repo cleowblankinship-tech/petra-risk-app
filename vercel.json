@@ -6,8 +6,6 @@
       "use": "@vercel/node"
     }
   ],
-  "buildCommand": null,
-  "outputDirectory": ".",
   "routes": [
     {
       "src": "/api/sendResults",
@@ -20,6 +18,10 @@
     {
       "src": "/review/(.*)",
       "dest": "/review/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
