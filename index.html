@@ -27,42 +27,42 @@
             <hr class="hr-gold narrow">
         </header>
 
-        <!-- NEW: Client Information Form -->
-        <div id="clientInfoSection" class="section" style="display: none;">
-            <h2 class="section-title">Your Information</h2>
-            <p class="section-subtitle">We need a few details to send your results to our advisors.</p>
-            
-            <div class="form-grid">
-                <div class="form-field">
-                    <label class="input-label" for="firstName">First Name *</label>
-                    <input type="text" id="clientFirstName" name="firstName" class="name-input" required>
-                </div>
-                
-                <div class="form-field">
-                    <label class="input-label" for="lastName">Last Name *</label>
-                    <input type="text" id="clientLastName" name="lastName" class="name-input" required>
-                </div>
-                
-                <div class="form-field full-width">
-                    <label class="input-label" for="clientEmail">Email *</label>
-                    <input type="email" id="clientEmail" name="clientEmail" class="name-input" required>
-                </div>
-                
-                <div class="form-field full-width">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="consentCheckbox" name="consent" required>
-                        <span>I authorize Petra Financial Advisors to store and review my questionnaire responses for planning purposes and to contact me about them. I understand my information will be handled according to Petra's Privacy Policy. *</span>
-                    </label>
-                </div>
-                
-                <div class="form-field full-width">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="wantsCopyCheckbox" name="emailMe">
-                        <span>Email me my results</span>
-                    </label>
-                </div>
-            </div>
+      <!-- NEW: Client Information Form - added this section from Claude on 12/9 to fix the variable labelling issue -->
+<div id="clientInfoSection" class="section" style="display: none;">
+    <h2 class="section-title">Your Information</h2>
+    <p class="section-subtitle">We need a few details to send your results to our advisors.</p>
+    
+    <div class="form-grid">
+        <div class="form-field">
+            <label class="input-label" for="clientFirstName">First Name *</label>
+            <input type="text" id="clientFirstName" name="firstName" class="name-input" required>
         </div>
+        
+        <div class="form-field">
+            <label class="input-label" for="clientLastName">Last Name *</label>
+            <input type="text" id="clientLastName" name="lastName" class="name-input" required>
+        </div>
+        
+        <div class="form-field full-width">
+            <label class="input-label" for="clientEmail">Email *</label>
+            <input type="email" id="clientEmail" name="clientEmail" class="name-input" required>
+        </div>
+        
+        <div class="form-field full-width">
+            <label class="checkbox-label">
+                <input type="checkbox" id="consentCheckbox" name="consent" required>
+                <span>I authorize Petra Financial Advisors to store and review my questionnaire responses for planning purposes and to contact me about them. I understand my information will be handled according to Petra's Privacy Policy. *</span>
+            </label>
+        </div>
+        
+        <div class="form-field full-width">
+            <label class="checkbox-label">
+                <input type="checkbox" id="wantsCopyCheckbox" name="emailMe">
+                <span>Email me my results</span>
+            </label>
+        </div>
+    </div>
+</div>
 
         <!-- UPDATED: Added .cta-buttons wrapper with z-index -->
         <div id="couplesSetup" class="section" style="text-align: center;">
