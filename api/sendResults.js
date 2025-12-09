@@ -164,9 +164,12 @@ module.exports = async (req, res) => {
     const BASE_URL = process.env.BASE_URL || 'https://risk.petrafinancial.com';
     const reviewLink = `${BASE_URL}/review/${token}`;
 
-    // Format score display for email
-    const scoreDisplay = `${scores.overall} — ${scores.band}`;
-    const componentDisplay = `Behavioral: ${scores.behavioral}/60 | Traditional: ${scores.traditional}/40`;
+    // Format score display for email %% CB took out this OG code to add a claude patch 12/9
+    //const scoreDisplay = `${scores.overall} — ${scores.band}`;
+    //const componentDisplay = `Behavioral: ${scores.behavioral}/60 | Traditional: ${scores.traditional}/40`;
+
+    const scoreDisplay = `${payload.scores.overall} — ${payload.scores.band}`;
+    const componentDisplay = `Behavioral: ${payload.scores.behavioral}/60 | Traditional: ${payload.scores.traditional}/40`;
     
     // Build advisor email
     const advisorSubject = `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${scoreDisplay}`;
