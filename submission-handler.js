@@ -46,14 +46,13 @@ calculateScore = function () {
 async function submitToBackend() {
     try {
         // Gather client info
-        const clientInfo = {
-            firstName: document.getElementById('firstName').value.trim(),
-            lastName: document.getElementById('lastName').value.trim(),
-            email: document.getElementById('clientEmail').value.trim(),
-            consent: document.getElementById('consentCheck').checked,
-            wantsCopy: document.getElementById('emailMeCheck')?.checked || false
-        };
-        
+       const clientInfo = {
+        firstName: document.getElementById('clientFirstName').value.trim(),
+        lastName: document.getElementById('clientLastName').value.trim(),
+        email: document.getElementById('clientEmail').value.trim(),
+        consent: document.getElementById('consentCheckbox').checked,
+        wantsCopy: document.getElementById('wantsCopyCheckbox')?.checked || false
+};
         // Prepare payload
         const payload = {
             client: clientInfo,
