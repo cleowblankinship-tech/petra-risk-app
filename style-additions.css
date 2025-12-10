@@ -134,3 +134,168 @@
     grid-column: 1;
   }
 }
+/* ============================================================================
+   HERO SECTION VISUAL REFINEMENTS
+   Paste this at the bottom of style-additions.css or in a new section
+   ============================================================================ */
+
+/* 1. HEADER CONTAINER - Reduce top spacing by ~40% */
+.petra-header.page-hero {
+  padding: var(--space-4) 0 var(--space-3);  /* Reduced from --space-6 (48px) to --space-4 (32px) = ~33% reduction */
+  margin-bottom: var(--space-3);  /* Tighter bottom */
+}
+
+/* 2. LOGO - Increase size 10-15%, reduce bottom spacing by ~50% */
+.petra-logo {
+  display: block;
+  max-width: 320px;  /* Increased from 280px = ~14% larger */
+  width: 100%;
+  height: auto;
+  margin: 0 auto var(--space-2);  /* Changed bottom from --space-4 (32px) to --space-2 (16px) = 50% reduction */
+  opacity: 0.95;
+}
+
+/* 3. TITLE - Reduce spacing to subtitle */
+.main-heading.center {
+  margin-bottom: var(--space-1);  /* Reduced from --space-2 for tighter connection */
+  letter-spacing: 0.03em;
+}
+
+/* 4. SUBTITLE - Slightly larger font, tighter letter-spacing, minimal gap to divider */
+.subhead {
+  font-size: 0.875rem;  /* Increased from 0.8125rem = ~7% larger */
+  letter-spacing: 0.08em;  /* Reduced from 0.1em for better density */
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-1);  /* Minimal gap to divider */
+}
+
+/* 5. GOLD DIVIDER - Remove top margin, soften color slightly */
+.hr-gold.narrow {
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 80px;
+  height: 2px;
+  background: #A88F2F;  /* Softened from #9A7611 = ~8% lighter for better contrast */
+  border: none;
+}
+
+/* 6. ASSESSMENT OPTIONS CARD - Reduce top margin by ~35% */
+#couplesSetup.section {
+  margin-top: var(--space-3);  /* Reduced from --space-5 (40px) to --space-3 (24px) = 40% reduction */
+  padding: var(--space-5) var(--space-5);  /* Slight padding increase for balance */
+  box-shadow: 0 2px 8px rgba(37, 40, 42, 0.06);  /* Subtle elevation */
+}
+
+/* Also apply to clientInfoSection if visible */
+#clientInfoSection.section {
+  margin-top: var(--space-3);
+  padding: var(--space-5) var(--space-5);
+}
+
+/* 7. BUTTON REFINEMENTS - Better vertical centering and hover effects */
+.mode-btn,
+.mode-btn-primary,
+.mode-btn-secondary,
+.begin-btn,
+.calculate-btn,
+.partner-start-btn,
+.print-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 28px;  /* Increased vertical from 13px to 15px */
+  line-height: 1;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* White/Secondary button - Add subtle shadow and gold border on hover */
+.mode-btn-secondary {
+  box-shadow: 0 1px 3px rgba(37, 40, 42, 0.08), inset 0 0 0 1px rgba(37, 40, 42, 0.04);  /* Subtle depth */
+}
+
+.mode-btn-secondary:hover {
+  background: var(--petra-warm-50);
+  border-color: #A88F2F;  /* Softer gold on hover */
+  color: var(--petra-charcoal);
+  box-shadow: 0 2px 8px rgba(154, 118, 17, 0.15), inset 0 0 0 1px #A88F2F;  /* Gold glow */
+  transform: translateY(-1px);
+}
+
+/* Gold button hover enhancement */
+.mode-btn-primary:hover,
+.begin-btn:hover,
+.calculate-btn:hover,
+.partner-start-btn:hover {
+  background: #876809;  /* Slightly darker gold on hover */
+  border-color: #876809;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(154, 118, 17, 0.3);
+}
+
+/* 8. RESPONSIVE ADJUSTMENTS */
+@media (max-width: 768px) {
+  .petra-header.page-hero {
+    padding: var(--space-3) 0 var(--space-2);  /* Proportional reduction */
+    margin-bottom: var(--space-2);
+  }
+  
+  .petra-logo {
+    max-width: 260px;  /* Proportional scaling */
+    margin-bottom: var(--space-1);
+  }
+  
+  .main-heading.center {
+    font-size: 2rem;  /* Slightly smaller on tablets */
+    margin-bottom: var(--space-1);
+  }
+  
+  .subhead {
+    font-size: 0.8125rem;
+    margin-bottom: var(--space-1);
+  }
+  
+  #couplesSetup.section,
+  #clientInfoSection.section {
+    margin-top: var(--space-2);
+    padding: var(--space-4) var(--space-3);
+  }
+  
+  .mode-btn,
+  .mode-btn-primary,
+  .mode-btn-secondary {
+    padding: 14px 24px;  /* Slightly smaller on mobile */
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .petra-header.page-hero {
+    padding: var(--space-2) 0 var(--space-1);
+  }
+  
+  .petra-logo {
+    max-width: 220px;
+  }
+  
+  .main-heading.center {
+    font-size: 1.75rem;  /* Further reduction on small phones */
+  }
+  
+  .subhead {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+  
+  #couplesSetup.section,
+  #clientInfoSection.section {
+    padding: var(--space-3) var(--space-2);
+  }
+}
+
+/* 9. ENSURE SMOOTH TRANSITIONS */
+.petra-logo,
+.mode-btn,
+.mode-btn-primary,
+.mode-btn-secondary {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
