@@ -14,10 +14,7 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     displayScoreInterpretation(finalScore);
     displayRiskScale(finalScore);
     
-    // Show PDF button for solo mode, hide for couple mode until both complete
-    if (!isCoupleMode) {
-        document.getElementById('downloadPdfBtn').style.display = 'block';
-    }
+// PDF download button removed - results are emailed automatically
     
     // Show advisor sections if in advisor view
     if (isAdvisorView) {
@@ -530,7 +527,7 @@ function downloadPDF() {
     htmlContent += '.footer{margin-top:25px;padding-top:12px;border-top:1px solid #ccc;text-align:center;font-size:9px;color:#666}';
     htmlContent += '@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}';
     htmlContent += '</style></head><body>';
-    htmlContent += '<div class="header"><h1>Risk Alignment Assessment</h1><h2>Petra Financial Advisors</h2></div>';
+    htmlContent += '<div class="header"><h1>Investment Risk Assessment</h1><h2>Petra Financial Advisors</h2></div>';
     htmlContent += '<div class="date">Assessment Date: ' + new Date().toLocaleDateString() + '</div>';
     
     if (isCoupleMode && person1Data && person2Data) {
@@ -1278,8 +1275,7 @@ function showCoupleComparison() {
     
     document.getElementById('coupleNarrativeText').innerHTML = narrative;
     
-    // Show PDF download button
-    document.getElementById('downloadPdfBtn').style.display = 'block';
+// PDF download button removed - results are emailed automatically
     
     window.scrollTo({ top: document.getElementById('coupleComparison').offsetTop - 100, behavior: 'smooth' });
 }
@@ -1287,7 +1283,7 @@ function showCoupleComparison() {
 function renderQuestions() {
     var html = '';
     
-    html += '<div class="section"><h2 class="section-title">Behavioral Profile</h2><p class="section-subtitle">This section looks at your natural decision tendencies and how they may affect your investment approach. (60% of total score)</p>';
+    html += '<div class="section"><h2 class="section-title">Behavioral Profile</h2><p class="section-subtitle">This section looks at your natural decision tendencies and how they may affect your investment approach.</p>';
     questions.behavioral.forEach(function(q) {
         html += renderQuestion(q);
     });
