@@ -1706,3 +1706,109 @@ button,
 │      Advisors           │
 │  ───────────────        │  ← Your existing gold line
 └─────────────────────────┘ */
+
+/* ============================================================================
+   HEADER VISUAL REFINEMENTS
+   ============================================================================ */
+
+/* 1. LOGO REFINEMENTS */
+.petra-logo {
+  display: block;
+  max-width: 320px;  /* Increased from 280px (~14% larger) */
+  width: 100%;
+  height: auto;
+  margin: var(--space-6) auto var(--space-3);  /* Generous top, reduced bottom */
+  opacity: 0.95;
+}
+
+/* 2. TITLE BLOCK SPACING */
+.petra-header.page-hero {
+  padding: var(--space-6) 0 var(--space-4);  /* Reduced bottom padding */
+  margin-bottom: var(--space-4);  /* Reduced from --space-5 */
+}
+
+.main-heading.center {
+  margin-bottom: var(--space-2);  /* Tighter spacing to subtitle */
+  letter-spacing: 0.03em;  /* Slightly refined from 0.02em */
+}
+
+.subhead {
+  font-size: 0.875rem;  /* Increased from 0.8125rem (~7% larger) */
+  letter-spacing: 0.12em;  /* Slightly tightened from 0.1em */
+  margin-bottom: var(--space-2);  /* Reduced spacing to gold line */
+}
+
+.hr-gold.narrow {
+  margin-top: 0;  /* Remove top margin so it sits tight to subtitle */
+  width: 80px;
+  height: 2px;
+  background: var(--petra-gold);
+  border: none;
+}
+
+/* 3. ASSESSMENT OPTIONS CARD (COUPLES SETUP) */
+#couplesSetup.section {
+  margin-top: var(--space-4);  /* Reduced from default --space-5 */
+  padding: var(--space-6) var(--space-5);  /* Increased vertical padding */
+  box-shadow: 0 2px 12px rgba(37, 40, 42, 0.08);  /* Subtle elevation */
+  border-radius: var(--radius-lg);  /* Ensure consistent radius */
+}
+
+/* 4. BUTTON REFINEMENTS */
+.mode-btn,
+.mode-btn-primary,
+.mode-btn-secondary,
+.begin-btn,
+.calculate-btn,
+.partner-start-btn {
+  display: inline-flex;
+  align-items: center;  /* Perfect vertical centering */
+  justify-content: center;
+  padding: 14px 28px;  /* Slightly increased vertical padding */
+  line-height: 1;  /* Ensure text doesn't shift */
+}
+
+/* White button hover effect (secondary button) */
+.mode-btn-secondary:hover {
+  background: var(--petra-warm-50);
+  border-color: var(--petra-gold);
+  color: var(--petra-charcoal);
+  box-shadow: 0 0 0 1px var(--petra-gold);  /* Subtle gold glow */
+  transform: translateY(-1px);
+}
+
+/* Gold button hover refinement (ensure smooth transition) */
+.mode-btn-primary:hover,
+.begin-btn:hover,
+.calculate-btn:hover,
+.partner-start-btn:hover {
+  transform: translateY(-2px);  /* Slightly more lift */
+  box-shadow: 0 4px 12px rgba(154, 118, 17, 0.25);  /* Enhanced shadow */
+}
+
+/* 5. RESPONSIVE ADJUSTMENTS */
+@media (max-width: 768px) {
+  .petra-logo {
+    max-width: 260px;  /* Proportional scaling */
+    margin-bottom: var(--space-2);
+  }
+  
+  .petra-header.page-hero {
+    padding: var(--space-5) 0 var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  
+  #couplesSetup.section {
+    padding: var(--space-5) var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .petra-logo {
+    max-width: 220px;
+  }
+  
+  .main-heading.center {
+    font-size: 2rem;  /* Slightly smaller on mobile */
+  }
+}
