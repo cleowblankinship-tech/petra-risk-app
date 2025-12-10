@@ -1,20 +1,6 @@
 var ADVISOR_PASSCODE = 'petra';
 var isAdvisorView = false;
 
-
-// Results Display
-function displayResults(finalScore, behavioralScore, traditionalScore, riskBand, rbClass) {
-    document.getElementById('results').style.display = 'block';
-    document.getElementById('mainScore').textContent = finalScore;
-    document.getElementById('behavioralScore').textContent = behavioralScore;
-    document.getElementById('traditionalScore').textContent = traditionalScore;
-    document.getElementById('riskBand').textContent = riskBand;
-    document.getElementById('riskBand').className = 'risk-band ' + rbClass;
-    document.getElementById('progressFill').style.width = finalScore + '%';
-    
-    displayScoreInterpretation(finalScore);
-    displayRiskScale(finalScore);
-    
 /**
  * Show splash screen for 4 seconds over the results
  */
@@ -31,6 +17,19 @@ function showSplashThenDisplayResults() {
     }
   }, 4000);
 }
+// Results Display
+function displayResults(finalScore, behavioralScore, traditionalScore, riskBand, rbClass) {
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('mainScore').textContent = finalScore;
+    document.getElementById('behavioralScore').textContent = behavioralScore;
+    document.getElementById('traditionalScore').textContent = traditionalScore;
+    document.getElementById('riskBand').textContent = riskBand;
+    document.getElementById('riskBand').className = 'risk-band ' + rbClass;
+    document.getElementById('progressFill').style.width = finalScore + '%';
+    
+    displayScoreInterpretation(finalScore);
+    displayRiskScale(finalScore);
+
 // PDF download button removed - results are emailed automatically
     
     // Show advisor sections if in advisor view
@@ -1475,6 +1474,7 @@ function calculateScore() {
     // Show splash screen for 4 seconds (covers results with high z-index)
     showSplashThenDisplayResults();
 }
+
 function calculateBehavioralScores(values) {
     return {
         lossAversion: ((1 - values.lossAversion) + (1 - values.lossAversion2)) / 2,  // FIX #1: Invert both
