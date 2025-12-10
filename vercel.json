@@ -1,4 +1,10 @@
 {
   "version": 2,
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/review/:token",
+      "destination": "/review/index.html"
+    }
+  ]
 }

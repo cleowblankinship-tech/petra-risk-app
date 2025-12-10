@@ -1658,3 +1658,51 @@ button,
         padding: 20px;
     }
 }
+/* Petra Logo */
+.petra-logo {
+  display: block;
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto var(--space-4);
+  opacity: 0.95;
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+  .petra-logo {
+    max-width: 220px;
+    margin-bottom: var(--space-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .petra-logo {
+    max-width: 180px;
+  }
+}
+/* ```
+
+---
+
+## What This Does:
+
+✅ **Centers the logo** - `display: block` with `margin: 0 auto`  
+✅ **Proportional sizing** - `max-width` constrains size, `height: auto` maintains aspect ratio  
+✅ **Uses Petra spacing** - `margin-bottom: var(--space-4)` creates space below logo using your existing spacing scale  
+✅ **Slight opacity** - `opacity: 0.95` gives it a subtle, sophisticated look  
+✅ **Responsive** - Scales down on tablets and mobile devices  
+
+---
+
+## Visual Result:
+```
+┌─────────────────────────┐
+│   [Petra Logo Image]    │  ← Centered, 280px max width
+│                         │
+│  RISK ALIGNMENT         │  ← Your existing heading
+│     ASSESSMENT          │
+│  Petra Financial        │  ← Your existing subhead
+│      Advisors           │
+│  ───────────────        │  ← Your existing gold line
+└─────────────────────────┘ */
