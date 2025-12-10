@@ -141,8 +141,9 @@
 
 /* 1. HEADER CONTAINER - Reduce top spacing by ~40% */
 .petra-header.page-hero {
-  padding: var(--space-4) 0 var(--space-3);  /* Reduced from --space-6 (48px) to --space-4 (32px) = ~33% reduction */
-  margin-bottom: var(--space-3);  /* Tighter bottom */
+  padding: var(--space-2) 0 var(--space-2);  /* much tighter top + bottom */
+  margin-top: 1;                             /* make sure nothing is pushing it down */
+  margin-bottom: var(--space-2);
 }
 
 /* 2. LOGO - Increase size 10-15%, reduce bottom spacing by ~50% */
@@ -151,7 +152,7 @@
   max-width: 320px;  /* Increased from 280px = ~14% larger */
   width: 100%;
   height: auto;
-  margin: 0 auto var(--space-2);  /* Changed bottom from --space-4 (32px) to --space-2 (16px) = 50% reduction */
+  margin: 0 auto var(--space-1);  /* Changed bottom from --space-4 (32px) to --space-2 (16px) = 50% reduction */
   opacity: 0.95;
 }
 
@@ -181,10 +182,10 @@
 
 /* 6. ASSESSMENT OPTIONS CARD - Reduce top margin by ~35% */
 #couplesSetup.section {
-  margin-top: var(--space-3);  /* Reduced from --space-5 (40px) to --space-3 (24px) = 40% reduction */
-  padding: var(--space-5) var(--space-5);  /* Slight padding increase for balance */
-  box-shadow: 0 2px 8px rgba(37, 40, 42, 0.06);  /* Subtle elevation */
+  margin-top: var(--space-2);     /* closer to the title block */
+  padding: var(--space-5) var(--space-5);
 }
+
 
 /* Also apply to clientInfoSection if visible */
 #clientInfoSection.section {

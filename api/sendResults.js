@@ -119,8 +119,8 @@ This assessment contains complete client responses and behavioral analysis.
 For advisor use only. Not for client distribution.
 
 © ${new Date().getFullYear()} Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
+2 N Nevada Ave. Suite 1300
+Colorado Springs, CO 80903
 www.petrafinancial.com
 
 ═══════════════════════════════════════════════════════════════════
