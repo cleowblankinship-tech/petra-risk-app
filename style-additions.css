@@ -141,18 +141,16 @@
 
 /* 1. HEADER CONTAINER - Reduce top spacing by ~40% */
 .petra-header.page-hero {
-  padding: var(--space-2) 0 var(--space-2);  /* much tighter top + bottom */
-  margin-top: 1;                             /* make sure nothing is pushing it down */
-  margin-bottom: var(--space-2);
+  padding: var(--space-3) 0 var(--space-1);  /* UPDATED from --space-4 and --space-3 */
+  margin-bottom: var(--space-2);              /* UPDATED from --space-3 */
 }
 
-/* 2. LOGO - Increase size 10-15%, reduce bottom spacing by ~50% */
 .petra-logo {
   display: block;
-  max-width: 320px;  /* Increased from 280px = ~14% larger */
+  max-width: 320px;
   width: 100%;
   height: auto;
-  margin: 0 auto var(--space-1);  /* Changed bottom from --space-4 (32px) to --space-2 (16px) = 50% reduction */
+  margin: 0 auto var(--space-1);  /* UPDATED from var(--space-2) */
   opacity: 0.95;
 }
 
@@ -299,4 +297,44 @@
 .mode-btn-primary,
 .mode-btn-secondary {
   transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* ============================================================================
+   SPLASH SCREEN
+   ============================================================================ */
+
+/* Full-screen splash overlay */
+.petra-splash {
+  position: fixed;
+  inset: 0;
+  background: var(--petra-warm-10, #f8f7f4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Centered splash image with fade-in */
+.petra-splash-img {
+  max-width: 320px;
+  width: 80%;
+  height: auto;
+  opacity: 0;
+  animation: petra-splash-fade 1.2s ease-out forwards;
+}
+
+/* Fade-in animation */
+@keyframes petra-splash-fade {
+  from { 
+    opacity: 0; 
+    transform: translateY(8px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Hidden utility (if not already defined) */
+.hidden {
+  display: none !important;
 }

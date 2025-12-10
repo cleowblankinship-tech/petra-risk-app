@@ -1,6 +1,7 @@
 var ADVISOR_PASSCODE = 'petra';
 var isAdvisorView = false;
 
+
 // Results Display
 function displayResults(finalScore, behavioralScore, traditionalScore, riskBand, rbClass) {
     document.getElementById('results').style.display = 'block';
@@ -14,6 +15,22 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     displayScoreInterpretation(finalScore);
     displayRiskScale(finalScore);
     
+/**
+ * Show splash screen for 4 seconds over the results
+ */
+function showSplashThenDisplayResults() {
+  const splash = document.getElementById('petra-splash');
+  if (splash) {
+    splash.classList.remove('hidden');
+  }
+
+  // After 4 seconds, hide splash (revealing results underneath)
+  setTimeout(() => {
+    if (splash) {
+      splash.classList.add('hidden');
+    }
+  }, 4000);
+}
 // PDF download button removed - results are emailed automatically
     
     // Show advisor sections if in advisor view
@@ -1452,10 +1469,12 @@ function calculateScore() {
         }
     }
     
-    // Display results
+// Display results (renders them in background)
     displayResults(finalScore, Math.round(behavioralPoints), Math.round(traditionalPoints), riskBandData.riskBand, riskBandData.rbClass);
+    
+    // Show splash screen for 4 seconds (covers results with high z-index)
+    showSplashThenDisplayResults();
 }
-
 function calculateBehavioralScores(values) {
     return {
         lossAversion: ((1 - values.lossAversion) + (1 - values.lossAversion2)) / 2,  // FIX #1: Invert both
