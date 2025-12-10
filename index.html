@@ -15,54 +15,54 @@
 
   <!-- Main Styles -->
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="style-additions.css">  <!-- CB added to call the new stylesheet.css file - instructions not from Claude-->
+  <link rel="stylesheet" href="style-additions.css">
 </head>
 
 <body>
     <div class="container">
-        <!-- UPDATED: Centered hero with subhead and gold rule -->
+        <!-- Hero Header -->
         <header class="petra-header page-hero">
-    <img src="/assets/petra-hero-title.svg" alt="Risk Alignment Assessment" class="petra-hero-image">
-</header>
+            <img src="/assets/petra-hero-title.svg" alt="Risk Alignment Assessment" class="petra-hero-image">
+        </header>
 
-      <!-- NEW: Client Information Form - added this section from Claude on 12/9 to fix the variable labelling issue -->
-<div id="clientInfoSection" class="section" style="display: none;">
-    <h2 class="section-title">Your Information</h2>
-    <p class="section-subtitle">We need a few details to send your results to our advisors.</p>
-    
-    <div class="form-grid">
-        <div class="form-field">
-            <label class="input-label" for="clientFirstName">First Name *</label>
-            <input type="text" id="clientFirstName" name="firstName" class="name-input" required>
+        <!-- Client Information Form -->
+        <div id="clientInfoSection" class="section" style="display: none;">
+            <h2 class="section-title">Your Information</h2>
+            <p class="section-subtitle">We need a few details to send your results to our advisors.</p>
+            
+            <div class="form-grid">
+                <div class="form-field">
+                    <label class="input-label" for="clientFirstName">First Name *</label>
+                    <input type="text" id="clientFirstName" name="firstName" class="name-input" required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="input-label" for="clientLastName">Last Name *</label>
+                    <input type="text" id="clientLastName" name="lastName" class="name-input" required>
+                </div>
+                
+                <div class="form-field full-width">
+                    <label class="input-label" for="clientEmail">Email *</label>
+                    <input type="email" id="clientEmail" name="clientEmail" class="name-input" required>
+                </div>
+                
+                <div class="form-field full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="consentCheckbox" name="consent" required>
+                        <span>I authorize Petra Financial Advisors to store and review my questionnaire responses for planning purposes and to contact me about them. I understand my information will be handled according to Petra's Privacy Policy. *</span>
+                    </label>
+                </div>
+                
+                <div class="form-field full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="wantsCopyCheckbox" name="emailMe">
+                        <span>Email me my results</span>
+                    </label>
+                </div>
+            </div>
         </div>
-        
-        <div class="form-field">
-            <label class="input-label" for="clientLastName">Last Name *</label>
-            <input type="text" id="clientLastName" name="lastName" class="name-input" required>
-        </div>
-        
-        <div class="form-field full-width">
-            <label class="input-label" for="clientEmail">Email *</label>
-            <input type="email" id="clientEmail" name="clientEmail" class="name-input" required>
-        </div>
-        
-        <div class="form-field full-width">
-            <label class="checkbox-label">
-                <input type="checkbox" id="consentCheckbox" name="consent" required>
-                <span>I authorize Petra Financial Advisors to store and review my questionnaire responses for planning purposes and to contact me about them. I understand my information will be handled according to Petra's Privacy Policy. *</span>
-            </label>
-        </div>
-        
-        <div class="form-field full-width">
-            <label class="checkbox-label">
-                <input type="checkbox" id="wantsCopyCheckbox" name="emailMe">
-                <span>Email me my results</span>
-            </label>
-        </div>
-    </div>
-</div>
 
-        <!-- UPDATED: Added .cta-buttons wrapper with z-index -->
+        <!-- Assessment Mode Selection -->
         <div id="couplesSetup" class="section" style="text-align: center;">
             <h3 style="color: var(--petra-charcoal); margin-bottom: 20px;">Who's taking this assessment?</h3>
             <div class="cta-buttons" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
@@ -88,14 +88,36 @@
             </div>
         </div>
 
+        <!-- Current Person Banner (for couples) -->
         <div id="currentPerson" class="current-person-banner" style="display: none;">
             <strong style="color: #4f46e5; font-size: 1.1rem;">Currently answering for: <span id="currentPersonName"></span></strong>
         </div>
 
-        <div id="questionnaire" style="display: none;"></div>
+        <!-- Progress Bar -->
+        <div id="progressBarContainer" class="progress-bar-container" style="display: none;">
+            <div class="progress-bar-track">
+                <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
+            <p class="progress-bar-label"><span id="progressPercent">0</span>% Complete</p>
+        </div>
 
+        <!-- Questionnaire (populated by JavaScript) -->
+        <div id="questionnaire" style="display: none;">
+            <!-- Questions will be dynamically inserted here by script.js -->
+            <!-- Each section should be wrapped in: -->
+            <!-- <div class="question-section">
+                    <div class="section-header">
+                        <h2>Section Title</h2>
+                        <p>Section description</p>
+                    </div>
+                    [question blocks here]
+                 </div> -->
+        </div>
+
+        <!-- Calculate Button -->
         <button type="button" id="calculateBtn" class="calculate-btn" style="display: none;">Calculate Risk Alignment Score</button>
 
+        <!-- Partner Transition Screen -->
         <div id="partnerTransition" class="partner-transition" style="display: none;">
             <h3 style="color: var(--petra-gold); margin-bottom: 20px;">Ready for your partner?</h3>
             <p style="color: var(--petra-charcoal); margin-bottom: 25px; font-size: 1.1rem;">
@@ -105,14 +127,16 @@
             <button onclick="startPerson2()" class="partner-start-btn">Start Partner Assessment</button>
         </div>
 
+        <!-- Results Section -->
         <div id="results" class="results" style="display: none;">
-            <!-- NEW: Confirmation Bar -->
+            <!-- Confirmation Bar -->
             <div id="confirmationBar" class="confirmation-bar" style="display: none;">
                 <div class="confirmation-content">
                     <span id="confirmationMessage"></span>
                 </div>
             </div>
 
+            <!-- Main Score Display -->
             <div class="score-display">
                 <div class="main-score" id="mainScore">--</div>
                 <div class="score-label">Risk Alignment Score</div>
@@ -122,6 +146,7 @@
                 </div>
             </div>
 
+            <!-- Component Scores -->
             <div class="sub-scores">
                 <div class="sub-score">
                     <div class="sub-score-value" id="behavioralScore">--</div>
@@ -135,11 +160,13 @@
                 </div>
             </div>
 
+            <!-- Score Interpretation -->
             <div id="scoreInterpretation" class="score-interpretation" style="display: none;">
                 <h3 id="interpretationTitle">Your Risk Profile</h3>
                 <p id="interpretationText"></p>
             </div>
 
+            <!-- Risk Scale Visualization -->
             <div id="riskScale" class="risk-scale-visualization" style="display: none;">
                 <h4>Risk Profile Scale</h4>
                 <div class="risk-scale-bar">
@@ -170,61 +197,64 @@
                 </div>
             </div>
 
-<div id="coupleComparison" class="couple-comparison" style="display: none;">
-    <h3 class="couple-comparison-title">Couple Comparison</h3>
-    
-    <div class="couple-scores-header">
-        <div class="couple-score-card couple-score-card-1">
-            <h4 id="person1ComparisonNameTop"></h4>
-            <div class="couple-main-score" id="person1ComparisonScoreTop"></div>
-            <div class="couple-risk-band" id="person1ComparisonBandTop"></div>
-            <div class="couple-components">
-                <div class="couple-component-item">
-                    <span class="couple-component-label">Behavioral:</span>
-                    <span class="couple-component-value" id="person1ComparisonBehavioralTop"></span>
-                </div>
-                <div class="couple-component-item">
-                    <span class="couple-component-label">Traditional:</span>
-                    <span class="couple-component-value" id="person1ComparisonTraditionalTop"></span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="couple-score-card couple-score-card-2">
-            <h4 id="person2ComparisonNameTop"></h4>
-            <div class="couple-main-score couple-main-score-2" id="person2ComparisonScoreTop"></div>
-            <div class="couple-risk-band" id="person2ComparisonBandTop"></div>
-            <div class="couple-components">
-                <div class="couple-component-item">
-                    <span class="couple-component-label">Behavioral:</span>
-                    <span class="couple-component-value" id="person2ComparisonBehavioralTop"></span>
-                </div>
-                <div class="couple-component-item">
-                    <span class="couple-component-label">Traditional:</span>
-                    <span class="couple-component-value" id="person2ComparisonTraditionalTop"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="coupleNarrative" class="couple-narrative">
-        <h4>What this means for you as a couple:</h4>
-        <p id="coupleNarrativeText"></p>
-    </div>
-</div>
+            <!-- Couple Comparison -->
+            <div id="coupleComparison" class="couple-comparison" style="display: none;">
+                <h3 class="couple-comparison-title">Couple Comparison</h3>
                 
-<!-- Download PDF button removed per new workflow - PDFs are emailed automatically -->
-<button id="printFullBtn" class="print-btn" onclick="printFullAssessment()" style="display: none;">Print Full Assessment</button>
+                <div class="couple-scores-header">
+                    <div class="couple-score-card couple-score-card-1">
+                        <h4 id="person1ComparisonNameTop"></h4>
+                        <div class="couple-main-score" id="person1ComparisonScoreTop"></div>
+                        <div class="couple-risk-band" id="person1ComparisonBandTop"></div>
+                        <div class="couple-components">
+                            <div class="couple-component-item">
+                                <span class="couple-component-label">Behavioral:</span>
+                                <span class="couple-component-value" id="person1ComparisonBehavioralTop"></span>
+                            </div>
+                            <div class="couple-component-item">
+                                <span class="couple-component-label">Traditional:</span>
+                                <span class="couple-component-value" id="person1ComparisonTraditionalTop"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="couple-score-card couple-score-card-2">
+                        <h4 id="person2ComparisonNameTop"></h4>
+                        <div class="couple-main-score couple-main-score-2" id="person2ComparisonScoreTop"></div>
+                        <div class="couple-risk-band" id="person2ComparisonBandTop"></div>
+                        <div class="couple-components">
+                            <div class="couple-component-item">
+                                <span class="couple-component-label">Behavioral:</span>
+                                <span class="couple-component-value" id="person2ComparisonBehavioralTop"></span>
+                            </div>
+                            <div class="couple-component-item">
+                                <span class="couple-component-label">Traditional:</span>
+                                <span class="couple-component-value" id="person2ComparisonTraditionalTop"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="coupleNarrative" class="couple-narrative">
+                    <h4>What this means for you as a couple:</h4>
+                    <p id="coupleNarrativeText"></p>
+                </div>
+            </div>
 
-            <!-- NEW: Footer line -->
+            <!-- Action Buttons -->
+            <button id="printFullBtn" class="print-btn" onclick="printFullAssessment()" style="display: none;">Print Full Assessment</button>
+
+            <!-- Advisor Follow-up Message -->
             <div id="advisorFollowup" class="advisor-followup" style="display: none;">
                 <p>A Petra advisor will review your responses and follow up shortly.</p>
             </div>
 
+            <!-- Disclosure -->
             <div class="disclosure">
                 <strong>Disclosure:</strong> This assessment is for educational purposes only and should not be considered investment advice.
             </div>
 
+            <!-- Advisor-Only Sections -->
             <div class="advisor-only" id="advisorSections" style="display: none;">
                 <div class="knowledge-overlay">
                     <h3>Financial Knowledge (Diagnostic Overlay)</h3>
@@ -252,30 +282,31 @@
         </div>
     </div>
     
-<details class="advisor-fab" id="advisorAccess">
-  <summary class="fab-button" aria-label="Advisor access">Advisor</summary>
+    <!-- Advisor Access FAB -->
+    <details class="advisor-fab" id="advisorAccess">
+        <summary class="fab-button" aria-label="Advisor access">Advisor</summary>
 
-  <div class="fab-panel card">
-    <label for="passcodeInput" class="label">Enter passcode</label>
-    <input id="passcodeInput" type="password" class="input" placeholder="Enter passcode" />
-    <div class="actions">
-      <button class="btn-primary" onclick="checkPasscode()">Enter</button>
-      <button class="btn-ghost" onclick="document.getElementById('advisorAccess').removeAttribute('open'); document.getElementById('passcodeInput').value=''; return false;">Cancel</button>
+        <div class="fab-panel card">
+            <label for="passcodeInput" class="label">Enter passcode</label>
+            <input id="passcodeInput" type="password" class="input" placeholder="Enter passcode" />
+            <div class="actions">
+                <button class="btn-primary" onclick="checkPasscode()">Enter</button>
+                <button class="btn-ghost" onclick="document.getElementById('advisorAccess').removeAttribute('open'); document.getElementById('passcodeInput').value=''; return false;">Cancel</button>
+            </div>
+        </div>
+    </details>
+
+    <!-- Splash Screen -->
+    <div id="petra-splash" class="petra-splash hidden">
+        <img
+            src="./assets/pre-results-message.svg"
+            alt="Preparing your results..."
+            class="petra-splash-img"
+        />
     </div>
-  </div>
-</details>
 
+    <!-- Scripts -->
     <script src="script.js"></script>
-    <script src="submission-handler.js"></script> <!--CB added this without Claude instruction - need to call the new JS file-->
-
-    <!-- Splash screen for results loading -->
-<div id="petra-splash" class="petra-splash hidden">
-  <img
-    src="./assets/pre-results-message.svg"
-    alt="Preparing your results..."
-    class="petra-splash-img"
-  />
-</div>
-
+    <script src="submission-handler.js"></script>
 </body>
 </html>
