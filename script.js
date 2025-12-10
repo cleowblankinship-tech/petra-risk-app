@@ -10,12 +10,12 @@ function showSplashThenDisplayResults() {
     splash.classList.remove('hidden');
   }
 
-  // After 4 seconds, hide splash (revealing results underneath)
+  // After 6 seconds, hide splash (revealing results underneath)
   setTimeout(() => {
     if (splash) {
       splash.classList.add('hidden');
     }
-  }, 4000);
+  }, 6000);  // CHANGED from 4000 to 6000
 }
 // Results Display
 function displayResults(finalScore, behavioralScore, traditionalScore, riskBand, rbClass) {
