@@ -1,19 +1,40 @@
 // submission-handler.js
-// Add this to the end of script.js or include as separate file
+// Handles client info collection and backend submission
 
 // Show client info form before questionnaire (solo mode)
-function startSolo() {
+const originalStartSolo = startSolo;
+startSolo = function() {
     isCoupleMode = false;
     document.getElementById('couplesSetup').style.display = 'none';
     document.getElementById('clientInfoSection').style.display = 'block';
     document.getElementById('questionnaire').style.display = 'block';
     document.getElementById('calculateBtn').style.display = 'block';
-}
+};
 
-// Override the existing calculate function to include client info
+// Show client info form for couple mode
+const originalBeginCoupleAssessment = beginCoupleAssessment;
+beginCoupleAssessment = function() {
+    person1Name = document.getElementById('person1Name').value.trim();
+    person2Name = document.getElementById('person2Name').value.trim();
+    
+    if (!person1Name || !person2Name) {
+        alert('Please enter both names to continue.');
+        return;
+    }
+    
+    isCoupleMode = true;
+    currentPerson = 1;
+    document.getElementById('couplesSetup').style.display = 'none';
+    document.getElementById('clientInfoSection').style.display = 'block';
+    document.getElementById('currentPerson').style.display = 'block';
+    document.getElementById('currentPersonName').textContent = person1Name;
+    document.getElementById('questionnaire').style.display = 'block';
+    document.getElementById('calculateBtn').style.display = 'block';
+};
+
+// Override calculateScore to add validation and submission
 const originalCalculateScore = calculateScore;
-
-calculateScore = function () {
+calculateScore = function() {
     // First validate client info fields
     const firstName = document.getElementById('clientFirstName')?.value.trim();
     const lastName  = document.getElementById('clientLastName')?.value.trim();
@@ -33,26 +54,33 @@ calculateScore = function () {
         return;
     }
 
-    // Everything is good → continue with original scoring logic
-    originalCalculateScore();
+    // Call the original scoring logic
+    originalCalculateScore.call(this);
     
     // After results are displayed, send to backend
     setTimeout(() => {
         submitToBackend();
-    }, 500);
+    }, 1000);
 };
 
 // Function to build complete payload and submit
 async function submitToBackend() {
     try {
+        // Make sure lastComputed exists
+        if (!lastComputed) {
+            console.error('No score data available to submit');
+            return;
+        }
+
         // Gather client info
-       const clientInfo = {
-        firstName: document.getElementById('clientFirstName').value.trim(),
-        lastName: document.getElementById('clientLastName').value.trim(),
-        email: document.getElementById('clientEmail').value.trim(),
-        consent: document.getElementById('consentCheckbox').checked,
-        wantsCopy: document.getElementById('wantsCopyCheckbox')?.checked || false
-};
+        const clientInfo = {
+            firstName: document.getElementById('clientFirstName').value.trim(),
+            lastName: document.getElementById('clientLastName').value.trim(),
+            email: document.getElementById('clientEmail').value.trim(),
+            consent: document.getElementById('consentCheckbox').checked,
+            wantsCopy: document.getElementById('wantsCopyCheckbox')?.checked || false
+        };
+        
         // Prepare payload
         const payload = {
             client: clientInfo,
@@ -67,6 +95,7 @@ async function submitToBackend() {
                     hour12: false
                 }),
                 version: '1.0',
+                sessionId: sessionId || 'unknown',
                 householdId: isCoupleMode ? sessionId : null
             },
             scores: {
@@ -90,10 +119,18 @@ async function submitToBackend() {
         }
         
         // Add flags
-        if (lastComputed.flags.longevity) payload.flags.push('Longevity Planning');
-        if (lastComputed.flags.caregiving) payload.flags.push('Caregiving Consideration');
-        if (lastComputed.knowledge.flag === 'overconfidence') payload.flags.push('Knowledge: Overconfident');
-        if (lastComputed.knowledge.flag === 'underconfidence') payload.flags.push('Knowledge: Underconfident');
+        if (lastComputed.flags && lastComputed.flags.longevity) {
+            payload.flags.push('Longevity Planning');
+        }
+        if (lastComputed.flags && lastComputed.flags.caregiving) {
+            payload.flags.push('Caregiving Consideration');
+        }
+        if (lastComputed.knowledge && lastComputed.knowledge.flag === 'overconfidence') {
+            payload.flags.push('Knowledge: Overconfident');
+        }
+        if (lastComputed.knowledge && lastComputed.knowledge.flag === 'underconfidence') {
+            payload.flags.push('Knowledge: Underconfident');
+        }
         
         // Gather all answers
         const allQuestions = questions.behavioral.concat(questions.traditional).concat(questions.knowledge);
@@ -112,6 +149,8 @@ async function submitToBackend() {
             }
         });
         
+        console.log('Submitting payload:', payload);
+        
         // Send to API
         const response = await fetch('/api/sendResults', {
             method: 'POST',
@@ -121,13 +160,22 @@ async function submitToBackend() {
             body: JSON.stringify(payload)
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const result = await response.json();
+        
+        console.log('API response:', result);
         
         // Show confirmation bar
         showConfirmation(clientInfo.wantsCopy, clientInfo.email, result.success);
         
         // Show advisor followup message
-        document.getElementById('advisorFollowup').style.display = 'block';
+        const advisorFollowup = document.getElementById('advisorFollowup');
+        if (advisorFollowup) {
+            advisorFollowup.style.display = 'block';
+        }
         
     } catch (error) {
         console.error('Error submitting to backend:', error);
@@ -153,41 +201,24 @@ function showConfirmation(wantsEmail, email, success) {
     const confirmationBar = document.getElementById('confirmationBar');
     const confirmationMessage = document.getElementById('confirmationMessage');
     
+    if (!confirmationBar || !confirmationMessage) {
+        console.error('Confirmation elements not found');
+        return;
+    }
+    
     if (!success) {
         confirmationBar.classList.add('error');
-        confirmationMessage.textContent = "We couldn't email your copy, but you can download it here.";
+        confirmationMessage.textContent = "We couldn't email your copy, but your results are displayed below.";
     } else if (wantsEmail) {
         confirmationMessage.textContent = `Thanks—your responses are in. We'll email a copy to ${email}.`;
     } else {
-        confirmationMessage.textContent = "Thanks—your responses are in.";
+        confirmationMessage.textContent = "Thanks—your responses are in. We'll email a copy to our advisors.";
     }
     
     confirmationBar.style.display = 'block';
     
-    // Scroll to results
+    // Scroll to confirmation
     setTimeout(() => {
         confirmationBar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 100);
 }
-
-// Override couple mode start to show client info
-const originalBeginCoupleAssessment = beginCoupleAssessment;
-
-beginCoupleAssessment = function() {
-    person1Name = document.getElementById('person1Name').value.trim();
-    person2Name = document.getElementById('person2Name').value.trim();
-    
-    if (!person1Name || !person2Name) {
-        alert('Please enter both names to continue.');
-        return;
-    }
-    
-    isCoupleMode = true;
-    currentPerson = 1;
-    document.getElementById('couplesSetup').style.display = 'none';
-    document.getElementById('clientInfoSection').style.display = 'block';
-    document.getElementById('currentPerson').style.display = 'block';
-    document.getElementById('currentPersonName').textContent = person1Name;
-    document.getElementById('questionnaire').style.display = 'block';
-    document.getElementById('calculateBtn').style.display = 'block';
-};
