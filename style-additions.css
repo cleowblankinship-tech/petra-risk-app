@@ -144,40 +144,38 @@
   padding: var(--space-3) 0 var(--space-1);  /* UPDATED from --space-4 and --space-3 */
   margin-bottom: var(--space-2);              /* UPDATED from --space-3 */
 }
+/* ============================================================================
+   HERO IMAGE (replaces logo + title stack)
+   ============================================================================ */
 
-.petra-logo {
+.petra-hero-image {
   display: block;
-  max-width: 320px;
+  max-width: 100%;
   width: 100%;
   height: auto;
-  margin: 0 auto var(--space-1);  /* UPDATED from var(--space-2) */
-  opacity: 0.95;
+  margin: 0 auto;
 }
 
-/* 3. TITLE - Reduce spacing to subtitle */
-.main-heading.center {
-  margin-bottom: var(--space-1);  /* Reduced from --space-2 for tighter connection */
-  letter-spacing: 0.03em;
+/* Header container - simplified for single image */
+.petra-header.page-hero {
+  padding: var(--space-4) 0 var(--space-3);
+  margin-bottom: var(--space-3);
+  text-align: center;
 }
 
-/* 4. SUBTITLE - Slightly larger font, tighter letter-spacing, minimal gap to divider */
-.subhead {
-  font-size: 0.875rem;  /* Increased from 0.8125rem = ~7% larger */
-  letter-spacing: 0.08em;  /* Reduced from 0.1em for better density */
-  margin-top: var(--space-1);
-  margin-bottom: var(--space-1);  /* Minimal gap to divider */
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .petra-header.page-hero {
+    padding: var(--space-3) 0 var(--space-2);
+    margin-bottom: var(--space-2);
+  }
 }
 
-/* 5. GOLD DIVIDER - Remove top margin, soften color slightly */
-.hr-gold.narrow {
-  margin-top: 0;
-  margin-bottom: 0;
-  width: 80px;
-  height: 2px;
-  background: #A88F2F;  /* Softened from #9A7611 = ~8% lighter for better contrast */
-  border: none;
+@media (max-width: 480px) {
+  .petra-header.page-hero {
+    padding: var(--space-2) 0 var(--space-1);
+  }
 }
-
 /* 6. ASSESSMENT OPTIONS CARD - Reduce top margin by ~35% */
 #couplesSetup.section {
   margin-top: var(--space-2);     /* closer to the title block */
