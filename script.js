@@ -590,21 +590,26 @@ document.addEventListener('DOMContentLoaded', function() {
 function startQuestionnaire() {
     // Hide client info
     document.getElementById('clientInfoSection').style.display = 'none';
-    
+
     // Show questionnaire container
     document.getElementById('questionnaire').style.display = 'block';
-    
+
     // Initialize section navigation
     initializeSectionNavigation();
-    
+
+    // Force show first section (ensure it's visible)
+    setTimeout(() => {
+        showSection(0);
+    }, 0);
+
     // Show and initialize progress bar
     document.getElementById('progressBarContainer').style.display = 'block';
     updateProgressBar();
-    
+
     // Show current person banner if couples mode
     if (isCoupleMode) {
         document.getElementById('currentPerson').style.display = 'block';
-        document.getElementById('currentPersonName').textContent = 
+        document.getElementById('currentPersonName').textContent =
             currentPerson === 1 ? person1Name : person2Name;
     }
 }
