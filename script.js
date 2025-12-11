@@ -234,31 +234,6 @@ function updateSectionProgress() {
     }
   });
 }
-  segments.forEach((segment, index) => {
-    const fill = segment.querySelector('.section-progress-fill');
-    
-    if (index < currentSectionIndex) {
-      // Completed section
-      segment.classList.add('completed');
-      segment.classList.remove('active');
-    } else if (index === currentSectionIndex) {
-      // Current section
-      segment.classList.add('active');
-      segment.classList.remove('completed');
-    } else {
-      // Future section
-      segment.classList.remove('active', 'completed');
-    }
-  });
-
-
-  // Calculate percentage
-  const percent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
-  
-  // Update UI
-  progressFill.style.width = percent + '%';
-  progressPercent.textContent = percent;
-
 
 // ============================================================================
 // CORRECT ANSWERS AND MAPPINGS
