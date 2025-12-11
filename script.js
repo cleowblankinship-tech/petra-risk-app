@@ -618,10 +618,6 @@ function startQuestionnaire() {
     // Initialize section navigation (this calls showSection(0))
     initializeSectionNavigation();
 
-    // Show and initialize progress bar
-    document.getElementById('progressBarContainer').style.display = 'block';
-    updateProgressBar();
-
     // Show current person banner if couples mode
     if (isCoupleMode) {
         document.getElementById('currentPerson').style.display = 'block';
