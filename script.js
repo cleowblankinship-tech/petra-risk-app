@@ -55,7 +55,7 @@ function updateProgressBar() {
   if (!progressContainer || !progressFill || !progressPercent) return;
   
   // Count total questions and answered questions
-  const allQuestions = document.querySelectorAll('.question');
+  const allQuestions = document.querySelectorAll('.question-block');
   const totalQuestions = allQuestions.length;
   
   let answeredCount = 0;
@@ -76,6 +76,14 @@ function updateProgressBar() {
   });
   answeredCount += Object.keys(likertGroups).length;
   
+  // Calculate percentage
+  const percent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+  
+  // Update UI
+  progressFill.style.width = percent + '%';
+  progressPercent.textContent = percent;
+}
+
 /**
  * Initialize section navigation
  */
@@ -209,6 +217,23 @@ function isSectionComplete(sectionIndex) {
 function updateSectionProgress() {
   const segments = document.querySelectorAll('.section-progress-segment');
   
+  segments.forEach((segment, index) => {
+    const fill = segment.querySelector('.section-progress-fill');
+    
+    if (index < currentSectionIndex) {
+      // Completed section
+      segment.classList.add('completed');
+      segment.classList.remove('active');
+    } else if (index === currentSectionIndex) {
+      // Current section
+      segment.classList.add('active');
+      segment.classList.remove('completed');
+    } else {
+      // Future section
+      segment.classList.remove('active', 'completed');
+    }
+  });
+}
   segments.forEach((segment, index) => {
     const fill = segment.querySelector('.section-progress-fill');
     
