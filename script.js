@@ -48,42 +48,7 @@ function showSplashThenDisplayResults() {
  * Update progress bar based on answered questions
  */
 function updateProgressBar() {
-  const progressContainer = document.getElementById('progressBarContainer');
-  const progressFill = document.getElementById('progressBarFill');
-  const progressPercent = document.getElementById('progressPercent');
-  
-  if (!progressContainer || !progressFill || !progressPercent) return;
-  
-  // Count total questions and answered questions
-  const allQuestions = document.querySelectorAll('.question-block');
-  const totalQuestions = allQuestions.length;
-  
-  let answeredCount = 0;
-  
-  // Count radio button answers
-  const radioGroups = {};
-  document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
-    radioGroups[radio.name] = true;
-  });
-  answeredCount += Object.keys(radioGroups).length;
-  
-  // Count likert answers
-  const likertAnswers = document.querySelectorAll('.likert-option.selected');
-  const likertGroups = {};
-  likertAnswers.forEach(opt => {
-    const name = opt.dataset.name;
-    if (name) likertGroups[name] = true;
-  });
-  answeredCount += Object.keys(likertGroups).length;
-  
-  // Calculate percentage
-  const percent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
-
-  // Update UI
-  progressFill.style.width = percent + '%';
-  progressPercent.textContent = percent;
-
-  // Also update the top progress bar
+  // Update the top progress bar
   updateSectionProgress();
 }
 
