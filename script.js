@@ -1576,3 +1576,11 @@ function getRiskBandColor(score) {
 function printFullAssessment() {
     window.print();
 }
+// Make sure couples setup shows on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Show the initial card
+    const couplesSetup = document.getElementById('couplesSetup');
+    if (couplesSetup) {
+        couplesSetup.style.display = 'block';
+    }
+});
