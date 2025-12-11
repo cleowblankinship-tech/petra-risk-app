@@ -250,7 +250,7 @@ function updateSectionProgress() {
       segment.classList.remove('active', 'completed');
     }
   });
-}
+
 
   // Calculate percentage
   const percent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
@@ -258,7 +258,7 @@ function updateSectionProgress() {
   // Update UI
   progressFill.style.width = percent + '%';
   progressPercent.textContent = percent;
-}
+
 
 // ============================================================================
 // CORRECT ANSWERS AND MAPPINGS
