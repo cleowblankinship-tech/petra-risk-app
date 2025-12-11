@@ -78,10 +78,13 @@ function updateProgressBar() {
   
   // Calculate percentage
   const percent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
-  
+
   // Update UI
   progressFill.style.width = percent + '%';
   progressPercent.textContent = percent;
+
+  // Also update the top progress bar
+  updateSectionProgress();
 }
 
 /**
@@ -90,8 +93,8 @@ function updateProgressBar() {
 let sectionNavigationInitialized = false;
 
 function initializeSectionNavigation() {
-  // Show section progress bar
-  document.getElementById('sectionProgressBar').style.display = 'block';
+  // Show top progress bar
+  document.getElementById('topProgressBar').style.display = 'block';
 
   // Show navigation buttons
   document.getElementById('sectionNavigation').style.display = 'flex';
@@ -217,27 +220,37 @@ function isSectionComplete(sectionIndex) {
 }
 
 /**
- * Update section progress bar
+ * Update top progress bar based on section completion
  */
 function updateSectionProgress() {
-  const segments = document.querySelectorAll('.section-progress-segment');
-  
-  segments.forEach((segment, index) => {
-    const fill = segment.querySelector('.section-progress-fill');
-    
-    if (index < currentSectionIndex) {
-      // Completed section
-      segment.classList.add('completed');
-      segment.classList.remove('active');
-    } else if (index === currentSectionIndex) {
-      // Current section
-      segment.classList.add('active');
-      segment.classList.remove('completed');
-    } else {
-      // Future section
-      segment.classList.remove('active', 'completed');
+  const progressFill = document.getElementById('topProgressFill');
+  if (!progressFill) return;
+
+  // Calculate progress: each section represents 33.33% of total progress
+  // Section 0: 0-33%, Section 1: 33-66%, Section 2: 66-100%
+  const progressPerSection = 100 / totalSections;
+  const baseProgress = currentSectionIndex * progressPerSection;
+
+  // Add partial progress within current section based on answered questions
+  const currentSectionQuestions = document.querySelectorAll('.question-section.active .question-block');
+  let answeredInSection = 0;
+
+  currentSectionQuestions.forEach(block => {
+    const radios = block.querySelectorAll('input[type="radio"]');
+    const likerts = block.querySelectorAll('.likert-option.selected');
+    if (radios.length > 0 && block.querySelector('input[type="radio"]:checked')) {
+      answeredInSection++;
+    } else if (likerts.length > 0) {
+      answeredInSection++;
     }
   });
+
+  const sectionProgress = currentSectionQuestions.length > 0
+    ? (answeredInSection / currentSectionQuestions.length) * progressPerSection
+    : 0;
+
+  const totalProgress = Math.min(baseProgress + sectionProgress, 100);
+  progressFill.style.width = totalProgress + '%';
 }
 
 // ============================================================================

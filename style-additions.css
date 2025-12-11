@@ -615,98 +615,47 @@
   }
 }
 /* ============================================================================
-   SECTION PROGRESS BAR (3-segment tracker)
+   MINIMAL TOP PROGRESS BAR
    ============================================================================ */
 
-.section-progress-bar {
-  position: sticky;
+.top-progress-bar {
+  position: fixed;
   top: 0;
-  z-index: 110;
-  background: linear-gradient(to bottom, #FEFDFB 0%, #F8F6F0 100%);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid rgba(154, 118, 17, 0.12);
-  box-shadow: 0 2px 8px rgba(37, 40, 42, 0.04);
-}
-
-.section-progress-track {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.section-progress-segment {
-  position: relative;
-  background: rgba(154, 118, 17, 0.1);
-  border-radius: 9999px;
-  height: 8px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 5px;
+  background: #FAF9F6;
+  z-index: 9999;
   overflow: hidden;
 }
 
-.section-progress-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
+.top-progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(to right, #9A7611 0%, #B8904A 50%, #CCA054 100%);
-  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 8px rgba(154, 118, 17, 0.3);
+  background: linear-gradient(
+    to right,
+    #6B7280 0%,        /* Conservative - cool gray */
+    #7EADAD 25%,       /* Balanced - teal */
+    #93A2BC 40%,       /* Balanced Growth - blue-gray */
+    #CCA054 65%,       /* Growth - gold */
+    #9A7611 85%,       /* Petra Gold */
+    #8B6F5C 100%       /* Aggressive Growth - muted clay */
+  );
+  transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 4px rgba(154, 118, 17, 0.2);
 }
 
-.section-progress-segment.active .section-progress-fill {
-  width: 100%;
-}
-
-.section-progress-segment.completed .section-progress-fill {
-  width: 100%;
-}
-
-.section-progress-label {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'brandon-grotesque', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #9A7611;
-  white-space: nowrap;
-  opacity: 0.5;
-  transition: opacity 300ms ease;
-}
-
-.section-progress-segment.active .section-progress-label,
-.section-progress-segment.completed .section-progress-label {
-  opacity: 1;
-}
-
-/* Mobile adjustments */
+/* Responsive - ensure full width on all devices */
 @media (max-width: 768px) {
-  .section-progress-bar {
-    padding: var(--space-2) var(--space-3);
-  }
-  
-  .section-progress-segment {
-    height: 6px;
-  }
-  
-  .section-progress-label {
-    font-size: 0.65rem;
-    top: calc(100% + 6px);
+  .top-progress-bar {
+    height: 4px;
   }
 }
 
 @media (max-width: 480px) {
-  .section-progress-track {
-    gap: var(--space-1);
-  }
-  
-  .section-progress-label {
-    font-size: 0.6rem;
+  .top-progress-bar {
+    height: 4px;
   }
 }
 
