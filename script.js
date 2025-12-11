@@ -87,21 +87,26 @@ function updateProgressBar() {
 /**
  * Initialize section navigation
  */
+let sectionNavigationInitialized = false;
+
 function initializeSectionNavigation() {
   // Show section progress bar
   document.getElementById('sectionProgressBar').style.display = 'block';
-  
+
   // Show navigation buttons
   document.getElementById('sectionNavigation').style.display = 'flex';
-  
+
   // Show first section
   currentSectionIndex = 0;
   showSection(0);
   updateSectionProgress();
-  
-  // Attach button handlers
-  document.getElementById('nextBtn').addEventListener('click', handleNextSection);
-  document.getElementById('backBtn').addEventListener('click', handleBackSection);
+
+  // Attach button handlers only once
+  if (!sectionNavigationInitialized) {
+    document.getElementById('nextBtn').addEventListener('click', handleNextSection);
+    document.getElementById('backBtn').addEventListener('click', handleBackSection);
+    sectionNavigationInitialized = true;
+  }
 }
 
 /**
@@ -591,16 +596,14 @@ function startQuestionnaire() {
     // Hide client info
     document.getElementById('clientInfoSection').style.display = 'none';
 
+    // Hide mode selection
+    document.getElementById('couplesSetup').style.display = 'none';
+
     // Show questionnaire container
     document.getElementById('questionnaire').style.display = 'block';
 
-    // Initialize section navigation
+    // Initialize section navigation (this calls showSection(0))
     initializeSectionNavigation();
-
-    // Force show first section (ensure it's visible)
-    setTimeout(() => {
-        showSection(0);
-    }, 0);
 
     // Show and initialize progress bar
     document.getElementById('progressBarContainer').style.display = 'block';
@@ -613,50 +616,15 @@ function startQuestionnaire() {
             currentPerson === 1 ? person1Name : person2Name;
     }
 }
-// Example: Add onclick to "Begin Assessment" button in solo mode
-function startSolo() {
+// ============================================================================
+// MODE SELECTION FUNCTIONS
+// ============================================================================
+
+window.startSolo = function() {
     isCoupleMode = false;
     document.getElementById('couplesSetup').style.display = 'none';
     document.getElementById('clientInfoSection').style.display = 'block';
-    
-    // Add continue button handler (you may need to add this button to clientInfoSection)
-    const continueBtn = document.getElementById('continueToQuestions'); // Add this button in HTML
-    if (continueBtn) {
-        continueBtn.onclick = function() {
-            // Validate client info
-            const firstName = document.getElementById('clientFirstName').value.trim();
-            const lastName = document.getElementById('clientLastName').value.trim();
-            const email = document.getElementById('clientEmail').value.trim();
-            const consent = document.getElementById('consentCheckbox').checked;
-            
-            if (!firstName || !lastName || !email || !consent) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            // Start questionnaire
-            startQuestionnaire();
-        };
-    }
-}
-// ============================================================================
-// COUPLES MODE FUNCTIONS
-// ============================================================================
 
-function beginCoupleAssessment() {
-    person1Name = document.getElementById('person1Name').value.trim();
-    person2Name = document.getElementById('person2Name').value.trim();
-    
-    if (!person1Name || !person2Name) {
-        alert('Please enter both names to continue.');
-        return;
-    }
-    
-    isCoupleMode = true;
-    currentPerson = 1;
-    document.getElementById('couplesSetup').style.display = 'none';
-    document.getElementById('clientInfoSection').style.display = 'block';
-    
     // Add continue button handler
     const continueBtn = document.getElementById('continueToQuestions');
     if (continueBtn) {
@@ -666,18 +634,65 @@ function beginCoupleAssessment() {
             const lastName = document.getElementById('clientLastName').value.trim();
             const email = document.getElementById('clientEmail').value.trim();
             const consent = document.getElementById('consentCheckbox').checked;
-            
+
             if (!firstName || !lastName || !email || !consent) {
                 alert('Please fill in all required fields.');
                 return;
             }
-            
+
+            // Start questionnaire
+            startQuestionnaire();
+        };
+    } else {
+        console.error('Continue button not found!');
+    }
+};
+
+window.startCouple = function() {
+    // Show the couple names input section
+    document.getElementById('coupleNames').style.display = 'block';
+};
+
+// ============================================================================
+// COUPLES MODE FUNCTIONS
+// ============================================================================
+
+window.beginCoupleAssessment = function() {
+    person1Name = document.getElementById('person1Name').value.trim();
+    person2Name = document.getElementById('person2Name').value.trim();
+
+    if (!person1Name || !person2Name) {
+        alert('Please enter both names to continue.');
+        return;
+    }
+
+    isCoupleMode = true;
+    currentPerson = 1;
+    document.getElementById('couplesSetup').style.display = 'none';
+    document.getElementById('clientInfoSection').style.display = 'block';
+
+    // Add continue button handler
+    const continueBtn = document.getElementById('continueToQuestions');
+    if (continueBtn) {
+        continueBtn.onclick = function() {
+            // Validate client info
+            const firstName = document.getElementById('clientFirstName').value.trim();
+            const lastName = document.getElementById('clientLastName').value.trim();
+            const email = document.getElementById('clientEmail').value.trim();
+            const consent = document.getElementById('consentCheckbox').checked;
+
+            if (!firstName || !lastName || !email || !consent) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
             // Start questionnaire
             startQuestionnaire();
         };
     }
-}
-function startPerson2() {
+};
+
+window.startPerson2 = function() {
     currentPerson = 2;
     document.getElementById('partnerTransition').style.display = 'none';
     document.getElementById('results').style.display = 'none';
