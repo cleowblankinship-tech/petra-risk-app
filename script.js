@@ -19,6 +19,10 @@ let person2Name = '';
 // Answer storage
 let answers = {};
 
+// Section navigation state
+let currentSectionIndex = 0;
+const totalSections = 3;
+
 // ============================================================================
 // SPLASH SCREEN AND PROGRESS BAR FUNCTIONS
 // ============================================================================
@@ -72,6 +76,157 @@ function updateProgressBar() {
   });
   answeredCount += Object.keys(likertGroups).length;
   
+/**
+ * Initialize section navigation
+ */
+function initializeSectionNavigation() {
+  // Show section progress bar
+  document.getElementById('sectionProgressBar').style.display = 'block';
+  
+  // Show navigation buttons
+  document.getElementById('sectionNavigation').style.display = 'flex';
+  
+  // Show first section
+  currentSectionIndex = 0;
+  showSection(0);
+  updateSectionProgress();
+  
+  // Attach button handlers
+  document.getElementById('nextBtn').addEventListener('click', handleNextSection);
+  document.getElementById('backBtn').addEventListener('click', handleBackSection);
+}
+
+/**
+ * Show a specific section by index
+ */
+function showSection(index) {
+  const sections = document.querySelectorAll('.question-section');
+  
+  // Hide all sections
+  sections.forEach((section, i) => {
+    if (i === index) {
+      section.classList.add('active');
+      section.classList.remove('exiting');
+    } else {
+      section.classList.remove('active');
+    }
+  });
+  
+  // Update button visibility
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const calculateBtn = document.getElementById('calculateBtn');
+  const navContainer = document.getElementById('sectionNavigation');
+  
+  // Show/hide back button
+  backBtn.style.display = index > 0 ? 'inline-flex' : 'none';
+  
+  // Show/hide next vs calculate button
+  if (index < totalSections - 1) {
+    nextBtn.style.display = 'inline-flex';
+    calculateBtn.style.display = 'none';
+    navContainer.style.display = 'flex';
+  } else {
+    nextBtn.style.display = 'none';
+    calculateBtn.style.display = 'block';
+    navContainer.style.display = 'flex';
+  }
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Handle next section button click
+ */
+function handleNextSection() {
+  // Validate current section is complete
+  if (!isSectionComplete(currentSectionIndex)) {
+    alert('Please answer all questions in this section before continuing.');
+    return;
+  }
+  
+  // Animate out current section
+  const sections = document.querySelectorAll('.question-section');
+  sections[currentSectionIndex].classList.add('exiting');
+  
+  setTimeout(() => {
+    currentSectionIndex++;
+    showSection(currentSectionIndex);
+    updateSectionProgress();
+  }, 300);
+}
+
+/**
+ * Handle back section button click
+ */
+function handleBackSection() {
+  if (currentSectionIndex > 0) {
+    const sections = document.querySelectorAll('.question-section');
+    sections[currentSectionIndex].classList.add('exiting');
+    
+    setTimeout(() => {
+      currentSectionIndex--;
+      showSection(currentSectionIndex);
+      updateSectionProgress();
+    }, 300);
+  }
+}
+
+/**
+ * Check if current section is complete
+ */
+function isSectionComplete(sectionIndex) {
+  const sections = document.querySelectorAll('.question-section');
+  const currentSection = sections[sectionIndex];
+  
+  // Count required questions in this section
+  const questionBlocks = currentSection.querySelectorAll('.question-block');
+  let answeredCount = 0;
+  
+  questionBlocks.forEach(block => {
+    // Check if question has an answer
+    const radioInputs = block.querySelectorAll('input[type="radio"]');
+    const likertOptions = block.querySelectorAll('.likert-option');
+    
+    if (radioInputs.length > 0) {
+      // Radio question
+      const checked = block.querySelector('input[type="radio"]:checked');
+      if (checked) answeredCount++;
+    } else if (likertOptions.length > 0) {
+      // Likert question
+      const selected = block.querySelector('.likert-option.selected');
+      if (selected) answeredCount++;
+    }
+  });
+  
+  return answeredCount === questionBlocks.length;
+}
+
+/**
+ * Update section progress bar
+ */
+function updateSectionProgress() {
+  const segments = document.querySelectorAll('.section-progress-segment');
+  
+  segments.forEach((segment, index) => {
+    const fill = segment.querySelector('.section-progress-fill');
+    
+    if (index < currentSectionIndex) {
+      // Completed section
+      segment.classList.add('completed');
+      segment.classList.remove('active');
+    } else if (index === currentSectionIndex) {
+      // Current section
+      segment.classList.add('active');
+      segment.classList.remove('completed');
+    } else {
+      // Future section
+      segment.classList.remove('active', 'completed');
+    }
+  });
+}
+
   // Calculate percentage
   const percent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
   
@@ -429,20 +584,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// ============================================================================
-// COUPLES MODE FUNCTIONS
-// ============================================================================
-
+/**
+ * Start questionnaire after client info is collected
+ */
+function startQuestionnaire() {
+    // Hide client info
+    document.getElementById('clientInfoSection').style.display = 'none';
+    
+    // Show questionnaire container
+    document.getElementById('questionnaire').style.display = 'block';
+    
+    // Initialize section navigation
+    initializeSectionNavigation();
+    
+    // Show and initialize progress bar
+    document.getElementById('progressBarContainer').style.display = 'block';
+    updateProgressBar();
+    
+    // Show current person banner if couples mode
+    if (isCoupleMode) {
+        document.getElementById('currentPerson').style.display = 'block';
+        document.getElementById('currentPersonName').textContent = 
+            currentPerson === 1 ? person1Name : person2Name;
+    }
+}
+// Example: Add onclick to "Begin Assessment" button in solo mode
 function startSolo() {
     isCoupleMode = false;
     document.getElementById('couplesSetup').style.display = 'none';
     document.getElementById('clientInfoSection').style.display = 'block';
+    
+    // Add continue button handler (you may need to add this button to clientInfoSection)
+    const continueBtn = document.getElementById('continueToQuestions'); // Add this button in HTML
+    if (continueBtn) {
+        continueBtn.onclick = function() {
+            // Validate client info
+            const firstName = document.getElementById('clientFirstName').value.trim();
+            const lastName = document.getElementById('clientLastName').value.trim();
+            const email = document.getElementById('clientEmail').value.trim();
+            const consent = document.getElementById('consentCheckbox').checked;
+            
+            if (!firstName || !lastName || !email || !consent) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Start questionnaire
+            startQuestionnaire();
+        };
+    }
 }
-
-function startCouple() {
-    document.getElementById('coupleNames').style.display = 'block';
-}
+// ============================================================================
+// COUPLES MODE FUNCTIONS
+// ============================================================================
 
 function beginCoupleAssessment() {
     person1Name = document.getElementById('person1Name').value.trim();
@@ -457,27 +651,45 @@ function beginCoupleAssessment() {
     currentPerson = 1;
     document.getElementById('couplesSetup').style.display = 'none';
     document.getElementById('clientInfoSection').style.display = 'block';
+    
+    // Add continue button handler
+    const continueBtn = document.getElementById('continueToQuestions');
+    if (continueBtn) {
+        continueBtn.onclick = function() {
+            // Validate client info
+            const firstName = document.getElementById('clientFirstName').value.trim();
+            const lastName = document.getElementById('clientLastName').value.trim();
+            const email = document.getElementById('clientEmail').value.trim();
+            const consent = document.getElementById('consentCheckbox').checked;
+            
+            if (!firstName || !lastName || !email || !consent) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Start questionnaire
+            startQuestionnaire();
+        };
+    }
 }
-
 function startPerson2() {
     currentPerson = 2;
     document.getElementById('partnerTransition').style.display = 'none';
-    document.getElementById('currentPerson').style.display = 'block';
-    document.getElementById('currentPersonName').textContent = person2Name;
     document.getElementById('results').style.display = 'none';
-    document.getElementById('questionnaire').style.display = 'block';
-    document.getElementById('calculateBtn').style.display = 'block';
-    document.getElementById('progressBarContainer').style.display = 'block';
     
-    // Reset form
+    // Reset to beginning
+    currentSectionIndex = 0;
+    
+    // Clear all answers
     document.querySelectorAll('.selected').forEach(function(el) {
         el.classList.remove('selected');
     });
     document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
         radio.checked = false;
     });
-    renderQuestions();
-    updateProgressBar();
+    
+    // Restart questionnaire
+    startQuestionnaire();
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }

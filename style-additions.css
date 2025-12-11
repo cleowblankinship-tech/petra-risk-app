@@ -614,3 +614,223 @@
     width: 120px;
   }
 }
+/* ============================================================================
+   SECTION PROGRESS BAR (3-segment tracker)
+   ============================================================================ */
+
+.section-progress-bar {
+  position: sticky;
+  top: 0;
+  z-index: 110;
+  background: linear-gradient(to bottom, #FEFDFB 0%, #F8F6F0 100%);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(154, 118, 17, 0.12);
+  box-shadow: 0 2px 8px rgba(37, 40, 42, 0.04);
+}
+
+.section-progress-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.section-progress-segment {
+  position: relative;
+  background: rgba(154, 118, 17, 0.1);
+  border-radius: 9999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.section-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #9A7611 0%, #B8904A 50%, #CCA054 100%);
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(154, 118, 17, 0.3);
+}
+
+.section-progress-segment.active .section-progress-fill {
+  width: 100%;
+}
+
+.section-progress-segment.completed .section-progress-fill {
+  width: 100%;
+}
+
+.section-progress-label {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'brandon-grotesque', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9A7611;
+  white-space: nowrap;
+  opacity: 0.5;
+  transition: opacity 300ms ease;
+}
+
+.section-progress-segment.active .section-progress-label,
+.section-progress-segment.completed .section-progress-label {
+  opacity: 1;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .section-progress-bar {
+    padding: var(--space-2) var(--space-3);
+  }
+  
+  .section-progress-segment {
+    height: 6px;
+  }
+  
+  .section-progress-label {
+    font-size: 0.65rem;
+    top: calc(100% + 6px);
+  }
+}
+
+@media (max-width: 480px) {
+  .section-progress-track {
+    gap: var(--space-1);
+  }
+  
+  .section-progress-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* ============================================================================
+   SECTION VISIBILITY AND TRANSITIONS
+   ============================================================================ */
+
+.question-section {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+
+.question-section.active {
+  display: block;
+  animation: fadeInUp 400ms ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.question-section.exiting {
+  animation: fadeOutUp 300ms ease-in forwards;
+}
+
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* ============================================================================
+   SECTION NAVIGATION BUTTONS
+   ============================================================================ */
+
+.section-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: var(--space-5) auto var(--space-3);
+  padding: 0 var(--space-3);
+}
+
+.nav-btn {
+  font-family: 'brandon-grotesque', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-btn-next {
+  background: var(--petra-gold, #9A7611);
+  color: white;
+  padding: 14px 32px;
+  box-shadow: 0 2px 8px rgba(154, 118, 17, 0.2);
+}
+
+.nav-btn-next:hover {
+  background: #876809;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(154, 118, 17, 0.3);
+}
+
+.nav-btn-next:active {
+  transform: translateY(0);
+}
+
+.nav-btn-back {
+  background: transparent;
+  color: #6B7280;
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.nav-btn-back:hover {
+  color: var(--petra-gold);
+  background: rgba(154, 118, 17, 0.05);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .section-navigation {
+    margin: var(--space-4) auto var(--space-2);
+  }
+  
+  .nav-btn-next {
+    padding: 12px 28px;
+    font-size: 0.875rem;
+  }
+  
+  .nav-btn-back {
+    font-size: 0.8125rem;
+  }
+}
+
+/* ============================================================================
+   HIDE DEFAULT CALCULATE BUTTON INITIALLY
+   ============================================================================ */
+
+.calculate-btn {
+  max-width: 900px;
+  margin: var(--space-4) auto;
+}

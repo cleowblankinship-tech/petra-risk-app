@@ -35,7 +35,11 @@
                     <label class="input-label" for="clientFirstName">First Name *</label>
                     <input type="text" id="clientFirstName" name="firstName" class="name-input" required>
                 </div>
-                
+                    <!-- ADD THIS BUTTON -->
+                <div style="text-align: center; margin-top: var(--space-4);">
+                     <button type="button" id="continueToQuestions" class="begin-btn">
+                     Begin Assessment
+                     </button>
                 <div class="form-field">
                     <label class="input-label" for="clientLastName">Last Name *</label>
                     <input type="text" id="clientLastName" name="lastName" class="name-input" required>
@@ -92,6 +96,31 @@
         <div id="currentPerson" class="current-person-banner" style="display: none;">
             <strong style="color: #4f46e5; font-size: 1.1rem;">Currently answering for: <span id="currentPersonName"></span></strong>
         </div>
+<!-- Section Progress Bar (3-segment) -->
+<div id="sectionProgressBar" class="section-progress-bar" style="display: none;">
+  <div class="section-progress-track">
+    <div class="section-progress-segment" data-section="1">
+      <div class="section-progress-fill"></div>
+      <span class="section-progress-label">Behavioral</span>
+    </div>
+    <div class="section-progress-segment" data-section="2">
+      <div class="section-progress-fill"></div>
+      <span class="section-progress-label">Traditional</span>
+    </div>
+    <div class="section-progress-segment" data-section="3">
+      <div class="section-progress-fill"></div>
+      <span class="section-progress-label">Knowledge</span>
+    </div>
+  </div>
+</div>
+
+<!-- Question Progress Bar (percentage) -->
+<div id="progressBarContainer" class="progress-bar-container" style="display: none;">
+  <div class="progress-bar-track">
+    <div id="progressBarFill" class="progress-bar-fill"></div>
+  </div>
+  <p class="progress-bar-label"><span id="progressPercent">0</span>% Complete</p>
+</div>
 
         <!-- Progress Bar -->
         <div id="progressBarContainer" class="progress-bar-container" style="display: none;">
@@ -115,7 +144,17 @@
         </div>
 
         <!-- Calculate Button -->
-        <button type="button" id="calculateBtn" class="calculate-btn" style="display: none;">Calculate Risk Alignment Score</button>
+ <!-- Section Navigation Buttons -->
+<div id="sectionNavigation" class="section-navigation" style="display: none;">
+  <button type="button" id="backBtn" class="nav-btn nav-btn-back" style="display: none;">
+    ← Back
+  </button>
+  <button type="button" id="nextBtn" class="nav-btn nav-btn-next">
+    Next →
+  </button>
+</div>
+
+<button type="button" id="calculateBtn" class="calculate-btn" style="display: none;">Calculate Risk Alignment Score</button>
 
         <!-- Partner Transition Screen -->
         <div id="partnerTransition" class="partner-transition" style="display: none;">
