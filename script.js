@@ -113,16 +113,13 @@ function initializeSectionNavigation() {
  * Show a specific section by index
  */
 function showSection(index) {
-  console.log('showSection called with index:', index, 'totalSections:', totalSections);
   const sections = document.querySelectorAll('.question-section');
-  console.log('Found', sections.length, 'sections');
 
   // Hide all sections
   sections.forEach((section, i) => {
     if (i === index) {
       section.classList.add('active');
       section.classList.remove('exiting');
-      console.log('Made section', i, 'active');
     } else {
       section.classList.remove('active');
     }
@@ -139,12 +136,10 @@ function showSection(index) {
 
   // Show/hide next vs calculate button
   if (index < totalSections - 1) {
-    console.log('Showing NEXT button, hiding CALCULATE button');
     nextBtn.style.display = 'inline-flex';
     calculateBtn.style.display = 'none';
     navContainer.style.display = 'flex';
   } else {
-    console.log('Showing CALCULATE button, hiding NEXT button');
     nextBtn.style.display = 'none';
     calculateBtn.style.display = 'block';
     navContainer.style.display = 'flex';
@@ -598,7 +593,6 @@ document.addEventListener('DOMContentLoaded', function() {
  * Start questionnaire after client info is collected
  */
 function startQuestionnaire() {
-    console.log('startQuestionnaire called');
     // Hide client info
     document.getElementById('clientInfoSection').style.display = 'none';
 
@@ -609,7 +603,6 @@ function startQuestionnaire() {
     document.getElementById('questionnaire').style.display = 'block';
 
     // Initialize section navigation (this calls showSection(0))
-    console.log('About to call initializeSectionNavigation');
     initializeSectionNavigation();
 
     // Show and initialize progress bar
@@ -622,31 +615,25 @@ function startQuestionnaire() {
         document.getElementById('currentPersonName').textContent =
             currentPerson === 1 ? person1Name : person2Name;
     }
-    console.log('startQuestionnaire finished');
 }
 // ============================================================================
 // MODE SELECTION FUNCTIONS
 // ============================================================================
 
 window.startSolo = function() {
-    console.log('startSolo called');
     isCoupleMode = false;
     document.getElementById('couplesSetup').style.display = 'none';
     document.getElementById('clientInfoSection').style.display = 'block';
 
     // Add continue button handler
     const continueBtn = document.getElementById('continueToQuestions');
-    console.log('continueBtn:', continueBtn);
     if (continueBtn) {
         continueBtn.onclick = function() {
-            console.log('Begin Assessment clicked!');
             // Validate client info
             const firstName = document.getElementById('clientFirstName').value.trim();
             const lastName = document.getElementById('clientLastName').value.trim();
             const email = document.getElementById('clientEmail').value.trim();
             const consent = document.getElementById('consentCheckbox').checked;
-
-            console.log('Validation:', {firstName, lastName, email, consent});
 
             if (!firstName || !lastName || !email || !consent) {
                 alert('Please fill in all required fields.');
@@ -654,11 +641,8 @@ window.startSolo = function() {
             }
 
             // Start questionnaire
-            console.log('Calling startQuestionnaire');
             startQuestionnaire();
         };
-    } else {
-        console.error('Continue button not found!');
     }
 };
 
@@ -1617,4 +1601,4 @@ document.addEventListener('DOMContentLoaded', function() {
     if (couplesSetup) {
         couplesSetup.style.display = 'block';
     }
-});/* Cache bust Thu, Dec 11, 2025 11:39:29 AM */
+});
