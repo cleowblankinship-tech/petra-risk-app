@@ -1,36 +1,8 @@
 // submission-handler.js
 // Handles client info collection and backend submission
 
-// Show client info form before questionnaire (solo mode)
-const originalStartSolo = startSolo;
-startSolo = function() {
-    isCoupleMode = false;
-    document.getElementById('couplesSetup').style.display = 'none';
-    document.getElementById('clientInfoSection').style.display = 'block';
-    document.getElementById('questionnaire').style.display = 'block';
-    document.getElementById('calculateBtn').style.display = 'block';
-};
-
-// Show client info form for couple mode
-const originalBeginCoupleAssessment = beginCoupleAssessment;
-beginCoupleAssessment = function() {
-    person1Name = document.getElementById('person1Name').value.trim();
-    person2Name = document.getElementById('person2Name').value.trim();
-    
-    if (!person1Name || !person2Name) {
-        alert('Please enter both names to continue.');
-        return;
-    }
-    
-    isCoupleMode = true;
-    currentPerson = 1;
-    document.getElementById('couplesSetup').style.display = 'none';
-    document.getElementById('clientInfoSection').style.display = 'block';
-    document.getElementById('currentPerson').style.display = 'block';
-    document.getElementById('currentPersonName').textContent = person1Name;
-    document.getElementById('questionnaire').style.display = 'block';
-    document.getElementById('calculateBtn').style.display = 'block';
-};
+// NOTE: startSolo and beginCoupleAssessment are now defined in script.js with proper logic
+// The old override code has been removed to avoid conflicts
 
 // Override calculateScore to add validation and submission
 const originalCalculateScore = calculateScore;
