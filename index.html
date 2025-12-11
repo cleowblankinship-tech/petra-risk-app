@@ -35,11 +35,7 @@
                     <label class="input-label" for="clientFirstName">First Name *</label>
                     <input type="text" id="clientFirstName" name="firstName" class="name-input" required>
                 </div>
-                    <!-- ADD THIS BUTTON -->
-                <div style="text-align: center; margin-top: var(--space-4);">
-                     <button type="button" id="continueToQuestions" class="begin-btn">
-                     Begin Assessment
-                     </button>
+
                 <div class="form-field">
                     <label class="input-label" for="clientLastName">Last Name *</label>
                     <input type="text" id="clientLastName" name="lastName" class="name-input" required>
@@ -121,14 +117,6 @@
   </div>
   <p class="progress-bar-label"><span id="progressPercent">0</span>% Complete</p>
 </div>
-
-        <!-- Progress Bar -->
-        <div id="progressBarContainer" class="progress-bar-container" style="display: none;">
-            <div class="progress-bar-track">
-                <div id="progressBarFill" class="progress-bar-fill"></div>
-            </div>
-            <p class="progress-bar-label"><span id="progressPercent">0</span>% Complete</p>
-        </div>
 
         <!-- Questionnaire (populated by JavaScript) -->
         <div id="questionnaire" style="display: none;">
