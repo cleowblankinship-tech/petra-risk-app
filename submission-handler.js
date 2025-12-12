@@ -11,10 +11,9 @@ calculateScore = function() {
     const firstName = document.getElementById('clientFirstName')?.value.trim();
     const lastName  = document.getElementById('clientLastName')?.value.trim();
     const email     = document.getElementById('clientEmail')?.value.trim();
-    const consent   = document.getElementById('consentCheckbox')?.checked;
 
-    if (!firstName || !lastName || !email || !consent) {
-        alert('Please complete your information at the top of the page (Name, Email, and Consent) before calculating your score.');
+    if (!firstName || !lastName || !email) {
+        alert('Please complete your information at the top of the page (Name and Email) before calculating your score.');
         document.getElementById('clientInfoSection')?.scrollIntoView({ behavior: 'smooth' });
         return;
     }
@@ -49,7 +48,6 @@ async function submitToBackend() {
             firstName: document.getElementById('clientFirstName').value.trim(),
             lastName: document.getElementById('clientLastName').value.trim(),
             email: document.getElementById('clientEmail').value.trim(),
-            consent: document.getElementById('consentCheckbox').checked,
             wantsCopy: document.getElementById('wantsCopyCheckbox')?.checked || false
         };
         

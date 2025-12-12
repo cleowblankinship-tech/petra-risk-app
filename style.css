@@ -1237,6 +1237,7 @@ button,
     opacity: 0.4;
     transition: all var(--transition-base);
     height: 80px;
+    box-shadow: none;
 }
 
 .risk-scale-segment.active {
@@ -1246,7 +1247,7 @@ button,
     padding-bottom: var(--space-3);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 0 3px var(--petra-charcoal);
     z-index: 2;
-    border-radius: 4px;
+    border-radius: 7px;
 }
 
 .risk-scale-segment.active .risk-scale-label {
@@ -1282,21 +1283,33 @@ button,
     font-weight: 600;
 }
 
-/* Risk Segment Colors */
-.rs-very-cons { background-color: #8B6F5C; }
-.rs-cons { background-color: #6B7280; }
-.rs-balanced { background-color: #CBD5E1; }
-.rs-bal-growth { background-color: #7EADAD; }
-.rs-growth { background-color: #CCA054; }
-.rs-agg-growth { background-color: #D4A968; }
+/* Risk Segment Colors - Inactive (5% lighter) */
+.rs-very-cons { background-color: #927561; }
+.rs-cons { background-color: #707886; }
+.rs-balanced { background-color: #D5E0EC; }
+.rs-bal-growth { background-color: #84B6B6; }
+.rs-growth { background-color: #D6A858; }
+.rs-agg-growth { background-color: #DFB16D; }
 
-/* Active segment colors - deeper and more saturated */
-.rs-very-cons.active { background-color: #6B5343; }
-.rs-cons.active { background-color: #4B5563; }
-.rs-balanced.active { background-color: #93A2BC; }
-.rs-bal-growth.active { background-color: #5A8E8E; }
-.rs-growth.active { background-color: #B88A3C; }
-.rs-agg-growth.active { background-color: #C0954D; }
+/* Active segment colors - deeper with subtle gradients */
+.rs-very-cons.active {
+    background: linear-gradient(to bottom, #6D5544, #695142);
+}
+.rs-cons.active {
+    background: linear-gradient(to bottom, #4D5765, #495361);
+}
+.rs-balanced.active {
+    background: linear-gradient(to bottom, #96A5C0, #909FB8);
+}
+.rs-bal-growth.active {
+    background: linear-gradient(to bottom, #5C9191, #588B8B);
+}
+.rs-growth.active {
+    background: linear-gradient(to bottom, #BC8D3D, #B4873B);
+}
+.rs-agg-growth.active {
+    background: linear-gradient(to bottom, #C4984F, #BC924B);
+}
 
 .rs-growth .risk-scale-label,
 .rs-growth .risk-scale-range,
@@ -1485,9 +1498,15 @@ button,
         grid-template-columns: repeat(3, 1fr);
         height: auto;
     }
-    
+
     .risk-scale-segment {
         min-height: 70px;
+        height: 70px;
+    }
+
+    .risk-scale-segment.active {
+        height: 78px;
+        border-radius: 6px;
     }
 }
 

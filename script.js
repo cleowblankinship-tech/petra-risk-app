@@ -499,7 +499,7 @@ const questions = {
     ],
     knowledge: [
         {
-            q: "How comfortable are you with financial terminology and concepts?",
+            q: "How comfortable are you with financial terminology and concepts (e.g., stocks, bonds, commodities, volatility, inflation, diversification, dollar-cost averaging, etc.)?",
             type: "likert",
             name: "knowledgeComfort",
             labels: ["Not comfortable", "Slightly", "Moderately", "Very", "Extremely"]
@@ -556,16 +556,18 @@ const questions = {
             correct: "C"
         },
         {
-            q: "Which best describes your investing experience?",
-            type: "radio",
+            q: "Which best describes your investing experience? (Choose all that apply)",
+            type: "checkbox",
             name: "kn_exp",
             opts: [
                 "Never beyond savings or CDs",
                 "Mutual funds / ETFs",
                 "Traded stocks or bonds",
-                "Private markets / alternatives"
+                "Individual stocks",
+                "Options or derivatives",
+                "Alternative investments (real estate, private credit, commodities, etc.)"
             ],
-            vals: ["A", "B", "C", "D"]
+            vals: [0, 0.15, 0.25, 0.30, 0.40, 0.50]
         }
     ]
 };
@@ -623,9 +625,8 @@ window.startSolo = function() {
             const firstName = document.getElementById('clientFirstName').value.trim();
             const lastName = document.getElementById('clientLastName').value.trim();
             const email = document.getElementById('clientEmail').value.trim();
-            const consent = document.getElementById('consentCheckbox').checked;
 
-            if (!firstName || !lastName || !email || !consent) {
+            if (!firstName || !lastName || !email) {
                 alert('Please fill in all required fields.');
                 return;
             }
@@ -667,9 +668,8 @@ window.beginCoupleAssessment = function() {
             const firstName = document.getElementById('clientFirstName').value.trim();
             const lastName = document.getElementById('clientLastName').value.trim();
             const email = document.getElementById('clientEmail').value.trim();
-            const consent = document.getElementById('consentCheckbox').checked;
 
-            if (!firstName || !lastName || !email || !consent) {
+            if (!firstName || !lastName || !email) {
                 alert('Please fill in all required fields.');
                 return;
             }
@@ -759,7 +759,7 @@ function renderQuestions() {
 function renderQuestion(q) {
     var html = '<div class="question-block">';
     html += '<div class="question-text">' + q.q + '</div>';
-    
+
     if (q.type === "radio") {
         html += '<div class="options">';
         q.opts.forEach(function(opt, i) {
@@ -767,6 +767,16 @@ function renderQuestion(q) {
             var correctAttr = (q.correct && val === q.correct) ? 'data-correct="1"' : '';
             html += '<label class="option">';
             html += '<input type="radio" name="' + q.name + '" value="' + val + '" ' + correctAttr + '>';
+            html += '<span class="option-text">' + opt + '</span>';
+            html += '</label>';
+        });
+        html += '</div>';
+    } else if (q.type === "checkbox") {
+        html += '<div class="options">';
+        q.opts.forEach(function(opt, i) {
+            var val = q.vals ? q.vals[i] : i;
+            html += '<label class="option">';
+            html += '<input type="checkbox" name="' + q.name + '" value="' + val + '" data-index="' + i + '">';
             html += '<span class="option-text">' + opt + '</span>';
             html += '</label>';
         });
@@ -781,18 +791,22 @@ function renderQuestion(q) {
         }
         html += '</div>';
     }
-    
+
     html += '</div>';
     return html;
 }
 
 function attachHandlers() {
     document.addEventListener('click', handleLikertClick);
-    
+
     document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
         radio.addEventListener('change', handleRadioChange);
     });
-    
+
+    document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+        checkbox.addEventListener('change', handleCheckboxChange);
+    });
+
     document.querySelectorAll('.likert-option').forEach(function(opt) {
         opt.addEventListener('keydown', handleLikertKeydown);
     });
@@ -818,7 +832,19 @@ function handleRadioChange(e) {
         r.closest('.option').classList.remove('selected');
     });
     radio.closest('.option').classList.add('selected');
-    
+
+    // Update progress bar
+    updateProgressBar();
+}
+
+function handleCheckboxChange(e) {
+    var checkbox = e.target;
+    if (checkbox.checked) {
+        checkbox.closest('.option').classList.add('selected');
+    } else {
+        checkbox.closest('.option').classList.remove('selected');
+    }
+
     // Update progress bar
     updateProgressBar();
 }
@@ -844,11 +870,30 @@ function getLikertValue(name) {
     return el ? parseFloat(el.dataset.value) : null;
 }
 
+function getCheckboxValue(name) {
+    var checkboxes = document.querySelectorAll('input[name="' + name + '"]:checked');
+    if (checkboxes.length === 0) return null;
+
+    var sum = 0;
+    checkboxes.forEach(function(cb) {
+        sum += parseFloat(cb.value);
+    });
+
+    // Cap at 1.0 to maintain balance with other questions
+    return Math.min(sum, 1.0);
+}
+
 function getAllValues() {
     var values = {};
     var allQuestions = questions.behavioral.concat(questions.traditional).concat(questions.knowledge);
     allQuestions.forEach(function(q) {
-        values[q.name] = q.type === "radio" ? getRadioValue(q.name) : getLikertValue(q.name);
+        if (q.type === "radio") {
+            values[q.name] = getRadioValue(q.name);
+        } else if (q.type === "checkbox") {
+            values[q.name] = getCheckboxValue(q.name);
+        } else {
+            values[q.name] = getLikertValue(q.name);
+        }
     });
     return values;
 }
@@ -986,7 +1031,8 @@ function computeKnowledge(values) {
         }
     });
     
-    var expScore = values.kn_exp ? EXPERIENCE_MAP[values.kn_exp] : 0;
+    // kn_exp is now a checkbox that returns a summed score (0-1.0)
+    var expScore = values.kn_exp || 0;
     if (values.kn_exp) answeredCount++;
     
     var objectiveAvg = answeredCount > 0 ? ((correctCount / 5) * 0.833 + (expScore * 0.167)) : 0;
