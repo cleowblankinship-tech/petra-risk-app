@@ -703,10 +703,10 @@ function showPartnerTransition() {
 function renderQuestions() {
     var html = '';
     
-    // SECTION 1: Behavioral Profile
+    // SECTION 1: Investment Mindset
     html += '<div class="question-section">';
     html += '  <div class="section-header">';
-    html += '    <h2>Behavioral Profile</h2>';
+    html += '    <h2>Investment Mindset</h2>';
     html += '    <p>This section looks at your natural decision tendencies and how they may affect your investment approach.</p>';
     html += '  </div>';
     questions.behavioral.forEach(function(q) {

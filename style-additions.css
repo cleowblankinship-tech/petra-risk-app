@@ -556,14 +556,14 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--petra-charcoal);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .section-header p {
   font-family: 'Crimson Pro', Georgia, serif;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #6B7280;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: #5A5D62;
   margin: 0;
 }
 
@@ -580,7 +580,7 @@
 
 /* Increase spacing around section content */
 .question-section .question-block:first-of-type {
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
 }
 
 .question-section .question-block:last-of-type {
@@ -596,13 +596,15 @@
   .section-header {
     margin-bottom: var(--space-4);
   }
-  
+
   .section-header h2 {
     font-size: 1.25rem;
+    margin-bottom: var(--space-2);
   }
-  
+
   .section-header p {
-    font-size: 0.9375rem;
+    font-size: 1rem;
+    line-height: 1.7;
   }
   
   .question-section .question-block {
