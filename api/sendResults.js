@@ -203,8 +203,8 @@ module.exports = async (req, res) => {
     const payload = req.body;
     
     // Validate required fields
-    if (!payload.client || !payload.client.firstName || !payload.client.lastName || 
-        !payload.client.email || !payload.client.consent) {
+    if (!payload.client || !payload.client.firstName || !payload.client.lastName ||
+        !payload.client.email) {
       return res.status(400).json({ error: 'Missing required client information' });
     }
 
