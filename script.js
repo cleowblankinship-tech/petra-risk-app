@@ -734,7 +734,7 @@ function renderQuestions() {
     html += '<div class="question-section">';
     html += '  <div class="section-header">';
     html += '    <h2>Traditional Risk Assessment</h2>';
-    html += '    <p>The practical side: how long you plan to invest, what you've experienced before, and what goals matter most to you.</p>'
+    html += '    <p>The practical side: how long you plan to invest, what you\'ve experienced before, and what goals matter most to you.</p>'
     html += '  </div>';
     questions.traditional.forEach(function(q) {
         html += renderQuestion(q);
