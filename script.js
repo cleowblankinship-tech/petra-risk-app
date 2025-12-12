@@ -756,13 +756,12 @@ function renderQuestion(q) {
         });
         html += '</div>';
     } else if (q.type === "likert") {
-        html += '<div class="likert-labels">';
-        q.labels.forEach(function(l) {
-            html += '<div>' + l + '</div>';
-        });
-        html += '</div><div class="likert-scale">';
+        html += '<div class="likert-scale">';
         for (var i = 0; i < 5; i++) {
-            html += '<div class="likert-option" data-name="' + q.name + '" data-value="' + (i * 0.25) + '" tabindex="0">' + (i + 1) + '</div>';
+            html += '<div class="likert-option" data-name="' + q.name + '" data-value="' + (i * 0.25) + '" tabindex="0">';
+            html += '<span class="likert-label">' + q.labels[i] + '</span>';
+            html += '<span class="likert-number">' + (i + 1) + '</span>';
+            html += '</div>';
         }
         html += '</div>';
     }

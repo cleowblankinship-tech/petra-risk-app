@@ -830,22 +830,6 @@ label.option input[type="radio"] {
    LIKERT SCALE - BALANCED GRID TILES
    ---------------------------------------------------------------------------- */
 
-.likert-labels {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: var(--space-1);
-    margin-bottom: var(--space-2);
-    font-size: 0.8125rem;
-    color: var(--petra-warm-600);
-    line-height: 1.3;
-}
-
-.likert-labels div {
-    text-align: center;
-    padding: 0 var(--space-1);
-    font-family: var(--font-body);
-}
-
 .likert-scale {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -856,27 +840,48 @@ label.option input[type="radio"] {
 .likert-option {
     /* Layout */
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 64px;
-    
+    min-height: 84px;
+    padding: var(--space-3) var(--space-2);
+    gap: var(--space-1);
+
+    /* Fixed width for consistency */
+    min-width: 120px;
+
     /* Appearance */
     background: var(--petra-white);
     border: 1.5px solid var(--petra-warm-300);
     border-radius: var(--radius-md);
-    
-    /* Typography */
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--petra-charcoal);
-    text-transform: uppercase;
-    
+
     /* Interaction */
     cursor: pointer;
     transition: all var(--transition-base);
     user-select: none;
     pointer-events: auto;
+}
+
+.likert-label {
+    /* Make label prominent */
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--petra-charcoal);
+    line-height: 1.3;
+    text-align: center;
+    order: 1;
+}
+
+.likert-number {
+    /* Make number smaller and lighter */
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--petra-warm-600);
+    opacity: 0.7;
+    line-height: 1;
+    order: 2;
 }
 
 .likert-option:hover {
@@ -886,12 +891,25 @@ label.option input[type="radio"] {
     transform: translateY(-2px);
 }
 
+.likert-option:hover .likert-number {
+    opacity: 0.9;
+}
+
 .likert-option.selected {
     background: var(--petra-gold-pale);
     border-color: var(--petra-gold);
-    color: var(--petra-charcoal);
     box-shadow: 0 0 0 3px rgba(154, 118, 17, 0.12);
     transform: scale(1.02);
+}
+
+.likert-option.selected .likert-label {
+    color: var(--petra-charcoal);
+    font-weight: 600;
+}
+
+.likert-option.selected .likert-number {
+    color: var(--petra-gold);
+    opacity: 1;
 }
 
 /* ----------------------------------------------------------------------------
@@ -1397,8 +1415,17 @@ button,
     }
     
     .likert-option {
-        height: 56px;
-        font-size: 1.25rem;
+        min-height: 76px;
+        padding: var(--space-2) var(--space-1);
+        min-width: 100px;
+    }
+
+    .likert-label {
+        font-size: 0.875rem;
+    }
+
+    .likert-number {
+        font-size: 1.125rem;
     }
     
     .options {
@@ -1431,10 +1458,19 @@ button,
     .likert-scale {
         gap: var(--space-1);
     }
-    
+
     .likert-option {
-        height: 52px;
-        font-size: 1.125rem;
+        min-height: 68px;
+        padding: var(--space-2) 6px;
+        min-width: 85px;
+    }
+
+    .likert-label {
+        font-size: 0.8125rem;
+    }
+
+    .likert-number {
+        font-size: 1rem;
     }
 }
 
