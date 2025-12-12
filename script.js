@@ -257,11 +257,13 @@ const behavioralWeights = {
 };
 
 const traditionalWeights = {
-    volatilityReaction: 0.25,
-    rewardStability: 0.20,
-    emotionalComfort: 0.20,
+    drawdownDiscipline: 0.20,
+    rewardStability: 0.15,
+    emotionalComfort: 0.15,
     disciplineConfidence: 0.15,
-    timeHorizon: 0.20
+    timeHorizon: 0.15,
+    lossFrequencyTolerance: 0.10,
+    returnVsLossTradeOff: 0.10
 };
 
 // ============================================================================
@@ -446,25 +448,25 @@ const questions = {
     ],
     traditional: [
         {
-            q: "If your portfolio fell 20% in a year, what would you most likely do?",
+            q: "If your long-term portfolio dropped 25% and financial headlines were negative, which response fits you best?",
             type: "likert",
-            name: "volatilityReaction",
-            labels: ["Sell everything", "Sell some", "Hold steady", "Buy more", "Buy much more"],
-            weight: 0.25
+            name: "drawdownDiscipline",
+            labels: ["Move to cash immediately", "Reduce exposure", "Wait before making any changes", "Stay invested but uneasy", "Stay invested confidently"],
+            weight: 0.20
         },
         {
             q: "Choose between: A) 6% avg return with a 20% worst year; B) 9% avg return with a 35% worst year. How likely are you to choose B?",
             type: "likert",
             name: "rewardStability",
             labels: ["Definitely A", "Probably A", "Unsure", "Probably B", "Definitely B"],
-            weight: 0.20
+            weight: 0.15
         },
         {
             q: "When markets swing sharply, I feel...",
             type: "likert",
             name: "emotionalComfort",
             labels: ["Very anxious", "Somewhat anxious", "Neutral", "Somewhat excited", "Very excited"],
-            weight: 0.20
+            weight: 0.15
         },
         {
             q: "I would stick with my long-term plan during a significant decline.",
@@ -478,7 +480,21 @@ const questions = {
             type: "likert",
             name: "timeHorizon",
             labels: ["Within 1 year", "In 1-3 years", "In 4-7 years", "In 8-15 years", "More than 15 years"],
-            weight: 0.20
+            weight: 0.15
+        },
+        {
+            q: "Experiencing several losing months in a row would not lead me to abandon my long-term strategy.",
+            type: "likert",
+            name: "lossFrequencyTolerance",
+            labels: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+            weight: 0.10
+        },
+        {
+            q: "I am willing to accept large temporary losses in pursuit of higher long-term returns.",
+            type: "likert",
+            name: "returnVsLossTradeOff",
+            labels: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+            weight: 0.10
         }
     ],
     knowledge: [
@@ -718,7 +734,7 @@ function renderQuestions() {
     html += '<div class="question-section">';
     html += '  <div class="section-header">';
     html += '    <h2>Traditional Risk Assessment</h2>';
-    html += '    <p>The practical side — how long you plan to invest, what you have experienced before and what goals you are prioritizing. </p>'
+    html += '    <p>The practical side: how long you plan to invest, what you've experienced before, and what goals matter most to you.</p>'
     html += '  </div>';
     questions.traditional.forEach(function(q) {
         html += renderQuestion(q);
@@ -925,11 +941,13 @@ function calculateBehavioralScores(values) {
 
 function calculateTraditionalScores(values) {
     return {
-        volatilityReaction: values.volatilityReaction,
+        drawdownDiscipline: values.drawdownDiscipline,
         rewardStability: values.rewardStability,
         emotionalComfort: values.emotionalComfort,
         disciplineConfidence: values.disciplineConfidence,
-        timeHorizon: values.timeHorizon
+        timeHorizon: values.timeHorizon,
+        lossFrequencyTolerance: values.lossFrequencyTolerance,
+        returnVsLossTradeOff: values.returnVsLossTradeOff
     };
 }
 
@@ -1317,20 +1335,20 @@ function generateBehavioralExplanation(data) {
 
 function generateTraditionalExplanation(data) {
     var html = '<div style="background: #f8fafc; padding: 15px; border-radius: 8px; font-size: 0.9rem;">';
-    
-    var volReact = data.traditionalScores.volatilityReaction;
-    html += '<p><strong>Volatility Reaction (' + (volReact * 100).toFixed(0) + '/100):</strong> ';
-    if (volReact > 0.75) {
-        html += 'Would buy more during 20% decline. Strong conviction and long-term orientation.';
-    } else if (volReact > 0.5) {
-        html += 'Would hold steady during 20% decline. Disciplined approach to market volatility.';
-    } else if (volReact > 0.25) {
-        html += 'Would consider selling some during 20% decline. Moderate discomfort with volatility.';
+
+    var drawdown = data.traditionalScores.drawdownDiscipline;
+    html += '<p><strong>Drawdown Discipline (' + (drawdown * 100).toFixed(0) + '/100):</strong> ';
+    if (drawdown > 0.75) {
+        html += 'Would stay invested confidently during 25% decline. Strong conviction and long-term orientation.';
+    } else if (drawdown > 0.5) {
+        html += 'Would stay invested or wait during 25% decline. Disciplined approach to market volatility.';
+    } else if (drawdown > 0.25) {
+        html += 'Would consider reducing exposure during 25% decline. Moderate discomfort with volatility.';
     } else {
-        html += 'Would sell during 20% decline. High sensitivity to portfolio losses. Conservative positioning recommended.';
+        html += 'Would move to cash during 25% decline. High sensitivity to portfolio losses. Conservative positioning recommended.';
     }
     html += '</p>';
-    
+
     var timeHor = data.traditionalScores.timeHorizon;
     html += '<p><strong>Time Horizon (' + (timeHor * 100).toFixed(0) + '/100):</strong> ';
     if (timeHor >= 0.75) {
@@ -1343,7 +1361,7 @@ function generateTraditionalExplanation(data) {
         html += '1-3 years or less. Short time horizon requires conservative positioning and capital preservation focus.';
     }
     html += '</p>';
-    
+
     var discipline = data.traditionalScores.disciplineConfidence;
     html += '<p><strong>Discipline Confidence (' + (discipline * 100).toFixed(0) + '/100):</strong> ';
     if (discipline > 0.75) {
@@ -1354,7 +1372,29 @@ function generateTraditionalExplanation(data) {
         html += 'Low discipline confidence. Requires frequent communication and behavioral coaching during volatility.';
     }
     html += '</p>';
-    
+
+    var lossFreq = data.traditionalScores.lossFrequencyTolerance;
+    html += '<p><strong>Loss Frequency Tolerance (' + (lossFreq * 100).toFixed(0) + '/100):</strong> ';
+    if (lossFreq > 0.75) {
+        html += 'High tolerance for sequential losses. Would maintain strategy through extended drawdowns.';
+    } else if (lossFreq > 0.5) {
+        html += 'Moderate tolerance for sequential losses. May require reassurance during extended periods of underperformance.';
+    } else {
+        html += 'Low tolerance for sequential losses. Conservative approach recommended to minimize behavioral risk.';
+    }
+    html += '</p>';
+
+    var returnLoss = data.traditionalScores.returnVsLossTradeOff;
+    html += '<p><strong>Return vs. Loss Trade-Off (' + (returnLoss * 100).toFixed(0) + '/100):</strong> ';
+    if (returnLoss > 0.75) {
+        html += 'Willing to accept large temporary losses for higher returns. Growth-oriented mindset.';
+    } else if (returnLoss > 0.5) {
+        html += 'Moderate acceptance of temporary losses. Balanced risk-return perspective.';
+    } else {
+        html += 'Low acceptance of temporary losses. Capital preservation is a priority.';
+    }
+    html += '</p>';
+
     html += '</div>';
     return html;
 }
