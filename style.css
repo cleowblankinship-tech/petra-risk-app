@@ -769,31 +769,34 @@ p {
 .options {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-3);
+    justify-content: center;
+    gap: var(--space-3);
+    row-gap: var(--space-3);
+    margin-top: var(--space-4);
+    max-width: 100%;
 }
 
 label.option {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    
+
     /* Appearance */
     background: var(--petra-white);
     border: 1.5px solid var(--petra-warm-300);
     border-radius: var(--radius-full);
-    padding: 11px 20px;
-    
+    padding: 13px 26px;
+
     /* Typography */
     font-size: 0.9375rem;
     line-height: 1.5;
     color: var(--petra-charcoal);
-    
+
     /* Interaction */
     cursor: pointer;
     transition: all var(--transition-base);
     user-select: none;
-    
+
     /* Layout */
     max-width: fit-content;
     white-space: normal;
@@ -1430,10 +1433,13 @@ button,
     
     .options {
         flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
     }
-    
+
     label.option {
         max-width: 100%;
+        padding: 12px 22px;
     }
     
     .risk-scale-bar {

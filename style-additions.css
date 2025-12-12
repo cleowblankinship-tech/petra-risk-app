@@ -570,9 +570,9 @@
 /* Question blocks within sections */
 .question-section .question-block {
   max-width: 900px;
-  margin: 0 auto var(--space-4);
+  margin: 0 auto var(--space-5);
   background: white;
-  padding: var(--space-4);
+  padding: var(--space-5) var(--space-4);
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(37, 40, 42, 0.05),
               0 1px 4px rgba(37, 40, 42, 0.03);
@@ -580,11 +580,11 @@
 
 /* Increase spacing around section content */
 .question-section .question-block:first-of-type {
-  margin-top: var(--space-3);
+  margin-top: var(--space-4);
 }
 
 .question-section .question-block:last-of-type {
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
 /* Mobile adjustments */
