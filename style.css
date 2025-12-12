@@ -1223,8 +1223,9 @@ button,
     gap: 2px;
     height: 80px;
     border-radius: var(--radius-md);
-    overflow: hidden;
+    overflow: visible;
     background: var(--petra-warm-200);
+    align-items: end;
 }
 
 .risk-scale-segment {
@@ -1235,24 +1236,31 @@ button,
     padding: var(--space-2);
     opacity: 0.4;
     transition: all var(--transition-base);
+    height: 80px;
 }
 
 .risk-scale-segment.active {
     opacity: 1;
-    transform: scale(1.08);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 0 2px #9A7611;
+    height: 88px;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 0 3px var(--petra-charcoal);
     z-index: 2;
-    filter: brightness(1.1);
+    border-radius: 4px;
 }
 
 .risk-scale-segment.active .risk-scale-label {
     font-weight: 800;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+    color: #FFFFFF;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.05em;
 }
 
 .risk-scale-segment.active .risk-scale-range {
     font-weight: 700;
+    font-size: 0.75rem;
+    color: #FFFFFF;
 }
 
 .risk-scale-label {
@@ -1282,11 +1290,31 @@ button,
 .rs-growth { background-color: #CCA054; }
 .rs-agg-growth { background-color: #D4A968; }
 
+/* Active segment colors - deeper and more saturated */
+.rs-very-cons.active { background-color: #6B5343; }
+.rs-cons.active { background-color: #4B5563; }
+.rs-balanced.active { background-color: #93A2BC; }
+.rs-bal-growth.active { background-color: #5A8E8E; }
+.rs-growth.active { background-color: #B88A3C; }
+.rs-agg-growth.active { background-color: #C0954D; }
+
 .rs-growth .risk-scale-label,
 .rs-growth .risk-scale-range,
 .rs-agg-growth .risk-scale-label,
-.rs-agg-growth .risk-scale-range {
+.rs-agg-growth .risk-scale-range,
+.rs-balanced .risk-scale-label,
+.rs-balanced .risk-scale-range {
     color: var(--petra-charcoal);
+}
+
+/* Override to white for active segments */
+.rs-growth.active .risk-scale-label,
+.rs-growth.active .risk-scale-range,
+.rs-agg-growth.active .risk-scale-label,
+.rs-agg-growth.active .risk-scale-range,
+.rs-balanced.active .risk-scale-label,
+.rs-balanced.active .risk-scale-range {
+    color: #FFFFFF;
 }
 
 /* ----------------------------------------------------------------------------
