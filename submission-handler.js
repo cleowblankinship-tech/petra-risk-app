@@ -179,8 +179,10 @@ function showConfirmation(wantsEmail, email, success) {
     if (!success) {
         confirmationBar.classList.add('error');
         confirmationMessage.textContent = "We couldn't email your copy, but your results are displayed below.";
+    } else if (wantsEmail) {
+        confirmationMessage.textContent = `Your results have been sent to ${email}.`;
     } else {
-        confirmationMessage.textContent = "Petra has received your responses and will begin developing an Investment Policy Statement based on your profile.";
+        confirmationMessage.textContent = "Your results have been submitted and are displayed below.";
     }
     
     confirmationBar.style.display = 'block';
