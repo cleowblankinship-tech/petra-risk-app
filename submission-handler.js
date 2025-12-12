@@ -181,10 +181,8 @@ function showConfirmation(wantsEmail, email, success) {
     if (!success) {
         confirmationBar.classList.add('error');
         confirmationMessage.textContent = "We couldn't email your copy, but your results are displayed below.";
-    } else if (wantsEmail) {
-        confirmationMessage.textContent = `Thanks—your responses are in. We'll email a copy to ${email}.`;
     } else {
-        confirmationMessage.textContent = "Thanks—your responses are in. We'll email a copy to our advisors.";
+        confirmationMessage.textContent = "Petra has received your responses and will begin developing an Investment Policy Statement based on your profile.";
     }
     
     confirmationBar.style.display = 'block';

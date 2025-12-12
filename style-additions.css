@@ -150,10 +150,11 @@
 
 .petra-hero-image {
   display: block;
-  max-width: 100%;
-  width: 100%;
+  max-width: 800px;
+  width: auto;
   height: auto;
   margin: 0 auto;
+  object-fit: contain;
 }
 
 /* Header container - simplified for single image */
@@ -169,11 +170,19 @@
     padding: var(--space-3) 0 var(--space-2);
     margin-bottom: var(--space-2);
   }
+
+  .petra-hero-image {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
   .petra-header.page-hero {
     padding: var(--space-2) 0 var(--space-1);
+  }
+
+  .petra-hero-image {
+    max-width: 100%;
   }
 }
 /* 6. ASSESSMENT OPTIONS CARD - Reduce top margin by ~35% */
