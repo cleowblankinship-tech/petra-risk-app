@@ -1211,6 +1211,12 @@ button,
     margin: var(--space-5) 0;
 }
 
+.results-intro {
+    background: var(--petra-gold-pale);
+    border: 2px solid var(--petra-gold);
+    margin-top: var(--space-4);
+}
+
 .insight-section h3 {
     font-size: 1.25rem;
     font-weight: 600;

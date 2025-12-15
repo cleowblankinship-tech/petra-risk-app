@@ -1072,7 +1072,6 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     document.getElementById('riskBand').className = 'risk-band ' + rbClass;
     document.getElementById('progressFill').style.width = finalScore + '%';
 
-    displayScoreInterpretation(finalScore);
     displayPersonalizedInsights();
     displayRiskScale(finalScore);
 
@@ -1132,18 +1131,24 @@ function displayPersonalizedInsights() {
     if (!lastComputed) return;
 
     // Show all insight sections
+    document.getElementById('resultsIntroduction').style.display = 'block';
     document.getElementById('overallSummary').style.display = 'block';
-    document.getElementById('sectionInsights').style.display = 'block';
+    document.getElementById('mindsetSection').style.display = 'block';
+    document.getElementById('traditionalSection').style.display = 'block';
     document.getElementById('alignmentCheck').style.display = 'block';
     document.getElementById('planningRelevance').style.display = 'block';
 
     // Generate content
+    document.getElementById('resultsIntroText').textContent = generateResultsIntroduction();
     document.getElementById('overallSummaryText').textContent = generateOverallSummary(lastComputed);
     document.getElementById('mindsetInsight').textContent = generateMindsetInsight(lastComputed);
-    document.getElementById('knowledgeInsight').textContent = generateKnowledgeInsight(lastComputed);
     document.getElementById('traditionalInsight').textContent = generateTraditionalInsight(lastComputed);
     document.getElementById('alignmentText').textContent = generateAlignmentCheck(lastComputed);
     document.getElementById('planningText').textContent = generatePlanningRelevance(lastComputed);
+}
+
+function generateResultsIntroduction() {
+    return 'This assessment is a starting point for conversation, not a final answer. At Petra, we believe risk tolerance is personal, contextual, and shaped by more than a questionnaire can capture. Your responses help us organize our thinking and frame initial discussions, but the real work happens through dialogue — understanding your goals, your life circumstances, and what you need from your portfolio both financially and emotionally. These results give us a foundation. Your advisor will use them to ask better questions, provide relevant examples, and make sure your investment strategy reflects who you actually are, not just a number on a page.';
 }
 
 function generateOverallSummary(data) {
@@ -1152,29 +1157,23 @@ function generateOverallSummary(data) {
     var behavioral = data.behavioralScore;
     var traditional = data.traditionalScore;
 
-    var summary = '';
+    var summary = 'Your overall score is ' + score + ' out of 100, which places you in the "' + band + '" range. ';
 
     if (score <= 24) {
-        summary = 'Your score of ' + score + ' places you in the Very Conservative range, reflecting a strong preference for capital preservation and stability. ';
+        summary += 'This suggests you prioritize protecting what you have over chasing growth. Stability and predictability feel important, and you likely prefer strategies where the path forward is clear and the potential for loss is limited. That doesn\'t mean you avoid all risk — it means the risk you take needs to feel justified, understandable, and proportionate to the outcome.';
     } else if (score <= 44) {
-        summary = 'Your score of ' + score + ' places you in the Conservative range, indicating comfort with modest risk when appropriately supported. ';
+        summary += 'This suggests you\'re open to taking some risk when there\'s a clear rationale, but you want to feel confident in the reasoning. You\'re not looking for the most aggressive path forward, but you\'re also not trying to avoid all uncertainty. You likely value portfolios that balance growth with downside protection, and you appreciate explanations that help you understand what you\'re invested in and why.';
     } else if (score <= 59) {
-        summary = 'Your score of ' + score + ' places you in the Balanced range, showing a thoughtful equilibrium between growth objectives and risk management. ';
+        summary += 'This reflects a middle ground between caution and conviction. You understand that growth requires accepting some volatility, but you also want strategies that don\'t feel reckless or overly speculative. You probably make investment decisions based on evidence and reason rather than emotion, and you\'re comfortable with market swings as long as they don\'t feel extreme or prolonged.';
     } else if (score <= 74) {
-        summary = 'Your score of ' + score + ' places you in the Balanced Growth range, suggesting comfort with meaningful equity exposure while maintaining some downside protection. ';
+        summary += 'This indicates comfort with meaningful equity exposure and a focus on long-term growth. You likely understand that building wealth means staying invested through market cycles, and short-term volatility doesn\'t derail your confidence. You may still want some downside management — not because you panic during declines, but because having a plan for bad markets makes it easier to stick with good strategies.';
     } else if (score <= 89) {
-        summary = 'Your score of ' + score + ' places you in the Growth range, reflecting strong tolerance for market volatility in pursuit of long-term returns. ';
+        summary += 'This reflects strong tolerance for market volatility and a long-term orientation. You\'re likely comfortable staying invested through significant drawdowns, and you probably view declines as part of the process rather than a signal to exit. You may focus more on outcomes than interim fluctuations, and you likely respond well to strategies that emphasize conviction and evidence over short-term noise.';
     } else {
-        summary = 'Your score of ' + score + ' places you in the Aggressive Growth range, indicating exceptional comfort with market fluctuations and a focus on maximum long-term growth. ';
+        summary += 'This suggests very high tolerance for volatility and a focus on maximizing long-term growth. You probably view market declines as opportunities rather than threats, and you\'re comfortable with strategies that require patience and conviction. You likely prefer portfolios that take meaningful positions based on long-term themes, and you don\'t need constant reassurance during periods of underperformance.';
     }
 
-    // Check consistency
-    var scoreDiff = Math.abs((behavioral / 60) - (traditional / 40));
-    if (scoreDiff < 0.15) {
-        summary += 'Your behavioral tendencies align closely with your practical circumstances and experience, suggesting a well-integrated approach to investment decisions.';
-    } else {
-        summary += 'This reflects how your natural decision-making style combines with your time horizon and goals to shape your overall risk capacity.';
-    }
+    summary += ' Your behavioral score (' + behavioral + ' out of 60) and traditional score (' + traditional + ' out of 40) combine to shape this overall picture.';
 
     return summary;
 }
@@ -1183,16 +1182,16 @@ function generateMindsetInsight(data) {
     var behavioral = data.behavioralScore;
     var normalized = behavioral / 60; // 0-1 scale
 
-    var insight = '';
+    var insight = 'This score (' + behavioral + ' out of 60) reflects how you tend to think and feel about investment decisions — your natural reactions to gains, losses, and uncertainty. ';
 
     if (normalized >= 0.75) {
-        insight = 'Your responses suggest strong confidence in your decision-making and low sensitivity to short-term losses. You appear comfortable staying invested during volatility and tend to focus on long-term outcomes rather than interim fluctuations. This mindset supports growth-oriented strategies with meaningful equity exposure.';
+        insight += 'Your responses suggest you stay calm and focused during market turbulence. If the market dropped 20% over a few months, you\'d likely view it as part of the process rather than a reason to abandon your strategy. You probably don\'t check your portfolio obsessively, and when you do see negative numbers, they don\'t trigger an emotional need to "do something." You might even see periods of weakness as opportunities to add to positions you believe in. This mindset is well-suited for equity-heavy portfolios where the path to long-term growth includes inevitable short-term setbacks.';
     } else if (normalized >= 0.55) {
-        insight = 'Your responses indicate a balanced emotional approach to investing. You show reasonable comfort with market swings but maintain awareness of downside risk. You likely make thoughtful, evidence-based decisions without being overly reactive to short-term market movements.';
+        insight += 'Your responses indicate a thoughtful, measured approach. You don\'t panic when markets decline, but you also don\'t ignore the discomfort entirely. If your portfolio dropped 15% during a volatile quarter, you\'d probably want to understand why it happened and whether anything fundamental changed. You might feel some unease, but you wouldn\'t necessarily act on it — especially if your advisor explained that the decline was consistent with normal market behavior. You value strategies that balance growth with downside awareness, and you likely appreciate communication that helps you stay grounded during uncertain periods.';
     } else if (normalized >= 0.35) {
-        insight = 'Your responses reflect a more cautious decision-making style, with moderate sensitivity to losses and a preference for stability. You value seeing clear rationale before accepting risk, and you may find reassurance in strategies that emphasize downside protection alongside growth.';
+        insight += 'Your responses reflect a more cautious emotional relationship with risk. You feel the weight of potential losses more acutely than potential gains, and market declines can be genuinely uncomfortable even when you understand they\'re temporary. If your portfolio fell 10% over a few weeks, you\'d probably want reassurance that your strategy still makes sense. You might not sell immediately, but you\'d think about it. This doesn\'t mean you can\'t invest successfully — it just means your portfolio should be structured in a way that doesn\'t test your emotional limits too often. Strategies with lower volatility, clear downside guardrails, or more conservative positioning may suit you better.';
     } else {
-        insight = 'Your responses suggest strong loss aversion and a preference for capital preservation. Market volatility feels uncomfortable, and you likely prioritize protecting what you have over pursuing aggressive growth. A conservative, stability-focused approach aligns well with this mindset.';
+        insight += 'Your responses suggest that market volatility feels genuinely stressful, and protecting what you have is a higher priority than chasing growth. If your investments dropped even 5-8%, you\'d likely feel anxious and might consider moving to cash or safer positions. This isn\'t a flaw — it\'s an honest recognition of what you need from your portfolio. The goal isn\'t to change how you feel; it\'s to build a strategy that respects it. That might mean more conservative positioning, more frequent communication during down markets, or portfolios designed to prioritize stability even if it means accepting lower long-term returns.';
     }
 
     return insight;
@@ -1229,68 +1228,50 @@ function generateTraditionalInsight(data) {
     var normalized = traditional / 40; // 0-1 scale
     var scores = data.traditionalScores;
 
-    var insight = '';
+    var insight = 'This score (' + traditional + ' out of 40) reflects your time horizon, your comfort with specific market scenarios, and your goals. ';
 
-    // Time horizon insight
     var timeHorizon = scores.timeHorizon;
-    if (timeHorizon >= 0.75) {
-        insight = 'Your long time horizon provides significant flexibility for growth-oriented strategies. ';
-    } else if (timeHorizon >= 0.5) {
-        insight = 'Your intermediate time horizon supports a balanced approach between growth and stability. ';
-    } else {
-        insight = 'Your shorter time horizon calls for more conservative positioning with emphasis on capital preservation. ';
-    }
-
-    // Drawdown tolerance
     var drawdown = scores.drawdownDiscipline;
-    if (drawdown >= 0.75) {
-        insight += 'You express confidence staying invested through significant market declines, which is essential for equity-heavy portfolios. ';
-    } else if (drawdown >= 0.5) {
-        insight += 'You show measured discipline during market stress, though extended volatility may test your comfort level. ';
-    } else {
-        insight += 'Market declines feel uncomfortable, and you may prefer strategies that emphasize capital preservation during turbulent periods. ';
-    }
 
-    // Loss tolerance patterns
-    var lossFreq = scores.lossFrequencyTolerance || 0.5;
-    if (lossFreq >= 0.75) {
-        insight += 'You demonstrate resilience through periods of underperformance, which supports long-term wealth building.';
-    } else if (lossFreq >= 0.5) {
-        insight += 'Sequential losses may require reassurance, which your advisor can provide through regular communication.';
+    // Combined narrative based on time + discipline
+    if (timeHorizon >= 0.75 && drawdown >= 0.75) {
+        insight += 'You have a long time horizon and express confidence staying invested through major market declines. That combination is powerful — it means you can ride out the inevitable bad periods without being forced to sell at the wrong time. You probably don\'t need your portfolio to perform well every quarter or even every year. You\'re thinking in decades, not months, which gives you the freedom to pursue strategies that might look terrible in the short run but make sense over the long haul. This is the kind of mindset that supports equity-heavy portfolios, concentrated positions, or strategies that require patience.';
+    } else if (timeHorizon >= 0.75 && drawdown < 0.75) {
+        insight += 'You have a long time horizon, which theoretically gives you flexibility, but your responses suggest you\'re not fully comfortable with the emotional reality of severe drawdowns. That\'s worth acknowledging. Just because you don\'t need the money for 20 years doesn\'t mean you\'ll sleep well if your portfolio drops 30%. Your advisor can help you find a middle ground — taking enough risk to meet your goals without structuring your portfolio in a way that makes you miserable during downturns.';
+    } else if (timeHorizon < 0.5 && drawdown >= 0.75) {
+        insight += 'Your time horizon is shorter, but you express confidence handling market declines. That\'s an interesting combination. You may have near-term liquidity needs, but you also don\'t panic when markets fall. Your advisor will likely structure your portfolio with this duality in mind — maintaining enough stability for upcoming needs while still positioning you to participate in growth where it makes sense.';
+    } else if (timeHorizon < 0.5) {
+        insight += 'Your time horizon is relatively short, which naturally points toward more conservative positioning. You probably need some portion of your portfolio to be stable and accessible, and you may not have the luxury of waiting out long recovery periods if markets decline significantly. That doesn\'t mean you can\'t take any risk, but it does mean your strategy should reflect the reality that you might need access to this money sooner rather than later.';
     } else {
-        insight += 'Avoiding extended periods of negative returns is a priority, suggesting strategies with lower volatility may suit you better.';
+        insight += 'You have a moderate time horizon and a measured approach to market stress. You\'re not overly aggressive, but you\'re also not trying to avoid all volatility. You probably want a strategy that grows over time without feeling reckless, and you likely value portfolios that balance upside potential with downside awareness. Your advisor will help calibrate that balance based on your specific goals and circumstances.';
     }
 
     return insight;
 }
 
 function generateAlignmentCheck(data) {
-    var behavioral = data.behavioralScore / 60;
-    var traditional = data.traditionalScore / 40;
-    var knowledge = data.knowledge.index / 100;
+    var behavioral = data.behavioralScore;
+    var traditional = data.traditionalScore;
+    var behavioralNorm = behavioral / 60;
+    var traditionalNorm = traditional / 40;
 
-    var diff = Math.abs(behavioral - traditional);
+    var diff = Math.abs(behavioralNorm - traditionalNorm);
 
     var alignment = '';
 
     if (diff < 0.15) {
-        alignment = 'Your emotional approach to risk, your practical circumstances, and your knowledge level are well-aligned. This consistency suggests your portfolio strategy can be built around a coherent risk tolerance framework without significant internal tensions.';
-    } else if (diff < 0.25) {
-        alignment = 'There is some variation between your emotional comfort with risk and your practical risk capacity. This is common and can be managed through portfolio construction that balances these elements — for example, taking enough risk to meet your goals while using strategies that smooth the emotional experience of volatility.';
+        alignment = 'Your emotional approach to risk and your practical circumstances are closely aligned. Your behavioral score (' + behavioral + ') and traditional score (' + traditional + ') tell a consistent story. This makes it easier to build a portfolio strategy that feels right both intellectually and emotionally. You\'re not fighting against yourself — your instincts about what you can handle match up reasonably well with your goals and time horizon. That internal consistency is valuable. It means your advisor can focus on execution rather than reconciling conflicting signals.';
+    } else if (diff < 0.30) {
+        alignment = 'There\'s some difference between your emotional comfort with risk (behavioral score: ' + behavioral + ') and your practical capacity for it (traditional score: ' + traditional + '). This is common, and it\'s not a problem — it just means there\'s a conversation to be had. You might have the time horizon and goals to support more risk than feels emotionally comfortable, or you might feel braver than your circumstances actually allow. Your advisor will help you navigate that gap. The goal isn\'t to force you into a strategy that feels wrong; it\'s to find an approach that respects both dimensions.';
     } else {
-        alignment = 'Your behavioral responses and practical circumstances suggest different risk orientations. This isn\'t a problem — it simply means your advisor will help you navigate this difference. You might have the capacity for more risk than feels comfortable, or vice versa, and the right strategy will acknowledge both dimensions.';
-    }
-
-    // Knowledge consideration
-    if (knowledge < 0.5 && (behavioral > 0.7 || traditional > 0.7)) {
-        alignment += ' Your developing investment knowledge is worth noting as you build experience with more complex strategies.';
+        alignment = 'Your behavioral score (' + behavioral + ') and traditional score (' + traditional + ') suggest some meaningful divergence. Maybe you have a long time horizon but strong loss aversion, or maybe you\'re emotionally comfortable with volatility but have near-term liquidity needs. These kinds of mismatches aren\'t failures — they\'re just realities your advisor will work with. The portfolio strategy that emerges from this assessment won\'t be a simple translation of your risk score. It\'ll be a thoughtful synthesis of what you need, what you can handle, and what makes sense given your actual life and goals.';
     }
 
     return alignment;
 }
 
 function generatePlanningRelevance(data) {
-    return 'This assessment helps your advisor in several ways: structuring your portfolio to match your actual risk tolerance (not just a questionnaire score), setting realistic expectations for how your investments might perform in different market environments, and tailoring communication during periods of volatility so you receive the right type of information at the right time. It also informs decisions about rebalancing, tax management, and when to consider adjustments as your circumstances or goals evolve. This is a starting point for ongoing conversations, not a one-time classification.';
+    return 'At Petra, we don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where potential friction points might emerge between your goals and your comfort level. Your advisor will use these results to frame conversations about portfolio structure — not just what you should own, but why, and how it\'s supposed to work in different market environments. They\'ll also use it to calibrate communication. Some clients want detailed explanations during downturns; others prefer minimal contact and trust the plan. Some need reassurance when markets are volatile; others want to talk about opportunities. Knowing your tendencies helps us provide the right kind of support at the right time. This also informs practical decisions: how much liquidity to maintain, when rebalancing makes sense, how to structure accounts for tax efficiency, and when it might be worth revisiting your strategy as your life changes. But none of this is automatic. Your advisor will talk through these decisions with you, not for you.';
 }
 
 function displayKnowledgeOverlay() {
