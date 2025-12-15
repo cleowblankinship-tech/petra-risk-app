@@ -1202,6 +1202,56 @@ button,
     color: var(--petra-charcoal);
 }
 
+/* Insight Sections */
+.insight-section {
+    background: var(--petra-white);
+    border: 1px solid var(--petra-warm-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    margin: var(--space-5) 0;
+}
+
+.insight-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--petra-charcoal);
+    margin-bottom: var(--space-3);
+}
+
+.insight-section p {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--petra-charcoal);
+}
+
+.insight-sections {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin: var(--space-5) 0;
+}
+
+.insight-card {
+    background: var(--petra-white);
+    border: 1px solid var(--petra-warm-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+}
+
+.insight-card h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--petra-gold);
+    margin-bottom: var(--space-2);
+}
+
+.insight-card p {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--petra-charcoal);
+    margin: 0;
+}
+
 /* Risk Scale Visualization */
 .risk-scale-visualization {
     background: var(--petra-white);

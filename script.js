@@ -1071,16 +1071,17 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     document.getElementById('riskBand').textContent = riskBand;
     document.getElementById('riskBand').className = 'risk-band ' + rbClass;
     document.getElementById('progressFill').style.width = finalScore + '%';
-    
+
     displayScoreInterpretation(finalScore);
+    displayPersonalizedInsights();
     displayRiskScale(finalScore);
-    
+
     // Show advisor sections if in advisor view
     if (isAdvisorView) {
         displayKnowledgeOverlay();
         generateAdvisorContent();
     }
-    
+
     setTimeout(function() {
         document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
     }, 100);
@@ -1125,6 +1126,171 @@ function displayScoreInterpretation(score) {
     document.getElementById('scoreInterpretation').style.display = 'block';
     document.getElementById('interpretationTitle').textContent = isAdvisorView ? "Client's Risk Profile" : 'Your Risk Profile';
     document.getElementById('interpretationText').textContent = interpretationText;
+}
+
+function displayPersonalizedInsights() {
+    if (!lastComputed) return;
+
+    // Show all insight sections
+    document.getElementById('overallSummary').style.display = 'block';
+    document.getElementById('sectionInsights').style.display = 'block';
+    document.getElementById('alignmentCheck').style.display = 'block';
+    document.getElementById('planningRelevance').style.display = 'block';
+
+    // Generate content
+    document.getElementById('overallSummaryText').textContent = generateOverallSummary(lastComputed);
+    document.getElementById('mindsetInsight').textContent = generateMindsetInsight(lastComputed);
+    document.getElementById('knowledgeInsight').textContent = generateKnowledgeInsight(lastComputed);
+    document.getElementById('traditionalInsight').textContent = generateTraditionalInsight(lastComputed);
+    document.getElementById('alignmentText').textContent = generateAlignmentCheck(lastComputed);
+    document.getElementById('planningText').textContent = generatePlanningRelevance(lastComputed);
+}
+
+function generateOverallSummary(data) {
+    var score = data.finalScore;
+    var band = data.riskBand;
+    var behavioral = data.behavioralScore;
+    var traditional = data.traditionalScore;
+
+    var summary = '';
+
+    if (score <= 24) {
+        summary = 'Your score of ' + score + ' places you in the Very Conservative range, reflecting a strong preference for capital preservation and stability. ';
+    } else if (score <= 44) {
+        summary = 'Your score of ' + score + ' places you in the Conservative range, indicating comfort with modest risk when appropriately supported. ';
+    } else if (score <= 59) {
+        summary = 'Your score of ' + score + ' places you in the Balanced range, showing a thoughtful equilibrium between growth objectives and risk management. ';
+    } else if (score <= 74) {
+        summary = 'Your score of ' + score + ' places you in the Balanced Growth range, suggesting comfort with meaningful equity exposure while maintaining some downside protection. ';
+    } else if (score <= 89) {
+        summary = 'Your score of ' + score + ' places you in the Growth range, reflecting strong tolerance for market volatility in pursuit of long-term returns. ';
+    } else {
+        summary = 'Your score of ' + score + ' places you in the Aggressive Growth range, indicating exceptional comfort with market fluctuations and a focus on maximum long-term growth. ';
+    }
+
+    // Check consistency
+    var scoreDiff = Math.abs((behavioral / 60) - (traditional / 40));
+    if (scoreDiff < 0.15) {
+        summary += 'Your behavioral tendencies align closely with your practical circumstances and experience, suggesting a well-integrated approach to investment decisions.';
+    } else {
+        summary += 'This reflects how your natural decision-making style combines with your time horizon and goals to shape your overall risk capacity.';
+    }
+
+    return summary;
+}
+
+function generateMindsetInsight(data) {
+    var behavioral = data.behavioralScore;
+    var normalized = behavioral / 60; // 0-1 scale
+
+    var insight = '';
+
+    if (normalized >= 0.75) {
+        insight = 'Your responses suggest strong confidence in your decision-making and low sensitivity to short-term losses. You appear comfortable staying invested during volatility and tend to focus on long-term outcomes rather than interim fluctuations. This mindset supports growth-oriented strategies with meaningful equity exposure.';
+    } else if (normalized >= 0.55) {
+        insight = 'Your responses indicate a balanced emotional approach to investing. You show reasonable comfort with market swings but maintain awareness of downside risk. You likely make thoughtful, evidence-based decisions without being overly reactive to short-term market movements.';
+    } else if (normalized >= 0.35) {
+        insight = 'Your responses reflect a more cautious decision-making style, with moderate sensitivity to losses and a preference for stability. You value seeing clear rationale before accepting risk, and you may find reassurance in strategies that emphasize downside protection alongside growth.';
+    } else {
+        insight = 'Your responses suggest strong loss aversion and a preference for capital preservation. Market volatility feels uncomfortable, and you likely prioritize protecting what you have over pursuing aggressive growth. A conservative, stability-focused approach aligns well with this mindset.';
+    }
+
+    return insight;
+}
+
+function generateKnowledgeInsight(data) {
+    var knowledge = data.knowledge;
+    var index = knowledge.index;
+    var flag = knowledge.flag;
+
+    var insight = '';
+
+    if (index >= 75) {
+        insight = 'You demonstrate strong familiarity with investment concepts and feel confident evaluating financial decisions. ';
+    } else if (index >= 50) {
+        insight = 'You show solid foundational knowledge of investment principles and moderate confidence in financial decision-making. ';
+    } else {
+        insight = 'You have developing knowledge of investment concepts and may benefit from educational support as your portfolio grows in complexity. ';
+    }
+
+    if (flag === 'overconfidence') {
+        insight += 'Your confidence in this area runs slightly ahead of your objective knowledge base. This is common and easily addressed through targeted education on specific topics as they become relevant to your plan.';
+    } else if (flag === 'underconfidence') {
+        insight += 'You may be more knowledgeable than you give yourself credit for. Building confidence through experience and education will help you feel more comfortable with investment decisions.';
+    } else {
+        insight += 'Your self-assessment of your knowledge level aligns well with your demonstrated understanding, indicating good awareness of your capabilities.';
+    }
+
+    return insight;
+}
+
+function generateTraditionalInsight(data) {
+    var traditional = data.traditionalScore;
+    var normalized = traditional / 40; // 0-1 scale
+    var scores = data.traditionalScores;
+
+    var insight = '';
+
+    // Time horizon insight
+    var timeHorizon = scores.timeHorizon;
+    if (timeHorizon >= 0.75) {
+        insight = 'Your long time horizon provides significant flexibility for growth-oriented strategies. ';
+    } else if (timeHorizon >= 0.5) {
+        insight = 'Your intermediate time horizon supports a balanced approach between growth and stability. ';
+    } else {
+        insight = 'Your shorter time horizon calls for more conservative positioning with emphasis on capital preservation. ';
+    }
+
+    // Drawdown tolerance
+    var drawdown = scores.drawdownDiscipline;
+    if (drawdown >= 0.75) {
+        insight += 'You express confidence staying invested through significant market declines, which is essential for equity-heavy portfolios. ';
+    } else if (drawdown >= 0.5) {
+        insight += 'You show measured discipline during market stress, though extended volatility may test your comfort level. ';
+    } else {
+        insight += 'Market declines feel uncomfortable, and you may prefer strategies that emphasize capital preservation during turbulent periods. ';
+    }
+
+    // Loss tolerance patterns
+    var lossFreq = scores.lossFrequencyTolerance || 0.5;
+    if (lossFreq >= 0.75) {
+        insight += 'You demonstrate resilience through periods of underperformance, which supports long-term wealth building.';
+    } else if (lossFreq >= 0.5) {
+        insight += 'Sequential losses may require reassurance, which your advisor can provide through regular communication.';
+    } else {
+        insight += 'Avoiding extended periods of negative returns is a priority, suggesting strategies with lower volatility may suit you better.';
+    }
+
+    return insight;
+}
+
+function generateAlignmentCheck(data) {
+    var behavioral = data.behavioralScore / 60;
+    var traditional = data.traditionalScore / 40;
+    var knowledge = data.knowledge.index / 100;
+
+    var diff = Math.abs(behavioral - traditional);
+
+    var alignment = '';
+
+    if (diff < 0.15) {
+        alignment = 'Your emotional approach to risk, your practical circumstances, and your knowledge level are well-aligned. This consistency suggests your portfolio strategy can be built around a coherent risk tolerance framework without significant internal tensions.';
+    } else if (diff < 0.25) {
+        alignment = 'There is some variation between your emotional comfort with risk and your practical risk capacity. This is common and can be managed through portfolio construction that balances these elements — for example, taking enough risk to meet your goals while using strategies that smooth the emotional experience of volatility.';
+    } else {
+        alignment = 'Your behavioral responses and practical circumstances suggest different risk orientations. This isn\'t a problem — it simply means your advisor will help you navigate this difference. You might have the capacity for more risk than feels comfortable, or vice versa, and the right strategy will acknowledge both dimensions.';
+    }
+
+    // Knowledge consideration
+    if (knowledge < 0.5 && (behavioral > 0.7 || traditional > 0.7)) {
+        alignment += ' Your developing investment knowledge is worth noting as you build experience with more complex strategies.';
+    }
+
+    return alignment;
+}
+
+function generatePlanningRelevance(data) {
+    return 'This assessment helps your advisor in several ways: structuring your portfolio to match your actual risk tolerance (not just a questionnaire score), setting realistic expectations for how your investments might perform in different market environments, and tailoring communication during periods of volatility so you receive the right type of information at the right time. It also informs decisions about rebalancing, tax management, and when to consider adjustments as your circumstances or goals evolve. This is a starting point for ongoing conversations, not a one-time classification.';
 }
 
 function displayKnowledgeOverlay() {
