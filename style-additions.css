@@ -140,10 +140,6 @@
    ============================================================================ */
 
 /* 1. HEADER CONTAINER - Reduce top spacing by ~40% */
-.petra-header.page-hero {
-  padding: var(--space-3) 0 var(--space-1);  /* UPDATED from --space-4 and --space-3 */
-  margin-bottom: var(--space-2);              /* UPDATED from --space-3 */
-}
 /* ============================================================================
    HERO IMAGE (replaces logo + title stack)
    ============================================================================ */
@@ -159,16 +155,16 @@
 
 /* Header container - simplified for single image */
 .petra-header.page-hero {
-  padding: var(--space-4) 0 var(--space-3);
-  margin-bottom: var(--space-3);
+  padding: var(--space-2) 0 var(--space-1);
+  margin-bottom: 8px;
   text-align: center;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .petra-header.page-hero {
-    padding: var(--space-3) 0 var(--space-2);
-    margin-bottom: var(--space-2);
+    padding: var(--space-1) 0 var(--space-1);
+    margin-bottom: 8px;
   }
 
   .petra-hero-image {
@@ -178,7 +174,8 @@
 
 @media (max-width: 480px) {
   .petra-header.page-hero {
-    padding: var(--space-2) 0 var(--space-1);
+    padding: var(--space-1) 0 0;
+    margin-bottom: 8px;
   }
 
   .petra-hero-image {
