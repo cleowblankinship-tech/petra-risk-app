@@ -1078,38 +1078,37 @@ button,
     box-shadow: var(--shadow-md);
 }
 
+.risk-band {
+    display: inline-block;
+    padding: 16px 32px;
+    background: var(--petra-charcoal);
+    color: var(--petra-white);
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-5);
+}
+
 .main-score {
     font-family: var(--font-heading);
-    font-size: 6rem;
-    font-weight: 700;
+    font-size: 3.5rem;
+    font-weight: 600;
     line-height: 1;
-    color: var(--petra-gold);
-    margin-bottom: var(--space-2);
-    text-transform: uppercase;
+    color: var(--petra-warm-500);
+    margin-bottom: var(--space-1);
     letter-spacing: -0.02em;
 }
 
 .score-label {
     font-family: var(--font-heading);
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--petra-charcoal);
-    margin-bottom: var(--space-3);
-}
-
-.risk-band {
-    display: inline-block;
-    padding: 10px 24px;
-    background: var(--petra-charcoal);
-    color: var(--petra-white);
-    font-family: var(--font-heading);
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-radius: var(--radius-full);
+    color: var(--petra-warm-400);
     margin-bottom: var(--space-4);
 }
 
@@ -1207,21 +1206,26 @@ button,
     background: var(--petra-white);
     border: 1px solid var(--petra-warm-200);
     border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    margin: var(--space-5) 0;
+    padding: var(--space-6);
+    margin: var(--space-6) 0;
 }
 
 .results-intro {
     background: var(--petra-gold-pale);
     border: 2px solid var(--petra-gold);
     margin-top: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.insight-section:nth-of-type(even) {
+    background: #FAFAF9;
 }
 
 .insight-section h3 {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--petra-charcoal);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .insight-section p {
@@ -1263,20 +1267,33 @@ button,
     background: var(--petra-white);
     border: 1px solid var(--petra-warm-200);
     border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    margin: var(--space-5) 0;
+    padding: var(--space-6);
+    margin: var(--space-6) 0;
 }
 
 .risk-scale-visualization h4 {
     font-size: 1.125rem;
     text-align: center;
     margin-bottom: var(--space-4);
+    font-weight: 600;
+    color: var(--petra-charcoal);
+}
+
+.scale-explanation {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--petra-charcoal);
+    text-align: center;
+    margin-bottom: var(--space-4);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .risk-scale-bar {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 2px;
+    gap: 3px;
     height: 80px;
     border-radius: var(--radius-md);
     overflow: visible;
@@ -1290,10 +1307,21 @@ button,
     align-items: center;
     justify-content: center;
     padding: var(--space-2);
-    opacity: 0.4;
+    opacity: 0.5;
     transition: all var(--transition-base);
     height: 80px;
     box-shadow: none;
+    border-radius: var(--radius-md);
+}
+
+.risk-scale-segment:first-child {
+    border-top-left-radius: var(--radius-md);
+    border-bottom-left-radius: var(--radius-md);
+}
+
+.risk-scale-segment:last-child {
+    border-top-right-radius: var(--radius-md);
+    border-bottom-right-radius: var(--radius-md);
 }
 
 .risk-scale-segment.active {
@@ -1301,9 +1329,9 @@ button,
     height: 88px;
     padding-top: var(--space-3);
     padding-bottom: var(--space-3);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 0 3px var(--petra-charcoal);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
     z-index: 2;
-    border-radius: 7px;
+    transform: translateY(-4px);
 }
 
 .risk-scale-segment.active .risk-scale-label {

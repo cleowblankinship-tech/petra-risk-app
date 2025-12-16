@@ -144,14 +144,15 @@
 
             <!-- Results Introduction -->
             <div id="resultsIntroduction" class="insight-section results-intro" style="display: none;">
+                <h3>How to Read These Results</h3>
                 <p id="resultsIntroText"></p>
             </div>
 
             <!-- Main Score Display -->
             <div class="score-display">
+                <div class="risk-band" id="riskBand">--</div>
                 <div class="main-score" id="mainScore">--</div>
                 <div class="score-label">Risk Alignment Score</div>
-                <div class="risk-band" id="riskBand">--</div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
@@ -203,7 +204,9 @@
 
             <!-- Risk Scale Visualization -->
             <div id="riskScale" class="risk-scale-visualization" style="display: none;">
-                <h4>Risk Profile Scale</h4>
+                <h4>Understanding the Scale</h4>
+                <p class="scale-explanation">Scores closer to 0 typically reflect a preference for stability and capital preservation, where protecting what you have matters more than maximizing growth. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation, even when that means accepting substantial short-term fluctuations. Neither approach is better or worse. They represent different priorities, timeframes, and emotional relationships with uncertainty.</p>
+                <h4 style="margin-top: 1.5rem;">Risk Profile Scale</h4>
                 <div class="risk-scale-bar">
                     <div class="risk-scale-segment rs-very-cons" data-range="0-24">
                         <span class="risk-scale-label">Very Conservative</span>
