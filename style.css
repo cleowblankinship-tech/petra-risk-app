@@ -555,7 +555,7 @@ body {
     font-size: 1rem;
     line-height: 1.65;
     color: var(--petra-charcoal);
-    background: var(--petra-warm-50);
+    background: var(--petra-white);
     padding-bottom: var(--space-8);
 }
 
