@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petra Risk Assessment Results</title>
+    <link rel="stylesheet" href="https://use.typekit.net/zzj8xsy.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* PDF-specific resets */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Color Variables (matching style.css) */
+        :root {
+            --petra-gold: #9A7611;
+            --petra-gold-light: #B8904A;
+            --petra-charcoal: #25282A;
+            --petra-white: #FFFFFF;
+            --petra-warm-50: #f8f7f6;
+            --petra-warm-100: #F5F4F1;
+            --petra-warm-200: #E8E6E1;
+            --petra-warm-300: #D6D3CD;
+            --petra-warm-500: #6B6862;
+            --font-body: 'Crimson Pro', Georgia, serif;
+            --font-heading: 'brandon-grotesque', Arial, sans-serif;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --space-5: 32px;
+            --space-4: 24px;
+            --space-3: 16px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 16px;
+            line-height: 1.65;
+            color: var(--petra-charcoal);
+            background: var(--petra-white);
+            padding: 40px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo img {
+            max-width: 200px;
+            height: auto;
+        }
+
+        /* Results Introduction */
+        .results-intro {
+            background: #FEF7E8;
+            border: 2px solid var(--petra-gold);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin-bottom: var(--space-5);
+        }
+
+        .results-intro h3 {
+            font-family: var(--font-heading);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--petra-charcoal);
+            margin-bottom: var(--space-3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .results-intro p {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--petra-charcoal);
+        }
+
+        /* Score Display */
+        .score-display {
+            background: var(--petra-white);
+            border: 1px solid var(--petra-warm-200);
+            border-radius: var(--radius-lg);
+            padding: 48px 32px;
+            margin-bottom: var(--space-5);
+            text-align: center;
+        }
+
+        .risk-band {
+            display: inline-block;
+            padding: 16px 32px;
+            background: var(--petra-charcoal);
+            color: var(--petra-white);
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 50px;
+            margin-bottom: 24px;
+        }
+
+        .main-score {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            font-weight: 600;
+            line-height: 1;
+            color: var(--petra-warm-500);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .score-label {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--petra-warm-500);
+            margin-bottom: 24px;
+        }
+
+        /* Component Scores */
+        .sub-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: var(--space-5);
+        }
+
+        .sub-score {
+            background: var(--petra-white);
+            border: 1px solid var(--petra-warm-200);
+            border-radius: var(--radius-lg);
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .sub-score-value {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--petra-gold);
+            margin-bottom: 12px;
+        }
+
+        .sub-score-label {
+            font-family: var(--font-heading);
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--petra-charcoal);
+            margin-bottom: 12px;
+        }
+
+        .sub-score-description {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            color: var(--petra-warm-500);
+        }
+
+        /* Scale Explanation */
+        .scale-explanation-section {
+            background: var(--petra-white);
+            border: 1px solid var(--petra-warm-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin: var(--space-5) 0;
+            text-align: center;
+        }
+
+        .scale-explanation-section h4 {
+            font-family: var(--font-heading);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--petra-charcoal);
+            margin-bottom: var(--space-3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .scale-explanation-section p {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--petra-charcoal);
+            text-align: left;
+        }
+
+        /* Risk Scale Visualization */
+        .risk-scale-visualization {
+            background: var(--petra-white);
+            border: 1px solid var(--petra-warm-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin: var(--space-5) 0;
+        }
+
+        .risk-scale-visualization h4 {
+            font-family: var(--font-heading);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--petra-charcoal);
+            margin-bottom: var(--space-4);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .risk-scale-bar {
+            display: flex;
+            gap: 4px;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+
+        .risk-scale-segment {
+            flex: 1;
+            background: var(--petra-warm-100);
+            padding: 16px 8px;
+            text-align: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            opacity: 0.4;
+        }
+
+        .risk-scale-segment.active {
+            opacity: 1;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+            position: relative;
+            margin-top: -4px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .risk-scale-label {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--petra-white);
+            line-height: 1.2;
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+        }
+
+        .risk-scale-range {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 0.625rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .rs-very-cons { background: #8B6F5C; }
+        .rs-cons { background: #6B7280; }
+        .rs-balanced { background: #7EADAD; }
+        .rs-bal-growth { background: #93A2BC; }
+        .rs-growth { background: #CCA054; }
+        .rs-agg-growth { background: #9A7611; }
+
+        /* Insight Sections */
+        .insight-section {
+            background: var(--petra-white);
+            border: 1px solid var(--petra-warm-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin: var(--space-5) 0;
+            page-break-inside: avoid;
+        }
+
+        .insight-section h3 {
+            font-family: var(--font-heading);
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: var(--petra-charcoal);
+            margin-bottom: var(--space-4);
+            letter-spacing: -0.01em;
+        }
+
+        .insight-section p {
+            font-size: 1.0625rem;
+            line-height: 1.75;
+            color: var(--petra-charcoal);
+        }
+
+        /* Q&A Section */
+        .qa-section {
+            margin-top: 48px;
+            padding-top: 48px;
+            border-top: 2px solid var(--petra-warm-200);
+        }
+
+        .qa-section h2 {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--petra-charcoal);
+            margin-bottom: var(--space-5);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .qa-item {
+            background: var(--petra-white);
+            border: 1px solid var(--petra-warm-200);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 16px;
+            page-break-inside: avoid;
+        }
+
+        .qa-question {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--petra-charcoal);
+            margin-bottom: 12px;
+        }
+
+        .qa-section-label {
+            display: inline-block;
+            background: var(--petra-gold);
+            color: var(--petra-white);
+            font-family: var(--font-heading);
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .qa-answer {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--petra-warm-500);
+            margin-top: 8px;
+            padding-left: 16px;
+            border-left: 3px solid var(--petra-gold);
+        }
+
+        /* Footer */
+        .pdf-footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--petra-warm-200);
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--petra-warm-500);
+        }
+
+        /* Print optimizations */
+        @media print {
+            body {
+                padding: 20px;
+            }
+
+            .insight-section,
+            .qa-item {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        {{LOGO}}
+    </div>
+
+    <!-- How to Read These Results -->
+    <div class="results-intro">
+        <h3>How to Read These Results</h3>
+        <p>{{INTRO_TEXT}}</p>
+    </div>
+
+    <!-- Score Display -->
+    <div class="score-display">
+        <div class="risk-band">{{RISK_BAND}}</div>
+        <div class="main-score">{{SCORE}}</div>
+        <div class="score-label">Risk Alignment Score</div>
+    </div>
+
+    <!-- Component Scores -->
+    <div class="sub-scores">
+        <div class="sub-score">
+            <div class="sub-score-value">{{BEHAVIORAL_SCORE}}</div>
+            <div class="sub-score-label">Behavioral Component (0-60)</div>
+            <div class="sub-score-description">How you tend to think and feel about risk: your natural reactions to gains, losses, and uncertainty.</div>
+        </div>
+        <div class="sub-score">
+            <div class="sub-score-value">{{TRADITIONAL_SCORE}}</div>
+            <div class="sub-score-label">Traditional Component (0-40)</div>
+            <div class="sub-score-description">The practical side: how long you plan to invest, what you've experienced before, and what goals you're prioritizing.</div>
+        </div>
+    </div>
+
+    <!-- Understanding the Scale -->
+    <div class="scale-explanation-section">
+        <h4>Understanding the Scale</h4>
+        <p>Scores closer to 0 typically reflect a preference for stability and capital preservation, where protecting what you have matters more than maximizing growth. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation, even when that means accepting substantial short-term fluctuations. Neither approach is better or worse. They represent different priorities, timeframes, and emotional relationships with uncertainty.</p>
+    </div>
+
+    <!-- Risk Profile Scale -->
+    <div class="risk-scale-visualization">
+        <h4>Risk Profile Scale</h4>
+        <div class="risk-scale-bar">
+            <div class="risk-scale-segment rs-very-cons {{ACTIVE_0_24}}">
+                <span class="risk-scale-label">Very Conservative</span>
+                <span class="risk-scale-range">0-24</span>
+            </div>
+            <div class="risk-scale-segment rs-cons {{ACTIVE_25_44}}">
+                <span class="risk-scale-label">Conservative</span>
+                <span class="risk-scale-range">25-44</span>
+            </div>
+            <div class="risk-scale-segment rs-balanced {{ACTIVE_45_59}}">
+                <span class="risk-scale-label">Balanced</span>
+                <span class="risk-scale-range">45-59</span>
+            </div>
+            <div class="risk-scale-segment rs-bal-growth {{ACTIVE_60_74}}">
+                <span class="risk-scale-label">Balanced Growth</span>
+                <span class="risk-scale-range">60-74</span>
+            </div>
+            <div class="risk-scale-segment rs-growth {{ACTIVE_75_89}}">
+                <span class="risk-scale-label">Growth</span>
+                <span class="risk-scale-range">75-89</span>
+            </div>
+            <div class="risk-scale-segment rs-agg-growth {{ACTIVE_90_100}}">
+                <span class="risk-scale-label">Aggressive Growth</span>
+                <span class="risk-scale-range">90-100</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- What Your Score Reflects -->
+    <div class="insight-section">
+        <h3>What Your Score Reflects</h3>
+        <p>{{OVERALL_SUMMARY}}</p>
+    </div>
+
+    <!-- Behavioral Tendencies -->
+    <div class="insight-section">
+        <h3>Behavioral Tendencies and Investment Mindset</h3>
+        <p>{{MINDSET_INSIGHT}}</p>
+    </div>
+
+    <!-- Time Horizon -->
+    <div class="insight-section">
+        <h3>Time Horizon and Risk Capacity</h3>
+        <p>{{TRADITIONAL_INSIGHT}}</p>
+    </div>
+
+    <!-- How Elements Work Together -->
+    <div class="insight-section">
+        <h3>How These Elements Work Together</h3>
+        <p>{{ALIGNMENT_CHECK}}</p>
+    </div>
+
+    <!-- How Petra Uses This -->
+    <div class="insight-section">
+        <h3>How Petra Uses This Information</h3>
+        <p>{{PLANNING_RELEVANCE}}</p>
+    </div>
+
+    <!-- Q&A Section -->
+    <div class="qa-section">
+        <h2>Client Responses (Assessment Detail)</h2>
+        {{QA_ITEMS}}
+    </div>
+
+    <!-- Footer -->
+    <div class="pdf-footer">
+        <p><strong>IMPORTANT DISCLOSURE</strong></p>
+        <p>This assessment is for educational purposes only and should not be considered investment advice.</p>
+        <p style="margin-top: 16px;">© {{YEAR}} Petra Financial Advisors | 1880 Office Club Pointe, Suite 128 | Colorado Springs, CO 80920 | www.petrafinancial.com</p>
+    </div>
+</body>
+</html>

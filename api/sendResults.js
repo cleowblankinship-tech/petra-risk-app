@@ -4,6 +4,8 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const chromium = require('@sparticuz/chromium');
+const puppeteer = require('puppeteer-core');
 
 // Helper to generate a secure token
 function generateToken() {
@@ -134,10 +136,10 @@ function generatePlanningRelevance() {
 }
 
 // ============================================================================
-// PDF GENERATION (matching quiz results UI + Q&A appendix)
+// PDF GENERATION (using Puppeteer + HTML template)
 // ============================================================================
 
-function generateClientPDFContent(payload) {
+async function generateClientPDF(payload) {
   const { client, scores, meta, answers } = payload;
 
   // Generate all narrative sections
@@ -148,130 +150,107 @@ function generateClientPDFContent(payload) {
   const alignmentCheck = generateAlignmentCheck(scores);
   const planningRelevance = generatePlanningRelevance();
 
-  let content = `
-═══════════════════════════════════════════════════════════════════
-   PETRA FINANCIAL ADVISORS
-   Risk Alignment Assessment — Personal Results
-═══════════════════════════════════════════════════════════════════
+  // Determine which risk scale segment is active
+  const score = scores.overall;
+  const activeClasses = {
+    '0-24': score <= 24 ? 'active' : '',
+    '25-44': score >= 25 && score <= 44 ? 'active' : '',
+    '45-59': score >= 45 && score <= 59 ? 'active' : '',
+    '60-74': score >= 60 && score <= 74 ? 'active' : '',
+    '75-89': score >= 75 && score <= 89 ? 'active' : '',
+    '90-100': score >= 90 ? 'active' : ''
+  };
 
-${client.firstName} ${client.lastName}
-Assessment Date: ${meta.timestamp}
+  // Build Q&A items HTML
+  let qaItemsHTML = '';
+  if (answers && answers.length > 0) {
+    answers.forEach((a, i) => {
+      qaItemsHTML += `
+        <div class="qa-item">
+          <div class="qa-question">
+            ${a.section ? `<span class="qa-section-label">${a.section}</span>` : ''}
+            ${i + 1}. ${a.text}
+          </div>
+          <div class="qa-answer">
+            ${a.selectedOption}
+            ${a.numericValue !== undefined ? ` (Value: ${a.numericValue})` : ''}
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    qaItemsHTML = '<p style="text-align: center; color: #6B6862;">No detailed responses recorded.</p>';
+  }
 
+  // Load HTML template
+  const templatePath = path.join(__dirname, 'templates', 'results-pdf.html');
+  let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
 
-HOW TO READ THESE RESULTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Intro text
+  const introText = 'This assessment helps organize our conversation, not define you. At Petra, we know risk tolerance is personal and shaped by more than any questionnaire can measure. Your responses give us a starting point, a way to frame the discussion and ask better questions, but the real understanding comes from talking.';
 
-This assessment helps organize our conversation, not define you. At Petra,
-we know risk tolerance is personal and shaped by more than any questionnaire
-can measure. Your responses give us a starting point, a way to frame the
-discussion and ask better questions, but the real understanding comes from
-talking.
+  // Logo SVG path - for PDF we can embed the logo
+  const logoPath = path.join(__dirname, '..', 'assets', 'petra-email-logo.svg');
+  let logoHTML = '<div style="font-family: brandon-grotesque, Arial, sans-serif; font-size: 48px; font-weight: 700; color: #9A7611; letter-spacing: 2px;">PETRA</div>';
 
+  if (fs.existsSync(logoPath)) {
+    const logoSVG = fs.readFileSync(logoPath, 'utf-8');
+    logoHTML = `<img src="data:image/svg+xml;base64,${Buffer.from(logoSVG).toString('base64')}" alt="Petra Financial Advisors" style="max-width: 200px; height: auto;" />`;
+  }
 
-YOUR RISK ALIGNMENT SCORE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Replace template variables
+  htmlTemplate = htmlTemplate
+    .replace('{{LOGO}}', logoHTML)
+    .replace('{{INTRO_TEXT}}', introText)
+    .replace('{{RISK_BAND}}', scores.band)
+    .replace('{{SCORE}}', scores.overall)
+    .replace('{{BEHAVIORAL_SCORE}}', scores.behavioral)
+    .replace('{{TRADITIONAL_SCORE}}', scores.traditional)
+    .replace('{{ACTIVE_0_24}}', activeClasses['0-24'])
+    .replace('{{ACTIVE_25_44}}', activeClasses['25-44'])
+    .replace('{{ACTIVE_45_59}}', activeClasses['45-59'])
+    .replace('{{ACTIVE_60_74}}', activeClasses['60-74'])
+    .replace('{{ACTIVE_75_89}}', activeClasses['75-89'])
+    .replace('{{ACTIVE_90_100}}', activeClasses['90-100'])
+    .replace('{{OVERALL_SUMMARY}}', overallSummary)
+    .replace('{{MINDSET_INSIGHT}}', mindsetInsight)
+    .replace('{{TRADITIONAL_INSIGHT}}', traditionalInsight)
+    .replace('{{ALIGNMENT_CHECK}}', alignmentCheck)
+    .replace('{{PLANNING_RELEVANCE}}', planningRelevance)
+    .replace('{{QA_ITEMS}}', qaItemsHTML)
+    .replace('{{YEAR}}', new Date().getFullYear());
 
-Risk Band:      ${scores.band}
-Overall Score:  ${scores.overall}/100
+  // Launch Puppeteer and generate PDF
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
+  });
 
+  const page = await browser.newPage();
+  await page.setContent(htmlTemplate, { waitUntil: 'networkidle0' });
 
-COMPONENT SCORES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const pdfBuffer = await page.pdf({
+    format: 'Letter',
+    printBackground: true,
+    margin: {
+      top: '0.5in',
+      right: '0.5in',
+      bottom: '0.5in',
+      left: '0.5in'
+    }
+  });
 
-Behavioral Component: ${scores.behavioral}/60
-  How you tend to think and feel about risk — your natural reactions
-  to gains, losses, and uncertainty.
+  await browser.close();
 
-Traditional Component: ${scores.traditional}/40
-  The practical side — time horizon, experience, and goal priorities.
-
-
-UNDERSTANDING THE SCALE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Scores closer to 0 typically reflect a preference for stability and capital
-preservation, where protecting what you have matters more than maximizing
-growth. Scores closer to 100 tend to indicate comfort with significant
-market volatility and a focus on long-term wealth accumulation, even when
-that means accepting substantial short-term fluctuations. Neither approach
-is better or worse. They represent different priorities, timeframes, and
-emotional relationships with uncertainty.
-
-
-RISK PROFILE SCALE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Very Conservative (0-24) | Conservative (25-44) | Balanced (45-59)
-Balanced Growth (60-74) | Growth (75-89) | Aggressive Growth (90-100)
-
-Your score: ${scores.overall} → ${scores.band}
-
-
-WHAT YOUR SCORE REFLECTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${overallSummary}
-
-
-BEHAVIORAL TENDENCIES AND INVESTMENT MINDSET
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${mindsetInsight}
-
-
-TIME HORIZON AND RISK CAPACITY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${traditionalInsight}
-
-
-HOW THESE ELEMENTS WORK TOGETHER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${alignmentCheck}
-
-
-HOW PETRA USES THIS INFORMATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${planningRelevance}
-
-
-═══════════════════════════════════════════════════════════════════
-   YOUR RESPONSES
-═══════════════════════════════════════════════════════════════════
-
-${answers && answers.length > 0 ? answers.map((a, i) => `
-${i + 1}. ${a.section ? `[${a.section}] ` : ''}${a.text}
-
-   Response: ${a.selectedOption}
-   ${a.numericValue !== undefined ? `Value: ${a.numericValue}` : ''}
-
-`).join('─────────────────────────────────────────────────────────────────\n') : 'No detailed responses recorded'}
-
-═══════════════════════════════════════════════════════════════════
-
-IMPORTANT DISCLOSURE
-This assessment is for educational purposes only and should not be
-considered investment advice. Your complete portfolio strategy should
-be developed in consultation with your financial advisor.
-
-© ${new Date().getFullYear()} Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
-www.petrafinancial.com
-
-═══════════════════════════════════════════════════════════════════
-`;
-
-  return content;
+  return pdfBuffer;
 }
 
-// Generate advisor PDF (with full Q&A)
+// Generate advisor PDF (text-based, internal use)
 function generateAdvisorPDFContent(payload) {
   const { client, scores, flags, answers, meta } = payload;
 
-  // Use same interpretation text as before
   let interpretationText = '';
   const score = scores.overall;
 
@@ -388,16 +367,23 @@ module.exports = async (req, res) => {
     // Generate secure token
     const token = generateToken();
 
-    // Generate PDF content
-    const advisorPDF = generateAdvisorPDFContent(payload);
-    const clientPDF = generateClientPDFContent(payload);
-
     // Get risk band color for styling
     const riskBandColor = getRiskBandColor(payload.scores.overall);
 
+    // Generate PDFs
+    console.log('Generating client PDF...');
+    const clientPDFBuffer = await generateClientPDF(payload);
+    console.log('Generating advisor PDF...');
+    const advisorPDF = generateAdvisorPDFContent(payload);
+
     // ========================================
-    // CLIENT EMAIL (using updated template)
+    // CLIENT EMAIL (with logo reference)
     // ========================================
+
+    // IMPORTANT: Replace this URL with your actual Vercel deployment URL
+    const logoURL = process.env.SITE_URL ?
+      `${process.env.SITE_URL}/assets/petra-email-logo.svg` :
+      'https://your-deployment-url.vercel.app/assets/petra-email-logo.svg';
 
     const clientHTMLBody = `<!DOCTYPE html>
 <html lang="en">
@@ -415,7 +401,7 @@ module.exports = async (req, res) => {
                     <!-- Logo Header -->
                     <tr>
                         <td align="center" style="padding: 40px 40px 32px 40px;">
-                            <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 32px; font-weight: 700; color: #9A7611; letter-spacing: 2px;">PETRA</div>
+                            <img src="${logoURL}" alt="Petra Financial Advisors" width="160" height="auto" style="max-width: 160px; height: auto; display: block; margin: 0 auto;" />
                         </td>
                     </tr>
 
@@ -588,7 +574,7 @@ www.petrafinancial.com
 `;
 
     // ========================================
-    // ADVISOR EMAIL (keep existing template)
+    // ADVISOR EMAIL (keep existing)
     // ========================================
 
     const advisorHTMLBody = `
@@ -835,9 +821,9 @@ www.petrafinancial.com
             HtmlBody: clientHTMLBody,
             TextBody: clientTextBody,
             Attachments: [{
-              Name: 'petra-risk-assessment-results.txt',
-              Content: Buffer.from(clientPDF).toString('base64'),
-              ContentType: 'text/plain'
+              Name: 'petra-risk-assessment-results.pdf',
+              Content: clientPDFBuffer.toString('base64'),
+              ContentType: 'application/pdf'
             }]
           });
           console.log('Client email sent:', clientMessage.MessageID);
