@@ -27,9 +27,16 @@ calculateScore = function() {
 
     // Call the original scoring logic
     originalCalculateScore.call(this);
-    
-    // After results are displayed, send to backend
+
+    // Only submit to backend when results are actually displayed
+    // In couple mode, don't submit for person 1 - wait until person 2 completes
     setTimeout(() => {
+        // Skip backend submission if we're in couple mode and this is person 1
+        if (isCoupleMode && currentPerson === 1) {
+            console.log('[submission-handler] Skipping backend submission for person 1 in couple mode');
+            return;
+        }
+
         submitToBackend();
     }, 1000);
 };

@@ -1795,12 +1795,12 @@ function getInterpretationText(score) {
 }
 
 function getRiskBandColor(score) {
-    if (score <= 24) return '#F4C55C';  // Very Conservative
-    if (score <= 44) return '#CCA054';  // Conservative
-    if (score <= 59) return '#93A2BC';  // Balanced
-    if (score <= 74) return '#7FADA0';  // Balanced Growth
-    if (score <= 89) return '#976491';  // Growth
-    return '#CD6969';  // Aggressive Growth
+    if (score <= 24) return '#E8B84E';  // Very Conservative (warm gold)
+    if (score <= 44) return '#8B9DC3';  // Conservative (cool blue-gray)
+    if (score <= 59) return '#7EADAD';  // Balanced (teal/cyan)
+    if (score <= 74) return '#6B8E7F';  // Balanced Growth (forest green)
+    if (score <= 89) return '#976491';  // Growth (purple)
+    return '#CD6969';  // Aggressive Growth (red)
 }
 
 function printFullAssessment() {

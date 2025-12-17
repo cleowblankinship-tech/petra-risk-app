@@ -28,12 +28,12 @@ function getMountainTime() {
 
 // Risk Band Colors (matching style.css and script.js - Single Source of Truth)
 function getRiskBandColor(score) {
-  if (score <= 24) return '#F4C55C';  // Very Conservative
-  if (score <= 44) return '#CCA054';  // Conservative
-  if (score <= 59) return '#93A2BC';  // Balanced
-  if (score <= 74) return '#7FADA0';  // Balanced Growth
-  if (score <= 89) return '#976491';  // Growth
-  return '#CD6969';  // Aggressive Growth
+  if (score <= 24) return '#E8B84E';  // Very Conservative (warm gold)
+  if (score <= 44) return '#8B9DC3';  // Conservative (cool blue-gray)
+  if (score <= 59) return '#7EADAD';  // Balanced (teal/cyan)
+  if (score <= 74) return '#6B8E7F';  // Balanced Growth (forest green)
+  if (score <= 89) return '#976491';  // Growth (purple)
+  return '#CD6969';  // Aggressive Growth (red)
 }
 
 // ============================================================================
@@ -225,11 +225,14 @@ async function generateClientPDF(payload) {
 
     // Launch Puppeteer and generate PDF
     console.log('[generateClientPDF] Launching Puppeteer...');
+    console.log('[generateClientPDF] Chromium executablePath:', await chromium.executablePath());
+
     const browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [...chromium.args, '--disable-gpu', '--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: true,
+      ignoreHTTPSErrors: true,
     });
 
     console.log('[generateClientPDF] Creating page and setting content...');
@@ -388,10 +391,19 @@ module.exports = async (req, res) => {
     // Get risk band color for styling
     const riskBandColor = getRiskBandColor(payload.scores.overall);
 
-    // Generate PDFs
-    console.log('Generating client PDF...');
-    const clientPDFBuffer = await generateClientPDF(payload);
-    console.log('Generating advisor PDF...');
+    // Generate PDFs (with graceful failure for client PDF)
+    let clientPDFBuffer = null;
+    try {
+      console.log('[sendResults] Generating client PDF...');
+      clientPDFBuffer = await generateClientPDF(payload);
+      console.log('[sendResults] ✓ Client PDF generated successfully');
+    } catch (pdfError) {
+      console.error('[sendResults] ✗ Client PDF generation failed:', pdfError.message);
+      console.error('[sendResults] Will send email without PDF attachment');
+      // Continue execution - email will send without PDF
+    }
+
+    console.log('[sendResults] Generating advisor PDF (text)...');
     const advisorPDF = generateAdvisorPDFContent(payload);
 
     // ========================================
@@ -841,18 +853,28 @@ www.petrafinancial.com
       if (payload.client.wantsCopy) {
         console.log('[sendResults] Sending client email to:', payload.client.email);
         try {
-          const clientMessage = await client.sendEmail({
+          // Build email payload
+          const clientEmailPayload = {
             From: process.env.POSTMARK_FROM || 'risk@petrafinancial.com',
             To: payload.client.email,
             Subject: 'Thank you — Your Petra risk assessment is complete',
             HtmlBody: clientHTMLBody,
-            TextBody: clientTextBody,
-            Attachments: [{
+            TextBody: clientTextBody
+          };
+
+          // Only include PDF attachment if it was successfully generated
+          if (clientPDFBuffer) {
+            console.log('[sendResults] Including PDF attachment');
+            clientEmailPayload.Attachments = [{
               Name: 'petra-risk-assessment-results.pdf',
               Content: clientPDFBuffer.toString('base64'),
               ContentType: 'application/pdf'
-            }]
-          });
+            }];
+          } else {
+            console.log('[sendResults] ⚠ Skipping PDF attachment (generation failed)');
+          }
+
+          const clientMessage = await client.sendEmail(clientEmailPayload);
           console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
         } catch (emailError) {
           console.error('[sendResults] ✗ Error sending client email:', emailError.message);
