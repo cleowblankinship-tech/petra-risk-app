@@ -1075,10 +1075,6 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     displayPersonalizedInsights();
     displayRiskScale(finalScore);
 
-    // Show action buttons
-    document.getElementById('printFullBtn').style.display = 'inline-block';
-    document.getElementById('downloadPDFBtn').style.display = 'inline-block';
-
     // Hide advisor FAB button in results view
     var advisorFab = document.getElementById('advisorAccess');
     if (advisorFab && !isAdvisorView) {

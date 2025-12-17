@@ -185,7 +185,103 @@ function generateCompletePDF(resultData, clientName, isCouple = false) {
     yPos += disclaimerHeight + 10;
 
     // ========================================================================
-    // SECTION B: ALL QUESTIONS AND ANSWERS
+    // NARRATIVE SECTIONS (matching on-screen results)
+    // ========================================================================
+
+    doc.addPage();
+    yPos = margin;
+
+    // Section: What Your Score Reflects
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...petraCharcoal);
+    doc.text('What Your Score Reflects', margin, yPos);
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...petraCharcoal);
+    const overallSummaryText = typeof generateOverallSummary === 'function'
+        ? generateOverallSummary(resultData)
+        : 'Overall summary not available.';
+    const summaryLines = doc.splitTextToSize(overallSummaryText, contentWidth);
+    doc.text(summaryLines, margin, yPos);
+    yPos += summaryLines.length * 5 + 15;
+
+    checkPageBreak(30);
+
+    // Section: Behavioral Tendencies and Investment Mindset
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...petraCharcoal);
+    doc.text('Behavioral Tendencies and Investment Mindset', margin, yPos);
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const mindsetText = typeof generateMindsetInsight === 'function'
+        ? generateMindsetInsight(resultData)
+        : 'Mindset insight not available.';
+    const mindsetLines = doc.splitTextToSize(mindsetText, contentWidth);
+    doc.text(mindsetLines, margin, yPos);
+    yPos += mindsetLines.length * 5 + 15;
+
+    checkPageBreak(30);
+
+    // Section: Time Horizon and Risk Capacity
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...petraCharcoal);
+    doc.text('Time Horizon and Risk Capacity', margin, yPos);
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const traditionalText = typeof generateTraditionalInsight === 'function'
+        ? generateTraditionalInsight(resultData)
+        : 'Traditional insight not available.';
+    const traditionalLines = doc.splitTextToSize(traditionalText, contentWidth);
+    doc.text(traditionalLines, margin, yPos);
+    yPos += traditionalLines.length * 5 + 15;
+
+    checkPageBreak(30);
+
+    // Section: How These Elements Work Together
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...petraCharcoal);
+    doc.text('How These Elements Work Together', margin, yPos);
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const alignmentText = typeof generateAlignmentCheck === 'function'
+        ? generateAlignmentCheck(resultData)
+        : 'Alignment information not available.';
+    const alignmentLines = doc.splitTextToSize(alignmentText, contentWidth);
+    doc.text(alignmentLines, margin, yPos);
+    yPos += alignmentLines.length * 5 + 15;
+
+    checkPageBreak(30);
+
+    // Section: How Petra Uses This Information
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...petraCharcoal);
+    doc.text('How Petra Uses This Information', margin, yPos);
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const planningText = typeof generatePlanningRelevance === 'function'
+        ? generatePlanningRelevance(resultData)
+        : 'Planning information not available.';
+    const planningLines = doc.splitTextToSize(planningText, contentWidth);
+    doc.text(planningLines, margin, yPos);
+    yPos += planningLines.length * 5 + 20;
+
+    // ========================================================================
+    // APPENDIX: YOUR RESPONSES
     // ========================================================================
 
     doc.addPage();
@@ -194,7 +290,7 @@ function generateCompletePDF(resultData, clientName, isCouple = false) {
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...petraCharcoal);
-    doc.text('Complete Response Detail', margin, yPos);
+    doc.text('Your Responses', margin, yPos);
     yPos += 10;
 
     doc.setDrawColor(...petraGold);

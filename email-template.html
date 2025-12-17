@@ -4,22 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Risk Alignment Assessment Results</title>
-    <style>
-        /* Email-safe CSS - inline styles preferred but these provide fallbacks */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Crimson Pro', Georgia, serif;
-            background-color: #F5F1EA;
-        }
-        table {
-            border-collapse: collapse;
-        }
-        img {
-            border: 0;
-            display: block;
-        }
-    </style>
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Crimson Pro', Georgia, serif; background-color: #F5F1EA;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA;">
@@ -30,7 +14,7 @@
                     <!-- Logo Header -->
                     <tr>
                         <td align="center" style="padding: 40px 40px 32px 40px;">
-                            <img src="cid:petra-logo" alt="Petra" width="160" height="auto" style="max-width: 160px; height: auto;">
+                            <img src="cid:petra-logo" alt="Petra" width="160" height="auto" style="max-width: 160px; height: auto; display: block;">
                         </td>
                     </tr>
 
@@ -44,45 +28,67 @@
                     <!-- Main Message -->
                     <tr>
                         <td style="padding: 0 40px 32px 40px;">
-                            <p style="margin: 0 0 16px 0; font-size: 17px; line-height: 1.7; color: #25282A;">We've received your Risk Alignment Assessment. Your responses have been sent to {{advisorEmail}}.</p>
+                            <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #25282A; text-align: center;">We've received your Risk Alignment Assessment and your advisor will be in touch to discuss your results.</p>
                         </td>
                     </tr>
 
                     <!-- Results Summary Card -->
                     <tr>
                         <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid: #E5DFD2;">
                                 <tr>
-                                    <td style="padding: 24px;">
-                                        <h2 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #25282A; text-transform: uppercase; letter-spacing: 0.05em;">Your Results Summary</h2>
+                                    <td style="padding: 32px 24px;">
+                                        <h2 style="margin: 0 0 24px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #25282A; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">Your Results Summary</h2>
 
                                         <!-- Risk Band -->
-                                        <div style="margin-bottom: 20px; text-align: center;">
-                                            <div style="display: inline-block; padding: 12px 28px; background-color: {{riskBandColor}}; color: #FFFFFF; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 50px;">{{riskBand}}</div>
+                                        <div align="center" style="margin-bottom: 24px;">
+                                            <table cellpadding="0" cellspacing="0">
+                                                <tr>
+                                                    <td style="padding: 14px 32px; background-color: {{riskBandColor}}; color: #FFFFFF; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 50px; text-align: center;">
+                                                        {{riskBand}}
+                                                    </td>
+                                                </tr>
+                                            </table>
                                         </div>
 
                                         <!-- Score -->
-                                        <p style="margin: 0 0 16px 0; font-size: 15px; color: #6B5B4F; text-align: center;">
-                                            <strong style="font-size: 32px; color: #9A7611; display: block; margin-bottom: 4px;">{{finalScore}}</strong>
-                                            <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #9A7611;">Risk Alignment Score</span>
-                                        </p>
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="center" style="padding-bottom: 8px;">
+                                                    <div style="font-size: 56px; font-weight: 700; color: #9A7611; line-height: 1; font-family: 'Brandon Grotesque', Arial, sans-serif;">{{finalScore}}</div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="padding-bottom: 24px;">
+                                                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6B5B4F; font-weight: 700; font-family: 'Brandon Grotesque', Arial, sans-serif;">Risk Alignment Score</div>
+                                                </td>
+                                            </tr>
+                                        </table>
 
                                         <!-- Component Scores -->
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top: 20px;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                             <tr>
-                                                <td width="50%" style="padding-right: 8px; text-align: center;">
-                                                    <div style="background-color: #FFFFFF; border: 1px solid #E5DFD2; border-radius: 8px; padding: 16px;">
-                                                        <div style="font-size: 28px; font-weight: 700; color: #9A7611; margin-bottom: 4px;">{{behavioralScore}}</div>
-                                                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #25282A; margin-bottom: 8px;">Behavioral (0-60)</div>
-                                                        <div style="font-size: 13px; line-height: 1.5; color: #6B5B4F;">How you think and feel about risk</div>
-                                                    </div>
+                                                <td width="50%" style="padding-right: 8px;">
+                                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E5DFD2; border-radius: 8px;">
+                                                        <tr>
+                                                            <td style="padding: 20px; text-align: center;">
+                                                                <div style="font-size: 36px; font-weight: 700; color: #9A7611; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">{{behavioralScore}}</div>
+                                                                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #25282A; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">Behavioral (0-60)</div>
+                                                                <div style="font-size: 13px; line-height: 1.4; color: #6B5B4F;">How you think and feel about risk</div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </td>
-                                                <td width="50%" style="padding-left: 8px; text-align: center;">
-                                                    <div style="background-color: #FFFFFF; border: 1px solid #E5DFD2; border-radius: 8px; padding: 16px;">
-                                                        <div style="font-size: 28px; font-weight: 700; color: #9A7611; margin-bottom: 4px;">{{traditionalScore}}</div>
-                                                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #25282A; margin-bottom: 8px;">Traditional (0-40)</div>
-                                                        <div style="font-size: 13px; line-height: 1.5; color: #6B5B4F;">Time horizon and goals</div>
-                                                    </div>
+                                                <td width="50%" style="padding-left: 8px;">
+                                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E5DFD2; border-radius: 8px;">
+                                                        <tr>
+                                                            <td style="padding: 20px; text-align: center;">
+                                                                <div style="font-size: 36px; font-weight: 700; color: #9A7611; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">{{traditionalScore}}</div>
+                                                                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #25282A; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">Traditional (0-40)</div>
+                                                                <div style="font-size: 13px; line-height: 1.4; color: #6B5B4F;">Time horizon and goals</div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </td>
                                             </tr>
                                         </table>
@@ -92,30 +98,29 @@
                         </td>
                     </tr>
 
+                    <!-- Starting Point Message -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">This assessment helps organize our conversation, not define you. Your responses give us a starting point to frame the discussion and ask better questions. Your advisor will use these results to guide your work together, and your investment strategy will be built around who you are, not a score.</p>
+                        </td>
+                    </tr>
+
                     <!-- Attachment Callout -->
                     <tr>
                         <td style="padding: 0 40px 32px 40px;">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FEF7E8; border: 2px solid #9A7611; border-radius: 8px;">
                                 <tr>
                                     <td style="padding: 20px; text-align: center;">
-                                        <p style="margin: 0; font-size: 15px; font-weight: 600; color: #25282A;">📄 Your complete results summary is attached.</p>
+                                        <p style="margin: 0; font-size: 15px; font-weight: 600; color: #25282A;">📄 Your complete results and responses are attached as a PDF.</p>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- What Happens Next -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <h3 style="margin: 0 0 12px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #25282A;">What Happens Next</h3>
-                            <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">Your advisor will review your results and reach out to schedule a conversation. This assessment helps frame our discussion about your goals, circumstances, and what you need from your portfolio.</p>
-                        </td>
-                    </tr>
-
                     <!-- Signature -->
                     <tr>
-                        <td style="padding: 0 40px 40px 40px; border-top: 1px solid #E5DFD2;">
+                        <td style="padding: 0 40px 32px 40px; border-top: 1px solid #E5DFD2;">
                             <p style="margin: 24px 0 0 0; font-size: 15px; line-height: 1.7; color: #25282A;">
                                 Thank you,<br>
                                 <strong>The Petra Team</strong>
