@@ -163,13 +163,19 @@
                 <div class="sub-score">
                     <div class="sub-score-value" id="behavioralScore">--</div>
                     <div class="sub-score-label">Behavioral Component (0-60)</div>
-                    <div class="sub-score-description">How you tend to think and feel about risk — your natural reactions to gains, losses, and uncertainty.</div>
+                    <div class="sub-score-description">How you tend to think and feel about risk: your natural reactions to gains, losses, and uncertainty.</div>
                 </div>
                 <div class="sub-score">
                     <div class="sub-score-value" id="traditionalScore">--</div>
                     <div class="sub-score-label">Traditional Component (0-40)</div>
-                    <div class="sub-score-description">The practical side — how long you plan to invest, what you've experienced before, and what goals you're prioritizing.</div>
+                    <div class="sub-score-description">The practical side: how long you plan to invest, what you've experienced before, and what goals you're prioritizing.</div>
                 </div>
+            </div>
+
+            <!-- Understanding the Scale -->
+            <div class="scale-explanation-section">
+                <h4>Understanding the Scale</h4>
+                <p>Scores closer to 0 typically reflect a preference for stability and capital preservation, where protecting what you have matters more than maximizing growth. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation, even when that means accepting substantial short-term fluctuations. Neither approach is better or worse. They represent different priorities, timeframes, and emotional relationships with uncertainty.</p>
             </div>
 
             <!-- Overall Summary -->
@@ -204,9 +210,7 @@
 
             <!-- Risk Scale Visualization -->
             <div id="riskScale" class="risk-scale-visualization" style="display: none;">
-                <h4>Understanding the Scale</h4>
-                <p class="scale-explanation">Scores closer to 0 typically reflect a preference for stability and capital preservation, where protecting what you have matters more than maximizing growth. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation, even when that means accepting substantial short-term fluctuations. Neither approach is better or worse. They represent different priorities, timeframes, and emotional relationships with uncertainty.</p>
-                <h4 style="margin-top: 1.5rem;">Risk Profile Scale</h4>
+                <h4>Risk Profile Scale</h4>
                 <div class="risk-scale-bar">
                     <div class="risk-scale-segment rs-very-cons" data-range="0-24">
                         <span class="risk-scale-label">Very Conservative</span>
@@ -344,6 +348,8 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="pdf-generator.js"></script>
     <script src="script.js"></script>
     <script src="submission-handler.js"></script>
 </body>

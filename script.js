@@ -1166,13 +1166,13 @@ function generateOverallSummary(data) {
     var summary = 'Your overall score is ' + score + ' out of 100, which places you in the "' + band + '" range. ';
 
     if (score <= 24) {
-        summary += 'This suggests protecting what you have matters more to you than chasing growth. You value stability and predictability. You probably prefer strategies where the path is clear and the downside is limited. That doesn\'t mean you won\'t take any risk—just that when you do, you need it to feel justified and proportionate.';
+        summary += 'This suggests protecting what you have matters more to you than chasing growth. You value stability and predictability. You probably prefer strategies where the path is clear and the downside is limited. That doesn\'t mean you won\'t take any risk, just that when you do, you need it to feel justified and proportionate.';
     } else if (score <= 44) {
         summary += 'This suggests you\'re open to risk when the reasoning is clear, but you want to understand it first. You\'re not chasing the most aggressive returns, but you\'re also not avoiding all uncertainty. You probably value portfolios that balance growth with protection, and you appreciate explanations that help you see what you own and why.';
     } else if (score <= 59) {
         summary += 'This reflects a middle ground. You get that growth means accepting volatility, but you also want strategies that don\'t feel reckless. You probably make decisions based on evidence more than emotion, and you can handle market swings as long as they aren\'t extreme or dragged out.';
     } else if (score <= 74) {
-        summary += 'This indicates you\'re comfortable with meaningful equity exposure and focused on long-term growth. You understand that building wealth means staying invested through cycles, and short-term volatility doesn\'t shake your confidence. You may still want some downside management—not because you panic, but because having a plan for bad markets makes it easier to stick with the good ones.';
+        summary += 'This indicates you\'re comfortable with meaningful equity exposure and focused on long-term growth. You understand that building wealth means staying invested through cycles, and short-term volatility doesn\'t shake your confidence. You may still want some downside management, not because you panic, but because having a plan for bad markets makes it easier to stick with the good ones.';
     } else if (score <= 89) {
         summary += 'This reflects strong tolerance for volatility and a long-term view. You can likely stay invested through significant drawdowns. You see declines as part of the process, not a reason to bail out. You probably care more about where you end up than what happens in between.';
     } else {
@@ -1188,7 +1188,7 @@ function generateMindsetInsight(data) {
     var behavioral = data.behavioralScore;
     var normalized = behavioral / 60; // 0-1 scale
 
-    var insight = 'This score (' + behavioral + ' out of 60) reflects how you tend to think and feel about investment decisions—your natural reactions to gains, losses, and uncertainty. ';
+    var insight = 'This score (' + behavioral + ' out of 60) reflects how you tend to think and feel about investment decisions: your natural reactions to gains, losses, and uncertainty. ';
 
     if (normalized >= 0.75) {
         insight += 'Your responses suggest you stay calm during market turbulence. If the market dropped 20% over a few months, you\'d probably see it as part of the process, not a reason to change course. You likely don\'t obsess over your portfolio, and when you do check and see red numbers, they don\'t create an urgent need to act. You might even view weak periods as a chance to buy more of what you already believe in. This mindset works well with equity-heavy portfolios, where the path to long-term growth always includes short-term pain.';
@@ -1243,9 +1243,9 @@ function generateTraditionalInsight(data) {
     if (timeHorizon >= 0.75 && drawdown >= 0.75) {
         insight += 'You have a long time horizon and say you can stay invested through major declines. That\'s a powerful combination. It means you can ride out the bad stretches without being forced to sell at the wrong time. You probably don\'t need your portfolio to work every quarter or even every year. You\'re thinking in decades, not months—and that gives you room to pursue strategies that might look awful short-term but make sense long-term. This kind of mindset supports equity-heavy portfolios, concentrated positions, or approaches that need patience to pay off.';
     } else if (timeHorizon >= 0.75 && drawdown < 0.75) {
-        insight += 'You have a long time horizon, which gives you flexibility on paper, but your responses suggest you aren\'t totally comfortable with severe drawdowns. That\'s worth noting. Just because you don\'t need the money for 20 years doesn\'t mean you\'ll sleep well if your portfolio drops 30%. Your advisor can help find a middle path—enough risk to meet your goals without making you miserable during the down cycles.';
+        insight += 'You have a long time horizon, which gives you flexibility on paper, but your responses suggest you aren\'t totally comfortable with severe drawdowns. That\'s worth noting. Just because you don\'t need the money for 20 years doesn\'t mean you\'ll sleep well if your portfolio drops 30%. Your advisor can help find a middle path: enough risk to meet your goals without making you miserable during the down cycles.';
     } else if (timeHorizon < 0.5 && drawdown >= 0.75) {
-        insight += 'Your time horizon is shorter, but you say you can handle declines. That\'s an interesting mix. You may have near-term needs, but you also don\'t panic when markets drop. Your advisor will probably build your portfolio with both realities in mind—keeping enough stable for what\'s coming while still letting you participate in growth where it fits.';
+        insight += 'Your time horizon is shorter, but you say you can handle declines. That\'s an interesting mix. You may have near-term needs, but you also don\'t panic when markets drop. Your advisor will probably build your portfolio with both realities in mind: keeping enough stable for what\'s coming while still letting you participate in growth where it fits.';
     } else if (timeHorizon < 0.5) {
         insight += 'Your time horizon is relatively short, which naturally leans toward more conservative positioning. You probably need part of your portfolio to be stable and available, and you may not have the luxury of waiting through long recoveries if the market tanks. That doesn\'t mean zero risk, but it does mean your strategy should reflect that you might need this money sooner, not later.';
     } else {
@@ -1277,7 +1277,7 @@ function generateAlignmentCheck(data) {
 }
 
 function generatePlanningRelevance(data) {
-    return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Your advisor will use these results to frame conversations about portfolio structure—not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Your advisor will talk through these decisions with you, not for you.';
+    return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Your advisor will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Your advisor will talk through these decisions with you, not for you.';
 }
 
 function displayKnowledgeOverlay() {
@@ -1373,7 +1373,7 @@ function showCoupleComparison() {
     var traditionalDiff = Math.abs(person1Data.traditionalScore - person2Data.traditionalScore);
     
     var narrative = '<strong>Behavioral Component (' + person1Data.behavioralScore + ' vs ' + person2Data.behavioralScore + '):</strong> ';
-    narrative += 'This reflects how each of you naturally thinks and feels about risk—your instinctive reactions to market movements, losses, and uncertainty. ';
+    narrative += 'This reflects how each of you naturally thinks and feels about risk: your instinctive reactions to market movements, losses, and uncertainty. ';
     
     if (behavioralDiff <= 10) {
         narrative += person1Name + ' and ' + person2Name + ' show similar emotional and cognitive patterns when it comes to investment decisions. ';
@@ -1384,7 +1384,7 @@ function showCoupleComparison() {
     }
     
     narrative += '<br><br><strong>Traditional Component (' + person1Data.traditionalScore + ' vs ' + person2Data.traditionalScore + '):</strong> ';
-    narrative += 'This captures the practical factors—your time horizon, past experiences, and comfort with volatility. ';
+    narrative += 'This captures the practical factors: your time horizon, past experiences, and comfort with volatility. ';
     
     if (traditionalDiff <= 8) {
         narrative += 'You share a very similar outlook on how long you can remain invested and how much short-term fluctuation feels comfortable. This common ground often makes it easier to make joint decisions with confidence when markets move. ';
