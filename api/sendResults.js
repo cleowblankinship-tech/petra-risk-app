@@ -410,10 +410,15 @@ module.exports = async (req, res) => {
     // CLIENT EMAIL (with logo reference)
     // ========================================
 
-    // IMPORTANT: Replace this URL with your actual Vercel deployment URL
-    const logoURL = process.env.SITE_URL ?
-      `${process.env.SITE_URL}/assets/petra-email-logo.svg` :
+    // Support both BASE_URL and SITE_URL environment variables
+    const baseURL = process.env.BASE_URL || process.env.SITE_URL;
+    console.log('[sendResults] Base URL for assets:', baseURL || 'NOT SET');
+
+    const logoURL = baseURL ?
+      `${baseURL}/assets/petra-email-logo.svg` :
       'https://your-deployment-url.vercel.app/assets/petra-email-logo.svg';
+
+    console.log('[sendResults] Logo URL for email:', logoURL);
 
     const clientHTMLBody = `<!DOCTYPE html>
 <html lang="en">

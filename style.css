@@ -1126,13 +1126,13 @@ button,
     margin-bottom: var(--space-4);
 }
 
-/* Risk Band Colors */
-.risk-band.rb-very-cons { background-color: #8B6F5C; }
-.risk-band.rb-cons { background-color: #6B7280; }
-.risk-band.rb-balanced { background-color: #7EADAD; }
-.risk-band.rb-balanced-growth { background-color: #93A2BC; }
-.risk-band.rb-growth { background-color: #CCA054; color: var(--petra-charcoal); }
-.risk-band.rb-agg-growth { background-color: var(--petra-gold); }
+/* Risk Band Colors (using centralized CSS variables) */
+.risk-band.rb-very-cons { background-color: var(--risk-very-conservative); color: var(--text-dark); }
+.risk-band.rb-cons { background-color: var(--risk-conservative); color: #FFFFFF; }
+.risk-band.rb-balanced { background-color: var(--risk-balanced); color: #FFFFFF; }
+.risk-band.rb-balanced-growth { background-color: var(--risk-balanced-growth); color: #FFFFFF; }
+.risk-band.rb-growth { background-color: var(--risk-growth); color: #FFFFFF; }
+.risk-band.rb-agg-growth { background-color: var(--risk-aggressive-growth); color: #FFFFFF; }
 
 /* Progress Bar */
 .progress-bar {
@@ -1147,9 +1147,9 @@ button,
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--petra-gold) 0%, #B8904A 50%, #93A2BC 100%);
+    /* Background color set dynamically via JavaScript based on risk band */
     border-radius: 3px;
-    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
 }
 
 /* Sub-Scores Grid */

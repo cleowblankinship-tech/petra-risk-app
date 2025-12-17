@@ -6,5 +6,11 @@
       "source": "/review/:token",
       "destination": "/review/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/sendResults.js": {
+      "maxDuration": 60,
+      "memory": 3008
+    }
+  }
 }

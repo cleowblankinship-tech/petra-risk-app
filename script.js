@@ -829,9 +829,16 @@ function handleLikertClick(e) {
 function handleRadioChange(e) {
     var radio = e.target;
     document.querySelectorAll('input[name="' + radio.name + '"]').forEach(function(r) {
-        r.closest('.option').classList.remove('selected');
+        var optionEl = r.closest('.option');
+        if (optionEl) {
+            optionEl.classList.remove('selected');
+        }
     });
-    radio.closest('.option').classList.add('selected');
+
+    var radioOption = radio.closest('.option');
+    if (radioOption) {
+        radioOption.classList.add('selected');
+    }
 
     // Update progress bar
     updateProgressBar();
@@ -839,10 +846,13 @@ function handleRadioChange(e) {
 
 function handleCheckboxChange(e) {
     var checkbox = e.target;
+    var optionElement = checkbox.closest('.option');
+    if (!optionElement) return; // Guard against missing DOM element
+
     if (checkbox.checked) {
-        checkbox.closest('.option').classList.add('selected');
+        optionElement.classList.add('selected');
     } else {
-        checkbox.closest('.option').classList.remove('selected');
+        optionElement.classList.remove('selected');
     }
 
     // Update progress bar
@@ -1070,7 +1080,11 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     document.getElementById('traditionalScore').textContent = traditionalScore;
     document.getElementById('riskBand').textContent = riskBand;
     document.getElementById('riskBand').className = 'risk-band ' + rbClass;
-    document.getElementById('progressFill').style.width = finalScore + '%';
+
+    // Set progress bar width and color based on risk band
+    var progressFill = document.getElementById('progressFill');
+    progressFill.style.width = finalScore + '%';
+    progressFill.style.backgroundColor = getRiskBandColor(finalScore);
 
     displayPersonalizedInsights();
     displayRiskScale(finalScore);
