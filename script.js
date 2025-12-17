@@ -1075,6 +1075,10 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     displayPersonalizedInsights();
     displayRiskScale(finalScore);
 
+    // Show action buttons
+    document.getElementById('printFullBtn').style.display = 'inline-block';
+    document.getElementById('downloadPDFBtn').style.display = 'inline-block';
+
     // Hide advisor FAB button in results view
     var advisorFab = document.getElementById('advisorAccess');
     if (advisorFab && !isAdvisorView) {
@@ -1806,6 +1810,45 @@ function getRiskBandColor(score) {
 function printFullAssessment() {
     window.print();
 }
+
+function downloadCompletePDF() {
+    if (!lastComputed) {
+        alert('No results available to download.');
+        return;
+    }
+
+    // Get client name
+    var clientName = 'Client';
+    if (isCoupleMode) {
+        clientName = person1Name + ' and ' + person2Name;
+    } else {
+        var firstNameEl = document.getElementById('clientFirstName');
+        var lastNameEl = document.getElementById('clientLastName');
+        if (firstNameEl && lastNameEl) {
+            clientName = firstNameEl.value + ' ' + lastNameEl.value;
+        }
+    }
+
+    // Prepare result data with all answers
+    var resultData = {
+        finalScore: lastComputed.finalScore,
+        riskBand: lastComputed.riskBand,
+        behavioralScore: lastComputed.behavioralScore,
+        traditionalScore: lastComputed.traditionalScore,
+        answers: answers,
+        traditionalScores: lastComputed.traditionalScores || {},
+        knowledge: lastComputed.knowledge || {}
+    };
+
+    // Call the PDF generator
+    try {
+        generateCompletePDF(resultData, clientName, isCoupleMode);
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        alert('There was an error generating the PDF. Please try again.');
+    }
+}
+
 // Make sure couples setup shows on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Show the initial card
