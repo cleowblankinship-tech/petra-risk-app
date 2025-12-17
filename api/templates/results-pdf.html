@@ -258,12 +258,20 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        .rs-very-cons { background: #8B6F5C; }
-        .rs-cons { background: #6B7280; }
-        .rs-balanced { background: #7EADAD; }
-        .rs-bal-growth { background: #93A2BC; }
-        .rs-growth { background: #CCA054; }
-        .rs-agg-growth { background: #9A7611; }
+        .rs-very-cons { background: #F4C55C; color: #40434E; }
+        .rs-cons { background: #CCA054; color: #40434E; }
+        .rs-balanced { background: #93A2BC; color: #40434E; }
+        .rs-bal-growth { background: #7FADA0; color: #FFFFFF; }
+        .rs-growth { background: #976491; color: #FFFFFF; }
+        .rs-agg-growth { background: #CD6969; color: #FFFFFF; }
+
+        /* Active segment styling */
+        .rs-very-cons.active { background: linear-gradient(to bottom, #D4A53C, #C99A30); color: #FFFFFF; }
+        .rs-cons.active { background: linear-gradient(to bottom, #AC803E, #A07838); color: #FFFFFF; }
+        .rs-balanced.active { background: linear-gradient(to bottom, #73829C, #687790); color: #FFFFFF; }
+        .rs-bal-growth.active { background: linear-gradient(to bottom, #5F8D80, #558074); color: #FFFFFF; }
+        .rs-growth.active { background: linear-gradient(to bottom, #774471, #6B3C65); color: #FFFFFF; }
+        .rs-agg-growth.active { background: linear-gradient(to bottom, #AD4949, #A13D3D); color: #FFFFFF; }
 
         /* Insight Sections */
         .insight-section {

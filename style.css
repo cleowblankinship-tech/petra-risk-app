@@ -19,6 +19,19 @@
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
+
+  /* Risk Spectrum Color System (Single Source of Truth) */
+  --risk-very-conservative: #F4C55C;
+  --risk-conservative: #CCA054;
+  --risk-balanced: #93A2BC;
+  --risk-balanced-growth: #7FADA0;
+  --risk-growth: #976491;
+  --risk-aggressive-growth: #CD6969;
+
+  /* Neutrals */
+  --text-dark: #40434E;
+  --black: #000000;
+  --deep-accent: #502D1E;
 }
 .assessment-container,
 .results-container {
@@ -1383,49 +1396,72 @@ button,
 }
 
 /* Risk Segment Colors - Inactive (5% lighter) */
-.rs-very-cons { background-color: #927561; }
-.rs-cons { background-color: #707886; }
-.rs-balanced { background-color: #D5E0EC; }
-.rs-bal-growth { background-color: #84B6B6; }
-.rs-growth { background-color: #D6A858; }
-.rs-agg-growth { background-color: #DFB16D; }
+.rs-very-cons { background-color: var(--risk-very-conservative); }
+.rs-cons { background-color: var(--risk-conservative); }
+.rs-balanced { background-color: var(--risk-balanced); }
+.rs-bal-growth { background-color: var(--risk-balanced-growth); }
+.rs-growth { background-color: var(--risk-growth); }
+.rs-agg-growth { background-color: var(--risk-aggressive-growth); }
 
 /* Active segment colors - deeper with subtle gradients */
 .rs-very-cons.active {
-    background: linear-gradient(to bottom, #6D5544, #695142);
+    background: linear-gradient(to bottom, #D4A53C, #C99A30);
+    box-shadow: 0 4px 12px rgba(244, 197, 92, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .rs-cons.active {
-    background: linear-gradient(to bottom, #4D5765, #495361);
+    background: linear-gradient(to bottom, #AC803E, #A07838);
+    box-shadow: 0 4px 12px rgba(204, 160, 84, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .rs-balanced.active {
-    background: linear-gradient(to bottom, #96A5C0, #909FB8);
+    background: linear-gradient(to bottom, #73829C, #687790);
+    box-shadow: 0 4px 12px rgba(147, 162, 188, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .rs-bal-growth.active {
-    background: linear-gradient(to bottom, #5C9191, #588B8B);
+    background: linear-gradient(to bottom, #5F8D80, #558074);
+    box-shadow: 0 4px 12px rgba(127, 173, 160, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .rs-growth.active {
-    background: linear-gradient(to bottom, #BC8D3D, #B4873B);
+    background: linear-gradient(to bottom, #774471, #6B3C65);
+    box-shadow: 0 4px 12px rgba(151, 100, 145, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .rs-agg-growth.active {
-    background: linear-gradient(to bottom, #C4984F, #BC924B);
+    background: linear-gradient(to bottom, #AD4949, #A13D3D);
+    box-shadow: 0 4px 12px rgba(205, 105, 105, 0.4), inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+/* Text colors for lighter segments (need dark text for contrast) */
+.rs-very-cons .risk-scale-label,
+.rs-very-cons .risk-scale-range,
+.rs-cons .risk-scale-label,
+.rs-cons .risk-scale-range,
+.rs-balanced .risk-scale-label,
+.rs-balanced .risk-scale-range {
+    color: var(--text-dark);
+}
+
+/* Default white text for darker segments */
+.rs-bal-growth .risk-scale-label,
+.rs-bal-growth .risk-scale-range,
 .rs-growth .risk-scale-label,
 .rs-growth .risk-scale-range,
 .rs-agg-growth .risk-scale-label,
-.rs-agg-growth .risk-scale-range,
-.rs-balanced .risk-scale-label,
-.rs-balanced .risk-scale-range {
-    color: var(--petra-charcoal);
+.rs-agg-growth .risk-scale-range {
+    color: #FFFFFF;
 }
 
-/* Override to white for active segments */
+/* Active segments always use white text */
+.rs-very-cons.active .risk-scale-label,
+.rs-very-cons.active .risk-scale-range,
+.rs-cons.active .risk-scale-label,
+.rs-cons.active .risk-scale-range,
+.rs-balanced.active .risk-scale-label,
+.rs-balanced.active .risk-scale-range,
+.rs-bal-growth.active .risk-scale-label,
+.rs-bal-growth.active .risk-scale-range,
 .rs-growth.active .risk-scale-label,
 .rs-growth.active .risk-scale-range,
 .rs-agg-growth.active .risk-scale-label,
-.rs-agg-growth.active .risk-scale-range,
-.rs-balanced.active .risk-scale-label,
-.rs-balanced.active .risk-scale-range {
+.rs-agg-growth.active .risk-scale-range {
     color: #FFFFFF;
 }
 

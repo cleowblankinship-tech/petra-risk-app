@@ -26,14 +26,14 @@ function getMountainTime() {
   });
 }
 
-// Risk Band Colors (matching style.css)
+// Risk Band Colors (matching style.css and script.js - Single Source of Truth)
 function getRiskBandColor(score) {
-  if (score <= 24) return '#8B6F5C';
-  if (score <= 44) return '#6B7280';
-  if (score <= 59) return '#7EADAD';
-  if (score <= 74) return '#93A2BC';
-  if (score <= 89) return '#CCA054';
-  return '#9A7611';
+  if (score <= 24) return '#F4C55C';  // Very Conservative
+  if (score <= 44) return '#CCA054';  // Conservative
+  if (score <= 59) return '#93A2BC';  // Balanced
+  if (score <= 74) return '#7FADA0';  // Balanced Growth
+  if (score <= 89) return '#976491';  // Growth
+  return '#CD6969';  // Aggressive Growth
 }
 
 // ============================================================================
@@ -140,15 +140,18 @@ function generatePlanningRelevance() {
 // ============================================================================
 
 async function generateClientPDF(payload) {
+  console.log('[generateClientPDF] Starting PDF generation...');
   const { client, scores, meta, answers } = payload;
 
-  // Generate all narrative sections
-  const overallSummary = generateOverallSummary(scores);
-  const mindsetInsight = generateMindsetInsight(scores);
-  const traditionalScores = payload.traditionalScores || {};
-  const traditionalInsight = generateTraditionalInsight(scores, traditionalScores);
-  const alignmentCheck = generateAlignmentCheck(scores);
-  const planningRelevance = generatePlanningRelevance();
+  try {
+    // Generate all narrative sections
+    console.log('[generateClientPDF] Generating narratives...');
+    const overallSummary = generateOverallSummary(scores);
+    const mindsetInsight = generateMindsetInsight(scores);
+    const traditionalScores = payload.traditionalScores || {};
+    const traditionalInsight = generateTraditionalInsight(scores, traditionalScores);
+    const alignmentCheck = generateAlignmentCheck(scores);
+    const planningRelevance = generatePlanningRelevance();
 
   // Determine which risk scale segment is active
   const score = scores.overall;
@@ -220,31 +223,40 @@ async function generateClientPDF(payload) {
     .replace('{{QA_ITEMS}}', qaItemsHTML)
     .replace('{{YEAR}}', new Date().getFullYear());
 
-  // Launch Puppeteer and generate PDF
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-  });
+    // Launch Puppeteer and generate PDF
+    console.log('[generateClientPDF] Launching Puppeteer...');
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
 
-  const page = await browser.newPage();
-  await page.setContent(htmlTemplate, { waitUntil: 'networkidle0' });
+    console.log('[generateClientPDF] Creating page and setting content...');
+    const page = await browser.newPage();
+    await page.setContent(htmlTemplate, { waitUntil: 'networkidle0' });
 
-  const pdfBuffer = await page.pdf({
-    format: 'Letter',
-    printBackground: true,
-    margin: {
-      top: '0.5in',
-      right: '0.5in',
-      bottom: '0.5in',
-      left: '0.5in'
-    }
-  });
+    console.log('[generateClientPDF] Generating PDF...');
+    const pdfBuffer = await page.pdf({
+      format: 'Letter',
+      printBackground: true,
+      margin: {
+        top: '0.5in',
+        right: '0.5in',
+        bottom: '0.5in',
+        left: '0.5in'
+      }
+    });
 
-  await browser.close();
+    await browser.close();
+    console.log('[generateClientPDF] ✓ PDF generated successfully');
 
-  return pdfBuffer;
+    return pdfBuffer;
+  } catch (error) {
+    console.error('[generateClientPDF] ✗ Error generating PDF:', error.message);
+    console.error('[generateClientPDF] Stack:', error.stack);
+    throw error;
+  }
 }
 
 // Generate advisor PDF (text-based, internal use)
@@ -346,13 +358,19 @@ www.petrafinancial.com
 
 // Main handler
 module.exports = async (req, res) => {
+  console.log('[sendResults] Function called');
+  console.log('[sendResults] Method:', req.method);
+
   // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    console.log('[sendResults] Processing request...');
     const payload = req.body;
+    console.log('[sendResults] Client:', payload.client?.firstName, payload.client?.lastName);
+    console.log('[sendResults] Score:', payload.scores?.overall);
 
     // Validate required fields
     if (!payload.client || !payload.client.firstName || !payload.client.lastName ||
@@ -788,11 +806,17 @@ www.petrafinancial.com
     // SEND EMAILS VIA POSTMARK
     // ========================================
 
+    console.log('[sendResults] Checking Postmark configuration...');
+    console.log('[sendResults] POSTMARK_SERVER_TOKEN exists:', !!process.env.POSTMARK_SERVER_TOKEN);
+    console.log('[sendResults] POSTMARK_FROM:', process.env.POSTMARK_FROM || 'risk@petrafinancial.com');
+
     if (process.env.POSTMARK_SERVER_TOKEN) {
+      console.log('[sendResults] Initializing Postmark client...');
       const postmark = require('postmark');
       const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
 
       // Send advisor email
+      console.log('[sendResults] Sending advisor email...');
       try {
         const advisorMessage = await client.sendEmail({
           From: process.env.POSTMARK_FROM || 'risk@petrafinancial.com',
@@ -806,13 +830,16 @@ www.petrafinancial.com
             ContentType: 'text/plain'
           }]
         });
-        console.log('Advisor email sent:', advisorMessage.MessageID);
+        console.log('[sendResults] ✓ Advisor email sent successfully:', advisorMessage.MessageID);
       } catch (emailError) {
-        console.error('Error sending advisor email:', emailError);
+        console.error('[sendResults] ✗ Error sending advisor email:', emailError.message);
+        console.error('[sendResults] Full error:', emailError);
       }
 
       // Send client email (if requested)
+      console.log('[sendResults] Client wants copy:', payload.client.wantsCopy);
       if (payload.client.wantsCopy) {
+        console.log('[sendResults] Sending client email to:', payload.client.email);
         try {
           const clientMessage = await client.sendEmail({
             From: process.env.POSTMARK_FROM || 'risk@petrafinancial.com',
@@ -826,13 +853,17 @@ www.petrafinancial.com
               ContentType: 'application/pdf'
             }]
           });
-          console.log('Client email sent:', clientMessage.MessageID);
+          console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
         } catch (emailError) {
-          console.error('Error sending client email:', emailError);
+          console.error('[sendResults] ✗ Error sending client email:', emailError.message);
+          console.error('[sendResults] Full error:', emailError);
         }
+      } else {
+        console.log('[sendResults] Skipping client email (wantsCopy = false)');
       }
     } else {
-      console.log('Postmark not configured - emails would be sent here');
+      console.log('[sendResults] ⚠ Postmark not configured - emails would be sent here');
+      console.log('[sendResults] Set POSTMARK_SERVER_TOKEN environment variable to enable emails');
     }
 
     // Return success (always, even if email fails - results page should show)
