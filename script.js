@@ -1074,17 +1074,30 @@ function computeKnowledge(values) {
 // ============================================================================
 
 function displayResults(finalScore, behavioralScore, traditionalScore, riskBand, rbClass) {
-    document.getElementById('results').style.display = 'block';
-    document.getElementById('mainScore').textContent = finalScore;
-    document.getElementById('behavioralScore').textContent = behavioralScore;
-    document.getElementById('traditionalScore').textContent = traditionalScore;
-    document.getElementById('riskBand').textContent = riskBand;
-    document.getElementById('riskBand').className = 'risk-band ' + rbClass;
+    var resultsEl = document.getElementById('results');
+    if (!resultsEl) return; // Guard: results section doesn't exist
+
+    resultsEl.style.display = 'block';
+
+    var mainScoreEl = document.getElementById('mainScore');
+    var behavioralScoreEl = document.getElementById('behavioralScore');
+    var traditionalScoreEl = document.getElementById('traditionalScore');
+    var riskBandEl = document.getElementById('riskBand');
+    var progressFillEl = document.getElementById('progressFill');
+
+    if (mainScoreEl) mainScoreEl.textContent = finalScore;
+    if (behavioralScoreEl) behavioralScoreEl.textContent = behavioralScore;
+    if (traditionalScoreEl) traditionalScoreEl.textContent = traditionalScore;
+    if (riskBandEl) {
+        riskBandEl.textContent = riskBand;
+        riskBandEl.className = 'risk-band ' + rbClass;
+    }
 
     // Set progress bar width and color based on risk band
-    var progressFill = document.getElementById('progressFill');
-    progressFill.style.width = finalScore + '%';
-    progressFill.style.backgroundColor = getRiskBandColor(finalScore);
+    if (progressFillEl) {
+        progressFillEl.style.width = finalScore + '%';
+        progressFillEl.style.backgroundColor = getRiskBandColor(finalScore);
+    }
 
     displayPersonalizedInsights();
     displayRiskScale(finalScore);
@@ -1168,7 +1181,7 @@ function displayPersonalizedInsights() {
 }
 
 function generateResultsIntroduction() {
-    return 'This assessment helps organize our conversation, not define you. At Petra, we know risk tolerance is personal and shaped by more than any questionnaire can measure. Your responses give us a starting point, a way to frame the discussion and ask better questions, but the real understanding comes from talking. We need to hear about your goals, your circumstances, and what you actually need from your portfolio, both financially and emotionally. Your advisor will use these results to guide our work together, but your investment strategy will be built around who you are, not a score.';
+    return 'These results are a starting point, not a label. Risk tolerance is personal, nuanced, and influenced by real-life experiences that no questionnaire can fully capture. This assessment helps us organize our discussion and ask better questions, but the most important insights come from talking together.\n\nWe want to understand your goals, your circumstances, and what you truly need from your portfolio, both financially and emotionally. Your advisor will use these results to inform our work, but your investment strategy will always be built around you, not a score.';
 }
 
 function generateOverallSummary(data) {

@@ -36,6 +36,12 @@ function getRiskBandColor(score) {
   return '#CD6969';  // Aggressive Growth (red)
 }
 
+// Risk Band Text Color (for readability on colored backgrounds)
+function getRiskBandTextColor(score) {
+  if (score <= 24) return '#40434E';  // Very Conservative: dark text on gold
+  return '#FFFFFF';  // All others: white text
+}
+
 // ============================================================================
 // NARRATIVE GENERATION FUNCTIONS (matching script.js exactly)
 // ============================================================================
