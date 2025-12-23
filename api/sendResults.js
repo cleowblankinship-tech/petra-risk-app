@@ -397,17 +397,14 @@ module.exports = async (req, res) => {
     // Get risk band color for styling
     const riskBandColor = getRiskBandColor(payload.scores.overall);
 
-    // Generate PDFs (with graceful failure for client PDF)
-    let clientPDFBuffer = null;
-    try {
-      console.log('[sendResults] Generating client PDF...');
-      clientPDFBuffer = await generateClientPDF(payload);
-      console.log('[sendResults] ✓ Client PDF generated successfully');
-    } catch (pdfError) {
-      console.error('[sendResults] ✗ Client PDF generation failed:', pdfError.message);
-      console.error('[sendResults] Will send email without PDF attachment');
-      // Continue execution - email will send without PDF
-    }
+    // Generate all narrative sections for email inclusion
+    console.log('[sendResults] Generating narrative sections...');
+    const overallSummary = generateOverallSummary(payload.scores);
+    const mindsetInsight = generateMindsetInsight(payload.scores);
+    const traditionalScores = payload.traditionalScores || {};
+    const traditionalInsight = generateTraditionalInsight(payload.scores, traditionalScores);
+    const alignmentCheck = generateAlignmentCheck(payload.scores);
+    const planningRelevance = generatePlanningRelevance();
 
     console.log('[sendResults] Generating advisor PDF (text)...');
     const advisorPDF = generateAdvisorPDFContent(payload);
@@ -533,13 +530,70 @@ module.exports = async (req, res) => {
                         </td>
                     </tr>
 
-                    <!-- Attachment Callout -->
+                    <!-- Overall Summary Section -->
                     <tr>
                         <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FEF7E8; border: 2px solid #9A7611; border-radius: 8px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
                                 <tr>
-                                    <td style="padding: 20px; text-align: center;">
-                                        <p style="margin: 0; font-size: 15px; font-weight: 600; color: #25282A;">📄 Your complete results and responses are attached as a PDF.</p>
+                                    <td style="padding: 24px;">
+                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">What Your Score Means</h3>
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${overallSummary}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Mindset Insight Section -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; border: 1px solid #E5DFD2;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">Your Behavioral Profile</h3>
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${mindsetInsight}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Traditional Insight Section -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">Time Horizon & Goals</h3>
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${traditionalInsight}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Alignment Check Section -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; border: 1px solid #E5DFD2;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">Alignment Check</h3>
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${alignmentCheck}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Planning Relevance Section -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">How We'll Use This</h3>
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${planningRelevance}</p>
                                     </td>
                                 </tr>
                             </table>
@@ -596,8 +650,35 @@ Component Breakdown:
 
 ───────────────────────────────────────────────────────────
 
-Your complete results summary is attached to this email for
-your records.
+WHAT YOUR SCORE MEANS
+
+${overallSummary}
+
+───────────────────────────────────────────────────────────
+
+YOUR BEHAVIORAL PROFILE
+
+${mindsetInsight}
+
+───────────────────────────────────────────────────────────
+
+TIME HORIZON & GOALS
+
+${traditionalInsight}
+
+───────────────────────────────────────────────────────────
+
+ALIGNMENT CHECK
+
+${alignmentCheck}
+
+───────────────────────────────────────────────────────────
+
+HOW WE'LL USE THIS
+
+${planningRelevance}
+
+───────────────────────────────────────────────────────────
 
 We'll be in touch soon to discuss your results and next steps.
 
@@ -731,6 +812,46 @@ www.petrafinancial.com
               </div>
               ` : ''}
 
+              <!-- Overall Summary Section -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5EFE0; border-left: 3px solid #9A7611; margin-bottom: 24px; border-radius: 10px;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">What This Score Means</p>
+                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${overallSummary}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Mindset Insight Section -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E8E6E1; margin-bottom: 24px; border-radius: 10px;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Behavioral Profile</p>
+                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${mindsetInsight}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Traditional Insight Section -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5EFE0; border-left: 3px solid #9A7611; margin-bottom: 24px; border-radius: 10px;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Time Horizon & Goals</p>
+                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${traditionalInsight}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Alignment Check Section -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E8E6E1; margin-bottom: 24px; border-radius: 10px;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Alignment Check</p>
+                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${alignmentCheck}</p>
+                  </td>
+                </tr>
+              </table>
+
               <!-- Attachment Notice -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F4F1; border-radius: 10px; margin-bottom: 24px; border: 1px solid #E8E6E1;">
                 <tr>
@@ -807,6 +928,30 @@ ${payload.flags.map(f => `  • ${f}`).join('\n')}
 
 ───────────────────────────────────────────────────────────
 
+WHAT THIS SCORE MEANS
+
+${overallSummary}
+
+───────────────────────────────────────────────────────────
+
+BEHAVIORAL PROFILE
+
+${mindsetInsight}
+
+───────────────────────────────────────────────────────────
+
+TIME HORIZON & GOALS
+
+${traditionalInsight}
+
+───────────────────────────────────────────────────────────
+
+ALIGNMENT CHECK
+
+${alignmentCheck}
+
+───────────────────────────────────────────────────────────
+
 ATTACHMENT
 The attached document contains all client responses and
 detailed scoring breakdown.
@@ -864,28 +1009,13 @@ www.petrafinancial.com
       if (payload.client.wantsCopy) {
         console.log('[sendResults] Sending client email to:', payload.client.email);
         try {
-          // Build email payload
-          const clientEmailPayload = {
+          const clientMessage = await client.sendEmail({
             From: process.env.POSTMARK_FROM || 'risk@petrafinancial.com',
             To: payload.client.email,
             Subject: 'Thank you — Your Petra risk assessment is complete',
             HtmlBody: clientHTMLBody,
             TextBody: clientTextBody
-          };
-
-          // Only include PDF attachment if it was successfully generated
-          if (clientPDFBuffer) {
-            console.log('[sendResults] Including PDF attachment');
-            clientEmailPayload.Attachments = [{
-              Name: 'petra-risk-assessment-results.pdf',
-              Content: clientPDFBuffer.toString('base64'),
-              ContentType: 'application/pdf'
-            }];
-          } else {
-            console.log('[sendResults] ⚠ Skipping PDF attachment (generation failed)');
-          }
-
-          const clientMessage = await client.sendEmail(clientEmailPayload);
+          });
           console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
         } catch (emailError) {
           console.error('[sendResults] ✗ Error sending client email:', emailError.message);
