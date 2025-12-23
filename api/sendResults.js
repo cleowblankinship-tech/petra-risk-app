@@ -1,11 +1,9 @@
 // api/sendResults.js
-// Vercel Serverless Function for Risk Assessment Email + PDF Workflow
+// Vercel Serverless Function for Risk Assessment Email Workflow
 
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const chromium = require('@sparticuz/chromium');
-const puppeteer = require('puppeteer-core');
 
 // Helper to generate a secure token
 function generateToken() {
@@ -139,133 +137,6 @@ function generateAlignmentCheck(data) {
 
 function generatePlanningRelevance() {
   return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Your advisor will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Your advisor will talk through these decisions with you, not for you.';
-}
-
-// ============================================================================
-// PDF GENERATION (using Puppeteer + HTML template)
-// ============================================================================
-
-async function generateClientPDF(payload) {
-  console.log('[generateClientPDF] Starting PDF generation...');
-  const { client, scores, meta, answers } = payload;
-
-  try {
-    // Generate all narrative sections
-    console.log('[generateClientPDF] Generating narratives...');
-    const overallSummary = generateOverallSummary(scores);
-    const mindsetInsight = generateMindsetInsight(scores);
-    const traditionalScores = payload.traditionalScores || {};
-    const traditionalInsight = generateTraditionalInsight(scores, traditionalScores);
-    const alignmentCheck = generateAlignmentCheck(scores);
-    const planningRelevance = generatePlanningRelevance();
-
-  // Determine which risk scale segment is active
-  const score = scores.overall;
-  const activeClasses = {
-    '0-24': score <= 24 ? 'active' : '',
-    '25-44': score >= 25 && score <= 44 ? 'active' : '',
-    '45-59': score >= 45 && score <= 59 ? 'active' : '',
-    '60-74': score >= 60 && score <= 74 ? 'active' : '',
-    '75-89': score >= 75 && score <= 89 ? 'active' : '',
-    '90-100': score >= 90 ? 'active' : ''
-  };
-
-  // Build Q&A items HTML
-  let qaItemsHTML = '';
-  if (answers && answers.length > 0) {
-    answers.forEach((a, i) => {
-      qaItemsHTML += `
-        <div class="qa-item">
-          <div class="qa-question">
-            ${a.section ? `<span class="qa-section-label">${a.section}</span>` : ''}
-            ${i + 1}. ${a.text}
-          </div>
-          <div class="qa-answer">
-            ${a.selectedOption}
-            ${a.numericValue !== undefined ? ` (Value: ${a.numericValue})` : ''}
-          </div>
-        </div>
-      `;
-    });
-  } else {
-    qaItemsHTML = '<p style="text-align: center; color: #6B6862;">No detailed responses recorded.</p>';
-  }
-
-  // Load HTML template
-  const templatePath = path.join(__dirname, 'templates', 'results-pdf.html');
-  let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
-
-  // Intro text
-  const introText = 'This assessment helps organize our conversation, not define you. At Petra, we know risk tolerance is personal and shaped by more than any questionnaire can measure. Your responses give us a starting point, a way to frame the discussion and ask better questions, but the real understanding comes from talking.';
-
-  // Logo SVG path - for PDF we can embed the logo
-  const logoPath = path.join(__dirname, '..', 'assets', 'petra-email-logo.svg');
-  let logoHTML = '<div style="font-family: brandon-grotesque, Arial, sans-serif; font-size: 48px; font-weight: 700; color: #9A7611; letter-spacing: 2px;">PETRA</div>';
-
-  if (fs.existsSync(logoPath)) {
-    const logoSVG = fs.readFileSync(logoPath, 'utf-8');
-    logoHTML = `<img src="data:image/svg+xml;base64,${Buffer.from(logoSVG).toString('base64')}" alt="Petra Financial Advisors" style="max-width: 200px; height: auto;" />`;
-  }
-
-  // Replace template variables
-  htmlTemplate = htmlTemplate
-    .replace('{{LOGO}}', logoHTML)
-    .replace('{{INTRO_TEXT}}', introText)
-    .replace('{{RISK_BAND}}', scores.band)
-    .replace('{{SCORE}}', scores.overall)
-    .replace('{{BEHAVIORAL_SCORE}}', scores.behavioral)
-    .replace('{{TRADITIONAL_SCORE}}', scores.traditional)
-    .replace('{{ACTIVE_0_24}}', activeClasses['0-24'])
-    .replace('{{ACTIVE_25_44}}', activeClasses['25-44'])
-    .replace('{{ACTIVE_45_59}}', activeClasses['45-59'])
-    .replace('{{ACTIVE_60_74}}', activeClasses['60-74'])
-    .replace('{{ACTIVE_75_89}}', activeClasses['75-89'])
-    .replace('{{ACTIVE_90_100}}', activeClasses['90-100'])
-    .replace('{{OVERALL_SUMMARY}}', overallSummary)
-    .replace('{{MINDSET_INSIGHT}}', mindsetInsight)
-    .replace('{{TRADITIONAL_INSIGHT}}', traditionalInsight)
-    .replace('{{ALIGNMENT_CHECK}}', alignmentCheck)
-    .replace('{{PLANNING_RELEVANCE}}', planningRelevance)
-    .replace('{{QA_ITEMS}}', qaItemsHTML)
-    .replace('{{YEAR}}', new Date().getFullYear());
-
-    // Launch Puppeteer and generate PDF
-    console.log('[generateClientPDF] Launching Puppeteer...');
-    console.log('[generateClientPDF] Chromium executablePath:', await chromium.executablePath());
-
-    const browser = await puppeteer.launch({
-      args: [...chromium.args, '--disable-gpu', '--no-sandbox', '--disable-setuid-sandbox'],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: true,
-      ignoreHTTPSErrors: true,
-    });
-
-    console.log('[generateClientPDF] Creating page and setting content...');
-    const page = await browser.newPage();
-    await page.setContent(htmlTemplate, { waitUntil: 'networkidle0' });
-
-    console.log('[generateClientPDF] Generating PDF...');
-    const pdfBuffer = await page.pdf({
-      format: 'Letter',
-      printBackground: true,
-      margin: {
-        top: '0.5in',
-        right: '0.5in',
-        bottom: '0.5in',
-        left: '0.5in'
-      }
-    });
-
-    await browser.close();
-    console.log('[generateClientPDF] ✓ PDF generated successfully');
-
-    return pdfBuffer;
-  } catch (error) {
-    console.error('[generateClientPDF] ✗ Error generating PDF:', error.message);
-    console.error('[generateClientPDF] Stack:', error.stack);
-    throw error;
-  }
 }
 
 // Generate advisor PDF (text-based, internal use)
@@ -410,17 +281,15 @@ module.exports = async (req, res) => {
     const advisorPDF = generateAdvisorPDFContent(payload);
 
     // ========================================
-    // CLIENT EMAIL (with logo reference)
+    // CLIENT EMAIL
     // ========================================
 
     // Support both BASE_URL and SITE_URL environment variables
-    const baseURL = process.env.BASE_URL || process.env.SITE_URL;
-    console.log('[sendResults] Base URL for assets:', baseURL || 'NOT SET');
+    const baseURL = process.env.BASE_URL || process.env.SITE_URL || 'https://petra-risk-app.vercel.app';
+    console.log('[sendResults] Base URL for assets:', baseURL);
 
-    const logoURL = baseURL ?
-      `${baseURL}/assets/petra-email-logo.svg` :
-      'https://your-deployment-url.vercel.app/assets/petra-email-logo.svg';
-
+    // Use PNG logo for better email compatibility
+    const logoURL = `${baseURL}/assets/petra-email-logo.png`;
     console.log('[sendResults] Logo URL for email:', logoURL);
 
     const clientHTMLBody = `<!DOCTYPE html>
@@ -439,7 +308,10 @@ module.exports = async (req, res) => {
                     <!-- Logo Header -->
                     <tr>
                         <td align="center" style="padding: 40px 40px 32px 40px;">
-                            <img src="${logoURL}" alt="Petra Financial Advisors" width="160" height="auto" style="max-width: 160px; height: auto; display: block; margin: 0 auto;" />
+                            <img src="${logoURL}" alt="Petra Financial Advisors" width="200" height="auto" style="max-width: 200px; width: 200px; height: auto; display: block; margin: 0 auto;" />
+                            <!--[if !mso]><!-->
+                            <div style="mso-hide: all; display: none; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 32px; font-weight: 700; color: #9A7611; letter-spacing: 2px; text-align: center; margin-top: 20px;">PETRA FINANCIAL ADVISORS</div>
+                            <!--<![endif]-->
                         </td>
                     </tr>
 
@@ -523,10 +395,73 @@ module.exports = async (req, res) => {
                         </td>
                     </tr>
 
-                    <!-- Starting Point Message -->
+                    <!-- How to Read These Results -->
                     <tr>
                         <td style="padding: 0 40px 32px 40px;">
-                            <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">This assessment helps organize our conversation, not define you. Your responses give us a starting point to frame the discussion and ask better questions. Your advisor will use these results to guide your work together, and your investment strategy will be built around who you are, not a score.</p>
+                            <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A; font-style: italic; text-align: center;">This assessment helps organize our conversation, not define you. Your responses give us a starting point to frame the discussion and ask better questions. Your advisor will use these results to guide your work together, and your investment strategy will be built around who you are, not a score.</p>
+                        </td>
+                    </tr>
+
+                    <!-- Understanding the Scale -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; border: 1px solid #E5DFD2;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #25282A;">Understanding the Scale</h3>
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">Scores closer to 0 typically reflect a preference for stability and capital preservation, where protecting what you have matters more than maximizing growth. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation, even when that means accepting substantial short-term fluctuations. Neither approach is better or worse. They represent different priorities, timeframes, and emotional relationships with uncertainty.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Risk Scale Visualization -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <h4 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #25282A; text-align: center;">Risk Profile Scale</h4>
+
+                                        <!-- Risk scale segments in table format -->
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                                            <tr>
+                                                <!-- Very Conservative -->
+                                                <td width="16.66%" style="background-color: ${payload.scores.overall <= 24 ? '#E8B84E' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall <= 24 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall <= 24 ? '#40434E' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Very Conservative</div>
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall <= 24 ? '#40434E' : '#6B5B4F'};">0-24</div>
+                                                </td>
+                                                <!-- Conservative -->
+                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#8B9DC3' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Conservative</div>
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#FFFFFF' : '#6B5B4F'};">25-44</div>
+                                                </td>
+                                                <!-- Balanced -->
+                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#7EADAD' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Balanced</div>
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#FFFFFF' : '#6B5B4F'};">45-59</div>
+                                                </td>
+                                                <!-- Balanced Growth -->
+                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#6B8E7F' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Balanced Growth</div>
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#FFFFFF' : '#6B5B4F'};">60-74</div>
+                                                </td>
+                                                <!-- Growth -->
+                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#976491' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Growth</div>
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#FFFFFF' : '#6B5B4F'};">75-89</div>
+                                                </td>
+                                                <!-- Aggressive Growth -->
+                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 90 ? '#CD6969' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 90 ? '#9A7611' : '#E5DFD2'};">
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 90 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Aggressive Growth</div>
+                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 90 ? '#FFFFFF' : '#6B5B4F'};">90-100</div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 
