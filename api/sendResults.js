@@ -284,8 +284,12 @@ module.exports = async (req, res) => {
     // CLIENT EMAIL
     // ========================================
 
-    // Support both BASE_URL and SITE_URL environment variables
-    const baseURL = process.env.BASE_URL || process.env.SITE_URL || 'https://petra-risk-app.vercel.app';
+    // Dynamic base URL resolution for domain-agnostic deployment
+    // Priority: BASE_URL > SITE_URL > VERCEL_URL (production) > fallback
+    const baseURL = process.env.BASE_URL
+      || process.env.SITE_URL
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+      || 'https://petra-risk-app.vercel.app';
     console.log('[sendResults] Base URL for assets:', baseURL);
 
     // Use PNG logo for better email compatibility
@@ -911,53 +915,65 @@ www.petrafinancial.com
 
     console.log('[sendResults] Checking Postmark configuration...');
     console.log('[sendResults] POSTMARK_SERVER_TOKEN exists:', !!process.env.POSTMARK_SERVER_TOKEN);
-    console.log('[sendResults] POSTMARK_FROM:', process.env.POSTMARK_FROM || 'risk@petrafinancial.com');
+    console.log('[sendResults] POSTMARK_FROM:', process.env.POSTMARK_FROM);
+    console.log('[sendResults] ADVISOR_EMAIL:', process.env.ADVISOR_EMAIL);
 
     if (process.env.POSTMARK_SERVER_TOKEN) {
       console.log('[sendResults] Initializing Postmark client...');
       const postmark = require('postmark');
       const client = new postmark.ServerClient(process.env.POSTMARK_SERVER_TOKEN);
 
-      // Send advisor email
-      console.log('[sendResults] Sending advisor email...');
-      try {
-        const advisorMessage = await client.sendEmail({
-          From: process.env.POSTMARK_FROM || 'risk@petrafinancial.com',
-          To: 'risk@petrafinancial.com',
-          Subject: `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${payload.scores.overall} – ${payload.scores.band}`,
-          HtmlBody: advisorHTMLBody,
-          TextBody: advisorTextBody,
-          Attachments: [{
-            Name: `petra-risk-assessment-${payload.client.lastName.toLowerCase()}-${Date.now()}.txt`,
-            Content: Buffer.from(advisorPDF).toString('base64'),
-            ContentType: 'text/plain'
-          }]
-        });
-        console.log('[sendResults] ✓ Advisor email sent successfully:', advisorMessage.MessageID);
-      } catch (emailError) {
-        console.error('[sendResults] ✗ Error sending advisor email:', emailError.message);
-        console.error('[sendResults] Full error:', emailError);
-      }
+      // Validate required email configuration
+      const fromEmail = process.env.POSTMARK_FROM;
+      const advisorEmail = process.env.ADVISOR_EMAIL;
 
-      // Send client email (if requested)
-      console.log('[sendResults] Client wants copy:', payload.client.wantsCopy);
-      if (payload.client.wantsCopy) {
-        console.log('[sendResults] Sending client email to:', payload.client.email);
+      if (!fromEmail || !advisorEmail) {
+        console.error('[sendResults] ✗ Missing required email configuration:');
+        if (!fromEmail) console.error('[sendResults]   - POSTMARK_FROM is not set');
+        if (!advisorEmail) console.error('[sendResults]   - ADVISOR_EMAIL is not set');
+        console.log('[sendResults] ⚠ Skipping email sending due to missing configuration');
+      } else {
+        // Send advisor email
+        console.log('[sendResults] Sending advisor email...');
         try {
-          const clientMessage = await client.sendEmail({
-            From: process.env.POSTMARK_FROM || 'risk@petrafinancial.com',
-            To: payload.client.email,
-            Subject: 'Thank you — Your Petra risk assessment is complete',
-            HtmlBody: clientHTMLBody,
-            TextBody: clientTextBody
+          const advisorMessage = await client.sendEmail({
+            From: fromEmail,
+            To: advisorEmail,
+            Subject: `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${payload.scores.overall} – ${payload.scores.band}`,
+            HtmlBody: advisorHTMLBody,
+            TextBody: advisorTextBody,
+            Attachments: [{
+              Name: `petra-risk-assessment-${payload.client.lastName.toLowerCase()}-${Date.now()}.txt`,
+              Content: Buffer.from(advisorPDF).toString('base64'),
+              ContentType: 'text/plain'
+            }]
           });
-          console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
+          console.log('[sendResults] ✓ Advisor email sent successfully:', advisorMessage.MessageID);
         } catch (emailError) {
-          console.error('[sendResults] ✗ Error sending client email:', emailError.message);
+          console.error('[sendResults] ✗ Error sending advisor email:', emailError.message);
           console.error('[sendResults] Full error:', emailError);
         }
-      } else {
-        console.log('[sendResults] Skipping client email (wantsCopy = false)');
+
+        // Send client email (if requested)
+        console.log('[sendResults] Client wants copy:', payload.client.wantsCopy);
+        if (payload.client.wantsCopy) {
+          console.log('[sendResults] Sending client email to:', payload.client.email);
+          try {
+            const clientMessage = await client.sendEmail({
+              From: fromEmail,
+              To: payload.client.email,
+              Subject: 'Thank you — Your Petra risk assessment is complete',
+              HtmlBody: clientHTMLBody,
+              TextBody: clientTextBody
+            });
+            console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
+          } catch (emailError) {
+            console.error('[sendResults] ✗ Error sending client email:', emailError.message);
+            console.error('[sendResults] Full error:', emailError);
+          }
+        } else {
+          console.log('[sendResults] Skipping client email (wantsCopy = false)');
+        }
       }
     } else {
       console.log('[sendResults] ⚠ Postmark not configured - emails would be sent here');
