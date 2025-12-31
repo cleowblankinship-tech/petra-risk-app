@@ -684,21 +684,24 @@ window.startPerson2 = function() {
     currentPerson = 2;
     document.getElementById('partnerTransition').style.display = 'none';
     document.getElementById('results').style.display = 'none';
-    
+
     // Reset to beginning
     currentSectionIndex = 0;
-    
-    // Clear all answers
+
+    // Clear all answers - radio, checkbox, and Likert selections
     document.querySelectorAll('.selected').forEach(function(el) {
         el.classList.remove('selected');
     });
     document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
         radio.checked = false;
     });
-    
+    document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+        checkbox.checked = false;
+    });
+
     // Restart questionnaire
     startQuestionnaire();
-    
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -706,10 +709,14 @@ function showPartnerTransition() {
     document.getElementById('questionnaire').style.display = 'none';
     document.getElementById('calculateBtn').style.display = 'none';
     document.getElementById('currentPerson').style.display = 'none';
-    document.getElementById('progressBarContainer').style.display = 'none';
+    document.getElementById('topProgressBar').style.display = 'none';
+    document.getElementById('sectionNavigation').style.display = 'none';
     document.getElementById('person1NameDisplay').textContent = person1Name;
     document.getElementById('person2NameDisplay').textContent = person2Name;
     document.getElementById('partnerTransition').style.display = 'block';
+
+    // Scroll to transition screen so user sees it
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ============================================================================
