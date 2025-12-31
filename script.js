@@ -638,8 +638,16 @@ window.startSolo = function() {
 };
 
 window.startCouple = function() {
+    console.log('[startCouple] Button clicked');
     // Show the couple names input section
-    document.getElementById('coupleNames').style.display = 'block';
+    var coupleNamesEl = document.getElementById('coupleNames');
+    console.log('[startCouple] coupleNames element:', coupleNamesEl);
+    if (coupleNamesEl) {
+        coupleNamesEl.style.display = 'block';
+        console.log('[startCouple] Set display to block');
+    } else {
+        console.error('[startCouple] coupleNames element not found!');
+    }
 };
 
 // ============================================================================
