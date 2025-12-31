@@ -143,6 +143,33 @@
                 </div>
             </div>
 
+            <!-- Couple Mode: Orientation Message -->
+            <div id="coupleOrientation" class="couple-orientation" style="display: none;">
+                <p>Both partners have completed the assessment. Below you'll see each person's results, followed by a comparison of how you align.</p>
+            </div>
+
+            <!-- Couple Mode: Individual Results Tabs -->
+            <div id="coupleTabs" class="couple-tabs" style="display: none;">
+                <button class="couple-tab active" data-person="1" id="tab1">
+                    <span id="tab1Name">Person 1</span>
+                </button>
+                <button class="couple-tab" data-person="2" id="tab2">
+                    <span id="tab2Name">Person 2</span>
+                </button>
+            </div>
+
+            <!-- Couple Mode: Tab Content Containers -->
+            <div id="coupleTabContent" class="couple-tab-content" style="display: none;">
+                <div id="person1TabPanel" class="person-tab-panel active" data-person="1">
+                    <!-- Person 1 individual results will be dynamically generated here -->
+                </div>
+                <div id="person2TabPanel" class="person-tab-panel" data-person="2">
+                    <!-- Person 2 individual results will be dynamically generated here -->
+                </div>
+            </div>
+
+            <!-- Solo Mode: Individual Results (original structure) -->
+            <div id="soloResultsContainer">
             <!-- How to Read These Results -->
             <div id="resultsIntroduction" class="insight-section results-intro" style="display: none;">
                 <h3>How to Read These Results</h3>
@@ -239,6 +266,7 @@
                 <h3>How Petra Uses This Information</h3>
                 <p id="planningText"></p>
             </div>
+            </div><!-- End soloResultsContainer -->
 
             <!-- Couple Comparison -->
             <div id="coupleComparison" class="couple-comparison" style="display: none;">

@@ -791,3 +791,128 @@
   max-width: 900px;
   margin: var(--space-4) auto;
 }
+
+/* ============================================================================
+   COUPLE MODE: ORIENTATION MESSAGE & TABBED RESULTS
+   ============================================================================ */
+
+/* Orientation message at top of couple results */
+.couple-orientation {
+  text-align: center;
+  padding: var(--space-4) var(--space-3);
+  margin-bottom: var(--space-4);
+  background: linear-gradient(to bottom, #FAF8F2 0%, #F8F6F0 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(154, 118, 17, 0.12);
+}
+
+.couple-orientation p {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--petra-charcoal);
+  margin: 0;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tab buttons container */
+.couple-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 auto var(--space-4);
+  max-width: 600px;
+  padding: 0 var(--space-3);
+}
+
+.couple-tab {
+  flex: 1;
+  max-width: 280px;
+  font-family: 'brandon-grotesque', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 15px 24px;
+  background: white;
+  color: #6B7280;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(37, 40, 42, 0.08);
+}
+
+.couple-tab:hover:not(.active) {
+  border-color: #D1D5DB;
+  background: #F9FAFB;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(37, 40, 42, 0.12);
+}
+
+.couple-tab.active {
+  background: var(--petra-gold, #9A7611);
+  color: white;
+  border-color: var(--petra-gold, #9A7611);
+  box-shadow: 0 2px 8px rgba(154, 118, 17, 0.25);
+}
+
+/* Tab content panels */
+.couple-tab-content {
+  position: relative;
+  min-height: 400px;
+}
+
+.person-tab-panel {
+  display: none;
+  opacity: 0;
+  animation: fadeIn 300ms ease-out forwards;
+}
+
+.person-tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .couple-tabs {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .couple-tab {
+    max-width: 100%;
+  }
+
+  .couple-orientation p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .couple-orientation {
+    padding: var(--space-3);
+  }
+
+  .couple-orientation p {
+    font-size: 0.9375rem;
+  }
+
+  .couple-tab {
+    padding: 12px 20px;
+    font-size: 0.875rem;
+  }
+}

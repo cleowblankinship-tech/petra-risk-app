@@ -976,13 +976,17 @@ function calculateScore() {
             return;
         } else {
             person2Data = JSON.parse(JSON.stringify(lastComputed));
-            showCoupleComparison();
+            // Display couple results with tabbed interface
+            displayCoupleResults();
+            // Show splash screen for 6 seconds (covers results with high z-index)
+            showSplashThenDisplayResults();
+            return;
         }
     }
-    
-    // Display results (renders them in background)
+
+    // Solo mode: Display individual results
     displayResults(finalScore, Math.round(behavioralPoints), Math.round(traditionalPoints), riskBandData.riskBand, riskBandData.rbClass);
-    
+
     // Show splash screen for 6 seconds (covers results with high z-index)
     showSplashThenDisplayResults();
 }
@@ -1085,6 +1089,12 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     if (!resultsEl) return; // Guard: results section doesn't exist
 
     resultsEl.style.display = 'block';
+
+    // Show solo results container, hide couple-specific elements
+    document.getElementById('soloResultsContainer').style.display = 'block';
+    document.getElementById('coupleOrientation').style.display = 'none';
+    document.getElementById('coupleTabs').style.display = 'none';
+    document.getElementById('coupleTabContent').style.display = 'none';
 
     var mainScoreEl = document.getElementById('mainScore');
     var behavioralScoreEl = document.getElementById('behavioralScore');
@@ -1381,6 +1391,179 @@ function generateKnowledgeFlags(personName, data) {
     }
     
     return flagsHTML;
+}
+
+// ============================================================================
+// COUPLE MODE: TABBED RESULTS DISPLAY
+// ============================================================================
+
+function generateIndividualResultsHTML(personData, personName) {
+    var data = personData;
+    var finalScore = data.finalScore;
+    var behavioralScore = data.behavioralScore;
+    var traditionalScore = data.traditionalScore;
+    var riskBand = data.riskBand;
+    var rbClass = getRiskBand(finalScore).rbClass;
+
+    var html = '';
+
+    // Results Introduction
+    html += '<div class="insight-section results-intro" style="display: block;">';
+    html += '<h3>How to Read These Results</h3>';
+    html += '<p>' + generateResultsIntroduction() + '</p>';
+    html += '</div>';
+
+    // Main Score Display
+    html += '<div class="score-display">';
+    html += '<div class="risk-band ' + rbClass + '">' + riskBand + '</div>';
+    html += '<div class="main-score">' + finalScore + '</div>';
+    html += '<div class="score-label">Risk Alignment Score</div>';
+    html += '<div class="progress-bar">';
+    html += '<div class="progress-fill" style="width: ' + finalScore + '%; background-color: ' + getRiskBandColor(finalScore) + ';"></div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Component Scores
+    html += '<div class="sub-scores">';
+    html += '<div class="sub-score">';
+    html += '<div class="sub-score-value">' + behavioralScore + '</div>';
+    html += '<div class="sub-score-label">Behavioral Component (0-60)</div>';
+    html += '<div class="sub-score-description">How you tend to think and feel about risk: your natural reactions to gains, losses, and uncertainty.</div>';
+    html += '</div>';
+    html += '<div class="sub-score">';
+    html += '<div class="sub-score-value">' + traditionalScore + '</div>';
+    html += '<div class="sub-score-label">Traditional Component (0-40)</div>';
+    html += '<div class="sub-score-description">The practical side: how long you plan to invest, what you've experienced before, and what goals you're prioritizing.</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Understanding the Scale
+    html += '<div class="scale-explanation-section">';
+    html += '<h4>Understanding the Scale</h4>';
+    html += '<p>Scores closer to 0 typically reflect a preference for stability and capital preservation, where protecting what you have matters more than maximizing growth. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation, even when that means accepting substantial short-term fluctuations. Neither approach is better or worse. They represent different priorities, timeframes, and emotional relationships with uncertainty.</p>';
+    html += '</div>';
+
+    // Risk Scale Visualization
+    html += generateRiskScaleHTML(finalScore);
+
+    // Insight Sections
+    html += '<div class="insight-section" style="display: block;">';
+    html += '<h3>What Your Score Reflects</h3>';
+    html += '<p>' + generateOverallSummary(data) + '</p>';
+    html += '</div>';
+
+    html += '<div class="insight-section" style="display: block;">';
+    html += '<h3>Behavioral Tendencies and Investment Mindset</h3>';
+    html += '<p>' + generateMindsetInsight(data) + '</p>';
+    html += '</div>';
+
+    html += '<div class="insight-section" style="display: block;">';
+    html += '<h3>Time Horizon and Risk Capacity</h3>';
+    html += '<p>' + generateTraditionalInsight(data) + '</p>';
+    html += '</div>';
+
+    html += '<div class="insight-section" style="display: block;">';
+    html += '<h3>How These Elements Work Together</h3>';
+    html += '<p>' + generateAlignmentCheck(data) + '</p>';
+    html += '</div>';
+
+    html += '<div class="insight-section" style="display: block;">';
+    html += '<h3>How Petra Uses This Information</h3>';
+    html += '<p>' + generatePlanningRelevance(data) + '</p>';
+    html += '</div>';
+
+    return html;
+}
+
+function generateRiskScaleHTML(score) {
+    var html = '<div class="risk-scale-visualization" style="display: block;">';
+    html += '<h4>Risk Profile Scale</h4>';
+    html += '<div class="risk-scale-bar">';
+
+    var segments = [
+        { label: 'Very Conservative', range: '0-24', class: 'rs-very-cons', max: 24 },
+        { label: 'Conservative', range: '25-44', class: 'rs-cons', max: 44 },
+        { label: 'Balanced', range: '45-59', class: 'rs-balanced', max: 59 },
+        { label: 'Balanced Growth', range: '60-74', class: 'rs-bal-growth', max: 74 },
+        { label: 'Growth', range: '75-89', class: 'rs-growth', max: 89 },
+        { label: 'Aggressive Growth', range: '90-100', class: 'rs-agg-growth', max: 100 }
+    ];
+
+    segments.forEach(function(seg, index) {
+        var isActive = (score <= seg.max && (index === 0 || score > segments[index - 1].max));
+        var activeClass = isActive ? ' active' : '';
+        html += '<div class="risk-scale-segment ' + seg.class + activeClass + '" data-range="' + seg.range + '">';
+        html += '<span class="risk-scale-label">' + seg.label + '</span>';
+        html += '<span class="risk-scale-range">' + seg.range + '</span>';
+        html += '</div>';
+    });
+
+    html += '</div>';
+    html += '</div>';
+    return html;
+}
+
+function displayCoupleResults() {
+    // Show results container
+    document.getElementById('results').style.display = 'block';
+
+    // Hide solo results container
+    document.getElementById('soloResultsContainer').style.display = 'none';
+
+    // Show couple-specific elements
+    document.getElementById('coupleOrientation').style.display = 'block';
+    document.getElementById('coupleTabs').style.display = 'flex';
+    document.getElementById('coupleTabContent').style.display = 'block';
+
+    // Set tab names
+    document.getElementById('tab1Name').textContent = person1Name;
+    document.getElementById('tab2Name').textContent = person2Name;
+
+    // Generate and insert individual results for each person
+    document.getElementById('person1TabPanel').innerHTML = generateIndividualResultsHTML(person1Data, person1Name);
+    document.getElementById('person2TabPanel').innerHTML = generateIndividualResultsHTML(person2Data, person2Name);
+
+    // Set up tab event listeners
+    setupCoupleTabs();
+
+    // Show couple comparison below tabs
+    showCoupleComparison();
+
+    // Hide advisor FAB if not in advisor view
+    var advisorFab = document.getElementById('advisorAccess');
+    if (advisorFab && !isAdvisorView) {
+        advisorFab.style.display = 'none';
+    }
+
+    // Show advisor sections if in advisor view
+    if (isAdvisorView) {
+        displayKnowledgeOverlay();
+        generateAdvisorContent();
+    }
+
+    // Scroll to results
+    setTimeout(function() {
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+}
+
+function setupCoupleTabs() {
+    var tabs = document.querySelectorAll('.couple-tab');
+    var panels = document.querySelectorAll('.person-tab-panel');
+
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            var personNumber = this.dataset.person;
+
+            // Remove active class from all tabs and panels
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            panels.forEach(function(p) { p.classList.remove('active'); });
+
+            // Add active class to clicked tab and corresponding panel
+            this.classList.add('active');
+            document.getElementById('person' + personNumber + 'TabPanel').classList.add('active');
+        });
+    });
 }
 
 // ============================================================================
