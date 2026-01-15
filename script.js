@@ -23,6 +23,13 @@ let answers = {};
 let currentSectionIndex = 0;
 const totalSections = 3;
 
+// Results mode state
+let isResultsMode = false;
+let hasEditedAfterResults = false;
+let savedFormState = null;        // Solo mode form backup
+let person1FormState = null;      // Couple mode form backups
+let person2FormState = null;
+
 // ============================================================================
 // SPLASH SCREEN AND PROGRESS BAR FUNCTIONS
 // ============================================================================
@@ -608,6 +615,189 @@ function startQuestionnaire() {
             currentPerson === 1 ? person1Name : person2Name;
     }
 }
+
+// ============================================================================
+// FORM STATE SERIALIZATION (for edit responses functionality)
+// ============================================================================
+
+/**
+ * Serialize current form state for later restoration
+ * @returns {Object} Serialized form state
+ */
+function serializeFormState() {
+    const state = {
+        radioSelections: {},
+        likertSelections: {},
+        checkboxSelections: {}
+    };
+
+    // Capture radio selections
+    document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+        state.radioSelections[radio.name] = radio.value;
+    });
+
+    // Capture likert selections (custom styled options)
+    document.querySelectorAll('.likert-option.selected').forEach(likert => {
+        const name = likert.dataset.name || likert.closest('.likert-scale')?.dataset.question;
+        const value = likert.dataset.value;
+        if (name && value) {
+            state.likertSelections[name] = value;
+        }
+    });
+
+    // Capture checkbox selections
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+        if (cb.name) {
+            if (!state.checkboxSelections[cb.name]) {
+                state.checkboxSelections[cb.name] = [];
+            }
+            state.checkboxSelections[cb.name].push(cb.value);
+        }
+    });
+
+    return state;
+}
+
+/**
+ * Restore form state from serialized data
+ * @param {Object} state - Previously serialized form state
+ */
+function restoreFormState(state) {
+    if (!state) return;
+
+    // Clear all current selections first
+    document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+
+    // Restore radios
+    Object.entries(state.radioSelections).forEach(([name, value]) => {
+        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (radio) {
+            radio.checked = true;
+            const option = radio.closest('.option');
+            if (option) option.classList.add('selected');
+        }
+    });
+
+    // Restore likerts
+    Object.entries(state.likertSelections).forEach(([name, value]) => {
+        const likert = document.querySelector(`.likert-option[data-name="${name}"][data-value="${value}"]`);
+        if (likert) {
+            likert.classList.add('selected');
+        } else {
+            // Try alternative selector for question-based likerts
+            const scale = document.querySelector(`.likert-scale[data-question="${name}"]`);
+            if (scale) {
+                const option = scale.querySelector(`.likert-option[data-value="${value}"]`);
+                if (option) option.classList.add('selected');
+            }
+        }
+    });
+
+    // Restore checkboxes
+    Object.entries(state.checkboxSelections).forEach(([name, values]) => {
+        values.forEach(value => {
+            const cb = document.querySelector(`input[name="${name}"][value="${value}"]`);
+            if (cb) {
+                cb.checked = true;
+                const option = cb.closest('.option');
+                if (option) option.classList.add('selected');
+            }
+        });
+    });
+}
+
+/**
+ * Update calculate button text based on edit state
+ */
+function updateCalculateButtonText() {
+    const calcBtn = document.getElementById('calculateBtn');
+    if (!calcBtn) return;
+
+    if (hasEditedAfterResults) {
+        calcBtn.textContent = 'Recalculate Results';
+    } else {
+        calcBtn.textContent = 'Calculate Risk Alignment Score';
+    }
+}
+
+/**
+ * Return to questionnaire for editing responses
+ * Handles both solo and couple modes with proper state management
+ */
+window.returnToQuestionnaire = function(personToEdit) {
+    // Mark that we're no longer in results mode
+    isResultsMode = false;
+    hasEditedAfterResults = true;
+
+    // Hide results section
+    const resultsEl = document.getElementById('results');
+    if (resultsEl) {
+        resultsEl.style.display = 'none';
+        resultsEl.classList.remove('results-active');
+    }
+
+    // Hide splash if visible
+    const splash = document.getElementById('petra-splash');
+    if (splash) splash.classList.add('hidden');
+
+    // For couple mode
+    if (isCoupleMode) {
+        // Determine which person to edit
+        if (personToEdit !== undefined && personToEdit !== null) {
+            currentPerson = personToEdit;
+        } else {
+            // Default: edit the currently active tab's person
+            const activeTab = document.querySelector('.couple-tab.active');
+            currentPerson = activeTab ? parseInt(activeTab.dataset.person) : 1;
+        }
+
+        // Restore the appropriate form state
+        if (currentPerson === 1 && person1FormState) {
+            restoreFormState(person1FormState);
+        } else if (currentPerson === 2 && person2FormState) {
+            restoreFormState(person2FormState);
+        }
+
+        // Update current person banner
+        document.getElementById('currentPerson').style.display = 'block';
+        document.getElementById('currentPersonName').textContent =
+            currentPerson === 1 ? person1Name : person2Name;
+
+        // Hide couple-specific result elements
+        var coupleOrientation = document.getElementById('coupleOrientation');
+        if (coupleOrientation) coupleOrientation.style.display = 'none';
+        var coupleTabsWrapper = document.getElementById('coupleTabsWrapper');
+        if (coupleTabsWrapper) coupleTabsWrapper.style.display = 'none';
+        var coupleTabContent = document.getElementById('coupleTabContent');
+        if (coupleTabContent) coupleTabContent.style.display = 'none';
+        var coupleComparison = document.getElementById('coupleComparison');
+        if (coupleComparison) coupleComparison.style.display = 'none';
+    } else {
+        // Solo mode: restore saved form state
+        if (savedFormState) {
+            restoreFormState(savedFormState);
+        }
+    }
+
+    // Show questionnaire and navigation
+    document.getElementById('questionnaire').style.display = 'block';
+    document.getElementById('topProgressBar').style.display = 'block';
+    document.getElementById('sectionNavigation').style.display = 'flex';
+
+    // Reset to first section and show it
+    currentSectionIndex = 0;
+    showSection(0);
+    updateSectionProgress();
+
+    // Update calculate button text
+    updateCalculateButtonText();
+
+    // Smooth scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 // ============================================================================
 // MODE SELECTION FUNCTIONS
 // ============================================================================
@@ -731,6 +921,9 @@ window.startPerson2 = function() {
 }
 
 function showPartnerTransition() {
+    // Store person 1's form state before transitioning to person 2
+    person1FormState = serializeFormState();
+
     document.getElementById('questionnaire').style.display = 'none';
     document.getElementById('calculateBtn').style.display = 'none';
     document.getElementById('currentPerson').style.display = 'none';
@@ -1003,8 +1196,10 @@ function calculateScore() {
             person2Data = JSON.parse(JSON.stringify(lastComputed));
             // Display couple results with tabbed interface
             displayCoupleResults();
-            // Show splash screen for 6 seconds (covers results with high z-index)
-            showSplashThenDisplayResults();
+            // Show splash screen for 6 seconds (skip if recalculating after edit)
+            if (!hasEditedAfterResults) {
+                showSplashThenDisplayResults();
+            }
             return;
         }
     }
@@ -1012,8 +1207,10 @@ function calculateScore() {
     // Solo mode: Display individual results
     displayResults(finalScore, Math.round(behavioralPoints), Math.round(traditionalPoints), riskBandData.riskBand, riskBandData.rbClass);
 
-    // Show splash screen for 6 seconds (covers results with high z-index)
-    showSplashThenDisplayResults();
+    // Show splash screen for 6 seconds (skip if recalculating after edit)
+    if (!hasEditedAfterResults) {
+        showSplashThenDisplayResults();
+    }
 }
 
 function calculateBehavioralScores(values) {
@@ -1113,12 +1310,39 @@ function displayResults(finalScore, behavioralScore, traditionalScore, riskBand,
     var resultsEl = document.getElementById('results');
     if (!resultsEl) return; // Guard: results section doesn't exist
 
+    // Set results mode state
+    isResultsMode = true;
+
+    // Save form state before displaying results (for edit functionality)
+    if (!isCoupleMode) {
+        savedFormState = serializeFormState();
+    }
+
+    // HIDE questionnaire and navigation completely for distinct "page" feel
+    var questionnaire = document.getElementById('questionnaire');
+    if (questionnaire) questionnaire.style.display = 'none';
+    var topProgressBar = document.getElementById('topProgressBar');
+    if (topProgressBar) topProgressBar.style.display = 'none';
+    var sectionNavigation = document.getElementById('sectionNavigation');
+    if (sectionNavigation) sectionNavigation.style.display = 'none';
+    var calculateBtn = document.getElementById('calculateBtn');
+    if (calculateBtn) calculateBtn.style.display = 'none';
+    var couplesSetup = document.getElementById('couplesSetup');
+    if (couplesSetup) couplesSetup.style.display = 'none';
+    var clientInfoSection = document.getElementById('clientInfoSection');
+    if (clientInfoSection) clientInfoSection.style.display = 'none';
+
+    // Show results with distinct page class
     resultsEl.style.display = 'block';
+    resultsEl.classList.add('results-active');
 
     // Show solo results container, hide couple-specific elements
     document.getElementById('soloResultsContainer').style.display = 'block';
     document.getElementById('coupleOrientation').style.display = 'none';
-    document.getElementById('coupleTabs').style.display = 'none';
+    var coupleTabsWrapper = document.getElementById('coupleTabsWrapper');
+    if (coupleTabsWrapper) coupleTabsWrapper.style.display = 'none';
+    var coupleTabs = document.getElementById('coupleTabs');
+    if (coupleTabs) coupleTabs.style.display = 'none';
     document.getElementById('coupleTabContent').style.display = 'none';
 
     var mainScoreEl = document.getElementById('mainScore');
@@ -1434,7 +1658,7 @@ function generateIndividualResultsHTML(personData, personName) {
 
     // Results Introduction
     html += '<div class="insight-section results-intro" style="display: block;">';
-    html += '<h3>How to Read These Results</h3>';
+    html += '<h3>How to Think About These Results</h3>';
     html += '<p>' + generateResultsIntroduction() + '</p>';
     html += '</div>';
 
@@ -1529,14 +1753,40 @@ function generateRiskScaleHTML(score) {
 }
 
 function displayCoupleResults() {
-    // Show results container
-    document.getElementById('results').style.display = 'block';
+    // Set results mode state
+    isResultsMode = true;
+
+    // Store person 2's form state (person 1's was stored at transition)
+    person2FormState = serializeFormState();
+
+    // HIDE questionnaire and navigation completely for distinct "page" feel
+    var questionnaire = document.getElementById('questionnaire');
+    if (questionnaire) questionnaire.style.display = 'none';
+    var topProgressBar = document.getElementById('topProgressBar');
+    if (topProgressBar) topProgressBar.style.display = 'none';
+    var sectionNavigation = document.getElementById('sectionNavigation');
+    if (sectionNavigation) sectionNavigation.style.display = 'none';
+    var calculateBtn = document.getElementById('calculateBtn');
+    if (calculateBtn) calculateBtn.style.display = 'none';
+    var couplesSetup = document.getElementById('couplesSetup');
+    if (couplesSetup) couplesSetup.style.display = 'none';
+    var clientInfoSection = document.getElementById('clientInfoSection');
+    if (clientInfoSection) clientInfoSection.style.display = 'none';
+    var currentPersonBanner = document.getElementById('currentPerson');
+    if (currentPersonBanner) currentPersonBanner.style.display = 'none';
+
+    // Show results container with distinct page class
+    var resultsEl = document.getElementById('results');
+    resultsEl.style.display = 'block';
+    resultsEl.classList.add('results-active');
 
     // Hide solo results container
     document.getElementById('soloResultsContainer').style.display = 'none';
 
     // Show couple-specific elements
     document.getElementById('coupleOrientation').style.display = 'block';
+    var coupleTabsWrapper = document.getElementById('coupleTabsWrapper');
+    if (coupleTabsWrapper) coupleTabsWrapper.style.display = 'block';
     document.getElementById('coupleTabs').style.display = 'flex';
     document.getElementById('coupleTabContent').style.display = 'block';
 

@@ -916,3 +916,235 @@
     font-size: 0.875rem;
   }
 }
+
+/* ============================================================================
+   RESULTS MODE - DISTINCT PAGE FEEL
+   ============================================================================ */
+
+/* Results container when active - distinct page feel */
+.results.results-active {
+  min-height: calc(100vh - 100px);
+  background: var(--petra-white);
+  padding-top: var(--space-4);
+}
+
+/* Results header with logo and edit link */
+.results-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--petra-warm-200);
+}
+
+.results-logo {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: var(--space-3);
+}
+
+.edit-responses-link {
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--petra-warm-500);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.edit-responses-link::before {
+  content: "\2190";  /* Left arrow */
+  font-size: 1em;
+}
+
+.edit-responses-link:hover {
+  color: var(--petra-gold);
+  background: rgba(154, 118, 17, 0.08);
+}
+
+/* ============================================================================
+   VIEWING RESULTS LABEL (COUPLES MODE)
+   ============================================================================ */
+
+.couple-tabs-wrapper {
+  text-align: center;
+  margin-bottom: var(--space-4);
+}
+
+.viewing-results-label {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--petra-warm-500);
+  margin-bottom: var(--space-2);
+}
+
+/* ============================================================================
+   RISK SCALE VISUALIZATION - CENTERED & BALANCED
+   ============================================================================ */
+
+.risk-scale-visualization {
+  max-width: 800px;
+  margin: var(--space-5) auto;
+  padding: 0 var(--space-3);
+}
+
+.risk-scale-visualization h4 {
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--petra-charcoal);
+  margin-bottom: var(--space-3);
+}
+
+.risk-scale-bar {
+  display: flex;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(37, 40, 42, 0.08);
+}
+
+.risk-scale-segment {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 6px;
+  min-height: 72px;
+  transition: all 0.3s ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  position: relative;
+}
+
+.risk-scale-segment:last-child {
+  border-right: none;
+}
+
+/* Active segment styling - slightly elevated */
+.risk-scale-segment.active {
+  transform: scaleY(1.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.risk-scale-segment.active .risk-scale-label,
+.risk-scale-segment.active .risk-scale-range {
+  font-weight: 700;
+}
+
+/* Ensure darker segments have visible text */
+.risk-scale-segment.rs-growth .risk-scale-label,
+.risk-scale-segment.rs-growth .risk-scale-range,
+.risk-scale-segment.rs-agg-growth .risk-scale-label,
+.risk-scale-segment.rs-agg-growth .risk-scale-range {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.risk-scale-segment.rs-growth.active .risk-scale-label,
+.risk-scale-segment.rs-growth.active .risk-scale-range,
+.risk-scale-segment.rs-agg-growth.active .risk-scale-label,
+.risk-scale-segment.rs-agg-growth.active .risk-scale-range {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================================
+   RESPONSIVE ADJUSTMENTS FOR RESULTS MODE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .results-header {
+    padding: var(--space-3) var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .results-logo {
+    max-width: 150px;
+  }
+
+  .edit-responses-link {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  .risk-scale-segment {
+    padding: 10px 4px;
+    min-height: 64px;
+  }
+
+  .risk-scale-label {
+    font-size: 0.5625rem;
+  }
+
+  .risk-scale-range {
+    font-size: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .results-logo {
+    max-width: 130px;
+  }
+
+  .risk-scale-segment {
+    padding: 8px 2px;
+    min-height: 56px;
+  }
+
+  .risk-scale-label {
+    font-size: 0.5rem;
+  }
+
+  .risk-scale-range {
+    font-size: 0.4375rem;
+  }
+}
+
+/* ============================================================================
+   PDF EXPORT / PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  .results.results-active {
+    padding: 0;
+    min-height: auto;
+  }
+
+  .edit-responses-link {
+    display: none !important;
+  }
+
+  .results-header {
+    border-bottom: 2px solid var(--petra-gold);
+    margin-bottom: var(--space-4);
+  }
+
+  .risk-scale-bar {
+    box-shadow: none;
+    border: 1px solid var(--petra-warm-300);
+  }
+
+  .risk-scale-segment {
+    break-inside: avoid;
+  }
+
+  .insight-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
