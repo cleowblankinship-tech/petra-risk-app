@@ -1458,7 +1458,7 @@ function generateIndividualResultsHTML(personData, personName) {
     html += '<div class="sub-score">';
     html += '<div class="sub-score-value">' + traditionalScore + '</div>';
     html += '<div class="sub-score-label">Traditional Component (0-40)</div>';
-    html += '<div class="sub-score-description">The practical side: how long you plan to invest, what you've experienced before, and what goals you're prioritizing.</div>';
+    html += '<div class="sub-score-description">The practical side: how long you plan to invest, what you\'ve experienced before, and what goals you\'re prioritizing.</div>';
     html += '</div>';
     html += '</div>';
 
