@@ -613,9 +613,26 @@ function startQuestionnaire() {
 // ============================================================================
 
 window.startSolo = function() {
+    console.log('[startSolo] Button clicked');
     isCoupleMode = false;
-    document.getElementById('couplesSetup').style.display = 'none';
-    document.getElementById('clientInfoSection').style.display = 'block';
+
+    var couplesSetupEl = document.getElementById('couplesSetup');
+    console.log('[startSolo] couplesSetup element:', couplesSetupEl);
+    if (couplesSetupEl) {
+        couplesSetupEl.style.display = 'none';
+        console.log('[startSolo] Hidden couplesSetup');
+    } else {
+        console.error('[startSolo] couplesSetup element not found!');
+    }
+
+    var clientInfoEl = document.getElementById('clientInfoSection');
+    console.log('[startSolo] clientInfoSection element:', clientInfoEl);
+    if (clientInfoEl) {
+        clientInfoEl.style.display = 'block';
+        console.log('[startSolo] Showed clientInfoSection');
+    } else {
+        console.error('[startSolo] clientInfoSection element not found!');
+    }
 
     // Add continue button handler
     const continueBtn = document.getElementById('continueToQuestions');
