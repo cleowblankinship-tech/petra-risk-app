@@ -924,24 +924,17 @@
 /* Results container when active - distinct page feel */
 .results.results-active {
   min-height: calc(100vh - 100px);
-  background: var(--petra-white);
+  background: transparent;  /* Clean, no additional background - inherits page background */
   padding-top: var(--space-4);
 }
 
-/* Results header with logo and edit link */
+/* Results header with edit link */
 .results-header {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: var(--space-5);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--petra-warm-200);
-}
-
-.results-logo {
-  max-width: 180px;
-  height: auto;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
 }
 
 .edit-responses-link {
@@ -1024,8 +1017,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 6px;
-  min-height: 72px;
+  padding: 20px 8px;  /* Increased vertical padding for breathing room */
+  min-height: 96px;   /* Taller segments for more visual weight */
   transition: all 0.3s ease;
   border-right: 1px solid rgba(255, 255, 255, 0.25);
   position: relative;
@@ -1033,6 +1026,19 @@
 
 .risk-scale-segment:last-child {
   border-right: none;
+}
+
+/* Risk scale text - improved spacing and readability */
+.risk-scale-label {
+  font-size: 0.6875rem;  /* Slightly larger for better readability */
+  line-height: 1.35;     /* More breathing room between lines */
+  margin-bottom: 6px;    /* More space between label and range */
+}
+
+.risk-scale-range {
+  font-size: 0.6875rem;  /* Match label size for visual consistency */
+  line-height: 1.3;
+  margin-top: 2px;
 }
 
 /* Active segment styling - slightly elevated */
@@ -1073,45 +1079,39 @@
     margin-bottom: var(--space-4);
   }
 
-  .results-logo {
-    max-width: 150px;
-  }
-
   .edit-responses-link {
     font-size: 0.75rem;
     padding: 6px 12px;
   }
 
   .risk-scale-segment {
-    padding: 10px 4px;
-    min-height: 64px;
+    padding: 16px 4px;
+    min-height: 80px;
   }
 
   .risk-scale-label {
     font-size: 0.5625rem;
+    margin-bottom: 4px;
   }
 
   .risk-scale-range {
-    font-size: 0.5rem;
+    font-size: 0.5625rem;
   }
 }
 
 @media (max-width: 480px) {
-  .results-logo {
-    max-width: 130px;
-  }
-
   .risk-scale-segment {
-    padding: 8px 2px;
-    min-height: 56px;
+    padding: 14px 3px;
+    min-height: 72px;
   }
 
   .risk-scale-label {
     font-size: 0.5rem;
+    margin-bottom: 3px;
   }
 
   .risk-scale-range {
-    font-size: 0.4375rem;
+    font-size: 0.5rem;
   }
 }
 
@@ -1125,13 +1125,8 @@
     min-height: auto;
   }
 
-  .edit-responses-link {
-    display: none !important;
-  }
-
   .results-header {
-    border-bottom: 2px solid var(--petra-gold);
-    margin-bottom: var(--space-4);
+    display: none;  /* Hide edit link in print */
   }
 
   .risk-scale-bar {
