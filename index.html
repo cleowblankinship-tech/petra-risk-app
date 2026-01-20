@@ -49,7 +49,7 @@
 
                 <div class="form-field full-width">
                     <label class="checkbox-label">
-                        <input type="checkbox" id="wantsCopyCheckbox" name="emailMe">
+                        <input type="checkbox" id="wantsCopyCheckbox" name="emailMe" checked>
                         <span>Email me my results</span>
                     </label>
                 </div>
@@ -84,6 +84,24 @@
                     <label class="input-label">Person 2:</label>
                     <input type="text" id="person2Name" placeholder="Partner's name" class="name-input">
                 </div>
+
+                <!-- Partner Email Inputs -->
+                <h4 style="color: var(--petra-charcoal); margin-bottom: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e5e7eb;">Where should we send results?</h4>
+                <div style="margin-bottom: 15px;">
+                    <label class="input-label" for="partnerAEmail"><span id="partnerAEmailLabel">Partner A</span> Email *</label>
+                    <input type="email" id="partnerAEmail" placeholder="partner1@example.com" class="name-input" required>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label class="input-label" for="partnerBEmail"><span id="partnerBEmailLabel">Partner B</span> Email (optional)</label>
+                    <input type="email" id="partnerBEmail" placeholder="partner2@example.com" class="name-input">
+                </div>
+                <p id="coupleEmailHelperText" class="couple-email-helper" style="font-size: 0.85rem; color: #6b7280; margin-bottom: 20px; line-height: 1.4;">
+                    If both emails are provided, each partner will receive their own results. If only one email is entered, both results will be sent to that address.
+                </p>
+                <div id="singleEmailNotice" class="couple-email-notice" style="display: none; background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #92400e; font-size: 0.85rem;"><strong>Note:</strong> Both partners' results will be sent to the single email address provided.</p>
+                </div>
+
                 <button onclick="beginCoupleAssessment()" class="begin-btn">Begin Assessment</button>
             </div>
         </div>
