@@ -202,10 +202,11 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
                 <!-- 600px centered container -->
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; max-width: 600px; background-color: ${EMAIL_COLORS.white};">
 
-                    <!-- Header with Logo -->
+                    <!-- Header with Logo (client) or just subtitle (advisor) -->
                     <tr>
                         <td align="center" valign="top" style="padding: 32px 40px 24px 40px; background-color: ${headerBg}; ${headerBorderBottom}">
-                            <!-- Logo centered via table -->
+                            ${!isAdvisor ? `
+                            <!-- Logo centered via table (client emails only) -->
                             <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
                                 <tr>
                                     <td align="center" style="padding-bottom: 16px;">
@@ -213,6 +214,7 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
                                     </td>
                                 </tr>
                             </table>
+                            ` : ''}
                             <!-- Subtitle -->
                             <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
                                 <tr>
@@ -694,16 +696,38 @@ function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary
     `;
   }
 
-  // Behavioral Flags (if any) - OUTLOOK COMPATIBLE table-based layout
+  // Behavioral Flags (if any) - OUTLOOK COMPATIBLE table-based layout with explanations
   if (flags && flags.length > 0) {
-    const flagRows = flags.map(flag => `
+    // Flag explanations mapping
+    const flagExplanations = {
+      'Longevity Planning': 'Client indicated concerns about outliving their savings or has longevity factors that may require extended planning horizons.',
+      'Caregiving Consideration': 'Client has or anticipates caregiving responsibilities that may impact their financial planning needs and risk capacity.',
+      'Knowledge: Overconfident': 'Client self-rated their investment knowledge higher than their quiz performance suggests. May benefit from education before making complex decisions.',
+      'Knowledge: Underconfident': 'Client self-rated their investment knowledge lower than their quiz performance indicates. May have more capability than they realize.'
+    };
+
+    const flagRows = flags.map(flag => {
+      const explanation = flagExplanations[flag] || '';
+      return `
       <tr>
-          <td style="padding: 6px 12px; background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.gold}; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 12px; color: ${EMAIL_COLORS.darkText}; margin-bottom: 6px;">
-              ${flag}
+          <td style="padding: 12px; background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.gold}; font-family: Georgia, 'Times New Roman', Times, serif;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                      <td style="font-size: 14px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; padding-bottom: 6px;">
+                          ${flag}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td style="font-size: 13px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                          ${explanation}
+                      </td>
+                  </tr>
+              </table>
           </td>
       </tr>
-      <tr><td style="height: 6px; font-size: 1px; line-height: 1px;">&nbsp;</td></tr>
-    `).join('');
+      <tr><td style="height: 8px; font-size: 1px; line-height: 1px;">&nbsp;</td></tr>
+    `;
+    }).join('');
 
     bodyHtml += `
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
@@ -714,7 +738,7 @@ function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary
                           <td style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral Flags</td>
                       </tr>
                   </table>
-                  <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                       ${flagRows}
                   </table>
               </td>
@@ -886,12 +910,18 @@ COUPLE COMPARISON
   }
 
   if (flags && flags.length > 0) {
+    const flagExplanations = {
+      'Longevity Planning': 'Client indicated concerns about outliving their savings or has longevity factors that may require extended planning horizons.',
+      'Caregiving Consideration': 'Client has or anticipates caregiving responsibilities that may impact their financial planning needs and risk capacity.',
+      'Knowledge: Overconfident': 'Client self-rated their investment knowledge higher than their quiz performance suggests. May benefit from education before making complex decisions.',
+      'Knowledge: Underconfident': 'Client self-rated their investment knowledge lower than their quiz performance indicates. May have more capability than they realize.'
+    };
     text += `
 ───────────────────────────────────────────────────────────
 
 BEHAVIORAL FLAGS
 
-${flags.map(f => `  • ${f}`).join('\n')}
+${flags.map(f => `  • ${f}\n    ${flagExplanations[f] || ''}`).join('\n\n')}
 `;
   }
 
@@ -1008,7 +1038,15 @@ ${interpretationText}
 BEHAVIORAL FLAGS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${flags && flags.length > 0 ? flags.map(f => `  • ${f}`).join('\n') : '  None identified'}
+${flags && flags.length > 0 ? flags.map(f => {
+    const explanations = {
+      'Longevity Planning': 'Client indicated concerns about outliving their savings or has longevity factors that may require extended planning horizons.',
+      'Caregiving Consideration': 'Client has or anticipates caregiving responsibilities that may impact their financial planning needs and risk capacity.',
+      'Knowledge: Overconfident': 'Client self-rated their investment knowledge higher than their quiz performance suggests. May benefit from education before making complex decisions.',
+      'Knowledge: Underconfident': 'Client self-rated their investment knowledge lower than their quiz performance indicates. May have more capability than they realize.'
+    };
+    return `  • ${f}\n    ${explanations[f] || ''}`;
+  }).join('\n\n') : '  None identified'}
 
 
 ═══════════════════════════════════════════════════════════════════
@@ -1118,7 +1156,7 @@ module.exports = async (req, res) => {
 
     const clientHTMLBody = renderEmailLayout({
       title: `Thank You, ${payload.client.firstName}`,
-      subtitle: "We've received your Risk Alignment Assessment and your advisor will be in touch to discuss your results.",
+      subtitle: "We've received your Risk Alignment Assessment and your Petra advisor will be in touch soon to discuss your results.",
       bodyHtml: clientBodyHtml,
       logoURL,
       isAdvisor: false
@@ -1201,7 +1239,7 @@ module.exports = async (req, res) => {
 
       const html = renderEmailLayout({
         title: `Thank You, ${personName}`,
-        subtitle: "We've received your Risk Alignment Assessment and your advisor will be in touch to discuss your results.",
+        subtitle: "We've received your Risk Alignment Assessment and your Petra advisor will be in touch soon to discuss your results.",
         bodyHtml: personBodyHtml,
         logoURL,
         isAdvisor: false
@@ -1242,12 +1280,23 @@ module.exports = async (req, res) => {
             ? `Couple Risk Assessment – ${payload.client.person1Name} & ${payload.client.person2Name} (${payload.client.firstName} ${payload.client.lastName})`
             : `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${payload.scores.overall} – ${payload.scores.band}`;
 
+          // Generate the detailed Q&A attachment content
+          const attachmentContent = generateAdvisorPDFContent(payload);
+          const attachmentBase64 = Buffer.from(attachmentContent, 'utf-8').toString('base64');
+          const clientNameSafe = `${payload.client.firstName}_${payload.client.lastName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+          const attachmentFilename = `Risk_Assessment_${clientNameSafe}_${new Date().toISOString().split('T')[0]}.txt`;
+
           const advisorMessage = await client.sendEmail({
             From: fromEmail,
             To: advisorEmail,
             Subject: advisorSubject,
             HtmlBody: advisorHTMLBody,
-            TextBody: advisorTextBody
+            TextBody: advisorTextBody,
+            Attachments: [{
+              Name: attachmentFilename,
+              Content: attachmentBase64,
+              ContentType: 'text/plain'
+            }]
           });
           console.log('[sendResults] ✓ Advisor email sent successfully:', advisorMessage.MessageID);
         } catch (emailError) {
