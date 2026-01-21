@@ -139,6 +139,656 @@ function generatePlanningRelevance() {
   return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Your advisor will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Your advisor will talk through these decisions with you, not for you.';
 }
 
+// ============================================================================
+// UNIFIED EMAIL TEMPLATE SYSTEM
+// ============================================================================
+
+// Brand colors (single source of truth)
+const EMAIL_COLORS = {
+  gold: '#9A7611',
+  darkText: '#25282A',
+  bodyText: '#6B5B4F',
+  lightBg: '#F5F1EA',
+  white: '#FFFFFF',
+  border: '#E5DFD2',
+  footerBg: '#25282A',
+  footerText: '#F5F4F1'
+};
+
+// Shared email layout wrapper
+function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = false }) {
+  const headerBg = isAdvisor ? EMAIL_COLORS.footerBg : EMAIL_COLORS.white;
+  const headerTitleColor = isAdvisor ? EMAIL_COLORS.gold : EMAIL_COLORS.darkText;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>${title}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; background-color: ${EMAIL_COLORS.lightBg}; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <!-- Full-width background wrapper -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg};">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- 600px centered container -->
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background-color: ${EMAIL_COLORS.white}; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td align="center" style="padding: 32px 40px 24px 40px; background-color: ${headerBg}; ${isAdvisor ? 'border-bottom: 3px solid ' + EMAIL_COLORS.gold + ';' : ''} border-radius: ${isAdvisor ? '8px 8px 0 0' : '8px 8px 0 0'};">
+                            <img src="${logoURL}" alt="Petra Financial Advisors" width="180" height="auto" style="max-width: 180px; width: 180px; height: auto; display: block; margin: 0 auto 16px auto;" />
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${isAdvisor ? EMAIL_COLORS.footerText : EMAIL_COLORS.bodyText}; text-transform: uppercase; letter-spacing: 2px;">
+                                        Risk Alignment Assessment
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Divider line (for non-advisor) -->
+                    ${!isAdvisor ? `
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="border-bottom: 1px solid ${EMAIL_COLORS.border};"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    ` : ''}
+
+                    <!-- Title Section -->
+                    <tr>
+                        <td style="padding: ${isAdvisor ? '32px' : '24px'} 40px 16px 40px;">
+                            <h1 style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: ${isAdvisor ? '22px' : '26px'}; font-weight: 700; color: ${headerTitleColor}; text-align: center; line-height: 1.3;">
+                                ${title}
+                            </h1>
+                            ${subtitle ? `
+                            <p style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText}; text-align: center;">
+                                ${subtitle}
+                            </p>
+                            ` : ''}
+                        </td>
+                    </tr>
+
+                    <!-- Main Body Content -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            ${bodyHtml}
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 24px 40px; background-color: ${EMAIL_COLORS.footerBg}; border-radius: 0 0 8px 8px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center">
+                                        <p style="margin: 0 0 8px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; color: ${EMAIL_COLORS.footerText};">
+                                            Thank you,<br>
+                                            <strong style="color: ${EMAIL_COLORS.gold};">The Petra Team</strong>
+                                        </p>
+                                        <p style="margin: 0 0 16px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: ${EMAIL_COLORS.footerText}; line-height: 1.5;">
+                                            1880 Office Club Pointe, Suite 128<br>
+                                            Colorado Springs, CO 80920<br>
+                                            <a href="https://www.petrafinancial.com" style="color: ${EMAIL_COLORS.gold}; text-decoration: none;">www.petrafinancial.com</a>
+                                        </p>
+                                        <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #888888; line-height: 1.5;">
+                                            ${isAdvisor ? 'This assessment is for internal use only.' : 'This assessment is for educational purposes only and should not be considered investment advice.'}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+}
+
+// Render risk scale visualization (shared between client and advisor)
+function renderRiskScale(score) {
+  const bands = [
+    { name: 'Very Conservative', range: '0-24', min: 0, max: 24, color: '#E8B84E', textColor: '#40434E' },
+    { name: 'Conservative', range: '25-44', min: 25, max: 44, color: '#8B9DC3', textColor: '#FFFFFF' },
+    { name: 'Balanced', range: '45-59', min: 45, max: 59, color: '#7EADAD', textColor: '#FFFFFF' },
+    { name: 'Balanced Growth', range: '60-74', min: 60, max: 74, color: '#6B8E7F', textColor: '#FFFFFF' },
+    { name: 'Growth', range: '75-89', min: 75, max: 89, color: '#976491', textColor: '#FFFFFF' },
+    { name: 'Aggressive Growth', range: '90-100', min: 90, max: 100, color: '#CD6969', textColor: '#FFFFFF' }
+  ];
+
+  const cells = bands.map((band, idx) => {
+    const isActive = score >= band.min && score <= band.max;
+    const isFirst = idx === 0;
+    const isLast = idx === bands.length - 1;
+
+    return `
+      <td width="16.66%" style="background-color: ${isActive ? band.color : EMAIL_COLORS.lightBg}; padding: 10px 4px; text-align: center; border: 2px solid ${isActive ? EMAIL_COLORS.gold : EMAIL_COLORS.border}; ${!isLast ? 'border-right: none;' : ''} ${isFirst ? 'border-radius: 4px 0 0 4px;' : ''} ${isLast ? 'border-radius: 0 4px 4px 0;' : ''}">
+          <div style="font-family: Arial, Helvetica, sans-serif; font-size: 9px; font-weight: 700; color: ${isActive ? band.textColor : EMAIL_COLORS.bodyText}; text-transform: uppercase; margin-bottom: 2px; line-height: 1.2;">${band.name}</div>
+          <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; color: ${isActive ? band.textColor : EMAIL_COLORS.bodyText};">${band.range}</div>
+          ${isActive ? `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 8px; color: ${band.textColor}; margin-top: 4px;">&#9650; You</div>` : ''}
+      </td>
+    `;
+  }).join('');
+
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
+        <tr>
+            <td>
+                <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-align: center; text-transform: uppercase; letter-spacing: 1px;">Risk Profile Scale</p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+                    <tr>${cells}</tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+}
+
+// Render a narrative section card
+function renderNarrativeCard({ title, content, isHighlighted = false }) {
+  const bgColor = isHighlighted ? EMAIL_COLORS.lightBg : EMAIL_COLORS.white;
+  const borderStyle = isHighlighted ? `border-left: 3px solid ${EMAIL_COLORS.gold};` : `border: 1px solid ${EMAIL_COLORS.border};`;
+
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+        <tr>
+            <td style="background-color: ${bgColor}; ${borderStyle} border-radius: 6px; padding: 20px;">
+                <h3 style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: ${EMAIL_COLORS.gold}; text-transform: uppercase; letter-spacing: 0.5px;">${title}</h3>
+                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.7; color: ${EMAIL_COLORS.darkText};">${content}</p>
+            </td>
+        </tr>
+    </table>
+  `;
+}
+
+// Render results summary card (scores display)
+function renderResultsSummary({ overall, band, behavioral, traditional, riskBandColor }) {
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 8px; margin-bottom: 24px;">
+        <tr>
+            <td style="padding: 28px 24px;">
+                <p style="margin: 0 0 20px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px; text-align: center;">Your Results Summary</p>
+
+                <!-- Risk Band Pill -->
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 12px 28px; background-color: ${riskBandColor}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 50px; text-align: center;">
+                            ${band}
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Overall Score -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 6px;">
+                            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 48px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${overall}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 20px;">
+                            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: ${EMAIL_COLORS.bodyText};">Risk Alignment Score</span>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Component Scores -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td width="48%" style="vertical-align: top;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 6px;">
+                                <tr>
+                                    <td style="padding: 16px; text-align: center;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; margin-bottom: 6px;">${behavioral}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: ${EMAIL_COLORS.darkText}; margin-bottom: 6px;">Behavioral (0-60)</div>
+                                        <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">How you think and feel about risk</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="4%"></td>
+                        <td width="48%" style="vertical-align: top;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 6px;">
+                                <tr>
+                                    <td style="padding: 16px; text-align: center;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; margin-bottom: 6px;">${traditional}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: ${EMAIL_COLORS.darkText}; margin-bottom: 6px;">Traditional (0-40)</div>
+                                        <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">Time horizon and goals</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+}
+
+// Render CTA button
+function renderCTAButton(url, text) {
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 24px 0;">
+        <tr>
+            <td style="background-color: ${EMAIL_COLORS.gold}; border-radius: 6px;">
+                <a href="${url}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; color: #FFFFFF; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">${text}</a>
+            </td>
+        </tr>
+    </table>
+  `;
+}
+
+// CLIENT EMAIL BODY BUILDER
+function renderClientBody({ scores, riskBandColor, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck, planningRelevance, baseURL }) {
+  let bodyHtml = '';
+
+  // Intro message
+  bodyHtml += `
+    <p style="margin: 0 0 24px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.7; color: ${EMAIL_COLORS.darkText}; text-align: center; font-style: italic;">
+        This assessment helps organize our conversation, not define you. Your responses give us a starting point to frame the discussion and ask better questions.
+    </p>
+  `;
+
+  // Results Summary Card
+  bodyHtml += renderResultsSummary({
+    overall: scores.overall,
+    band: scores.band,
+    behavioral: scores.behavioral,
+    traditional: scores.traditional,
+    riskBandColor
+  });
+
+  // Understanding the Scale
+  bodyHtml += renderNarrativeCard({
+    title: 'Understanding the Scale',
+    content: 'Scores closer to 0 typically reflect a preference for stability and capital preservation. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation. Neither approach is better or worse\u2014they represent different priorities, timeframes, and emotional relationships with uncertainty.',
+    isHighlighted: false
+  });
+
+  // Risk Scale Visualization
+  bodyHtml += renderRiskScale(scores.overall);
+
+  // Narrative Sections
+  bodyHtml += renderNarrativeCard({
+    title: 'What Your Score Means',
+    content: overallSummary,
+    isHighlighted: true
+  });
+
+  bodyHtml += renderNarrativeCard({
+    title: 'Your Behavioral Profile',
+    content: mindsetInsight,
+    isHighlighted: false
+  });
+
+  bodyHtml += renderNarrativeCard({
+    title: 'Time Horizon & Goals',
+    content: traditionalInsight,
+    isHighlighted: true
+  });
+
+  bodyHtml += renderNarrativeCard({
+    title: 'Alignment Check',
+    content: alignmentCheck,
+    isHighlighted: false
+  });
+
+  bodyHtml += renderNarrativeCard({
+    title: 'How We\'ll Use This',
+    content: planningRelevance,
+    isHighlighted: true
+  });
+
+  // CTA Button
+  bodyHtml += renderCTAButton(baseURL || 'https://www.petrafinancial.com', 'Visit PetraFinancial.com');
+
+  return bodyHtml;
+}
+
+// ADVISOR EMAIL BODY BUILDER
+function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck, riskBandColor }) {
+  let bodyHtml = '';
+
+  // Client Information Card
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border-left: 3px solid ${EMAIL_COLORS.gold}; border-radius: 6px; margin-bottom: 24px;">
+        <tr>
+            <td style="padding: 20px;">
+                <p style="margin: 0 0 8px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                    <strong>Client:</strong> ${client.firstName} ${client.lastName}
+                </p>
+                <p style="margin: 0 0 8px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                    <strong>Email:</strong> ${client.email}
+                </p>
+                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                    <strong>Submitted:</strong> ${meta.timestamp}
+                </p>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  // Score Display
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
+        <tr>
+            <td align="center">
+                <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${EMAIL_COLORS.bodyText}; text-transform: uppercase; letter-spacing: 1px;">Risk Alignment Score</p>
+                <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 56px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.overall}</p>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                    <tr>
+                        <td style="padding: 10px 24px; background-color: ${riskBandColor}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 50px;">
+                            ${scores.band}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  // Component Scores
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
+        <tr>
+            <td width="48%" style="vertical-align: top; background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; padding: 20px; border-radius: 6px; text-align: center;">
+                <p style="margin: 0 0 8px 0; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.behavioral}</p>
+                <p style="margin: 0 0 6px 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral (0-60)</p>
+                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">How they think and feel about risk</p>
+            </td>
+            <td width="4%"></td>
+            <td width="48%" style="vertical-align: top; background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; padding: 20px; border-radius: 6px; text-align: center;">
+                <p style="margin: 0 0 8px 0; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.traditional}</p>
+                <p style="margin: 0 0 6px 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Traditional (0-40)</p>
+                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">Time horizon, experience, and goals</p>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  // Couple Comparison (if applicable)
+  if (couple && scores.deltas) {
+    bodyHtml += `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF9E6; border-left: 3px solid ${EMAIL_COLORS.gold}; margin-bottom: 24px; border-radius: 6px;">
+          <tr>
+              <td style="padding: 20px;">
+                  <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Couple Comparison</p>
+                  <p style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                      <strong>Overall Delta:</strong> ${scores.deltas.overall} points
+                  </p>
+                  <p style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                      <strong>Behavioral Delta:</strong> ${scores.deltas.behavioral} points
+                  </p>
+                  <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                      <strong>Traditional Delta:</strong> ${scores.deltas.traditional} points
+                  </p>
+              </td>
+          </tr>
+      </table>
+    `;
+  }
+
+  // Behavioral Flags (if any)
+  if (flags && flags.length > 0) {
+    const flagPills = flags.map(flag => `
+      <span style="display: inline-block; background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.gold}; color: ${EMAIL_COLORS.darkText}; padding: 6px 12px; border-radius: 50px; font-family: Georgia, 'Times New Roman', serif; font-size: 12px; margin: 0 6px 6px 0;">${flag}</span>
+    `).join('');
+
+    bodyHtml += `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
+          <tr>
+              <td>
+                  <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral Flags</p>
+                  <div>${flagPills}</div>
+              </td>
+          </tr>
+      </table>
+    `;
+  }
+
+  // Risk Scale
+  bodyHtml += renderRiskScale(scores.overall);
+
+  // Narrative Sections
+  bodyHtml += renderNarrativeCard({
+    title: 'What This Score Means',
+    content: overallSummary,
+    isHighlighted: true
+  });
+
+  bodyHtml += renderNarrativeCard({
+    title: 'Behavioral Profile',
+    content: mindsetInsight,
+    isHighlighted: false
+  });
+
+  bodyHtml += renderNarrativeCard({
+    title: 'Time Horizon & Goals',
+    content: traditionalInsight,
+    isHighlighted: true
+  });
+
+  bodyHtml += renderNarrativeCard({
+    title: 'Alignment Check',
+    content: alignmentCheck,
+    isHighlighted: false
+  });
+
+  // Next Steps Notice
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 8px;">
+        <tr>
+            <td style="text-align: center;">
+                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText};">
+                    Follow up with the client to discuss their results and investment strategy alignment.
+                </p>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  return bodyHtml;
+}
+
+// Plain-text email builder for client
+function renderClientTextBody({ firstName, scores, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck, planningRelevance }) {
+  return `
+═══════════════════════════════════════════════════════════
+PETRA FINANCIAL ADVISORS
+Risk Alignment Assessment
+═══════════════════════════════════════════════════════════
+
+Thank you, ${firstName}
+
+We've received your Risk Alignment Assessment and your advisor
+will be in touch to discuss your results.
+
+───────────────────────────────────────────────────────────
+
+YOUR RESULTS SUMMARY
+
+Risk Band:      ${scores.band}
+Overall Score:  ${scores.overall}/100
+
+Component Breakdown:
+  • Behavioral:  ${scores.behavioral}/60
+  • Traditional: ${scores.traditional}/40
+
+───────────────────────────────────────────────────────────
+
+UNDERSTANDING THE SCALE
+
+Scores closer to 0 typically reflect a preference for stability
+and capital preservation. Scores closer to 100 tend to indicate
+comfort with significant market volatility and a focus on
+long-term wealth accumulation. Neither approach is better or
+worse—they represent different priorities, timeframes, and
+emotional relationships with uncertainty.
+
+───────────────────────────────────────────────────────────
+
+WHAT YOUR SCORE MEANS
+
+${overallSummary}
+
+───────────────────────────────────────────────────────────
+
+YOUR BEHAVIORAL PROFILE
+
+${mindsetInsight}
+
+───────────────────────────────────────────────────────────
+
+TIME HORIZON & GOALS
+
+${traditionalInsight}
+
+───────────────────────────────────────────────────────────
+
+ALIGNMENT CHECK
+
+${alignmentCheck}
+
+───────────────────────────────────────────────────────────
+
+HOW WE'LL USE THIS
+
+${planningRelevance}
+
+───────────────────────────────────────────────────────────
+
+Thank you,
+The Petra Team
+
+Petra Financial Advisors
+1880 Office Club Pointe, Suite 128
+Colorado Springs, CO 80920
+www.petrafinancial.com
+
+This assessment is for educational purposes only and should
+not be considered investment advice.
+
+═══════════════════════════════════════════════════════════
+`;
+}
+
+// Plain-text email builder for advisor
+function renderAdvisorTextBody({ client, scores, flags, couple, meta, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck }) {
+  let text = `
+═══════════════════════════════════════════════════════════
+RISK ASSESSMENT RECEIVED
+Petra Financial Advisors
+═══════════════════════════════════════════════════════════
+
+NEW CLIENT ASSESSMENT
+
+Client: ${client.firstName} ${client.lastName}
+Email: ${client.email}
+Submitted: ${meta.timestamp}
+
+───────────────────────────────────────────────────────────
+
+RISK ALIGNMENT SCORE
+
+Overall Score:  ${scores.overall}/100
+Risk Band:      ${scores.band}
+
+Component Breakdown:
+  • Behavioral:  ${scores.behavioral}/60
+  • Traditional: ${scores.traditional}/40
+`;
+
+  if (couple && scores.deltas) {
+    text += `
+───────────────────────────────────────────────────────────
+
+COUPLE COMPARISON
+
+  • Overall Delta:     ${scores.deltas.overall} points
+  • Behavioral Delta:  ${scores.deltas.behavioral} points
+  • Traditional Delta: ${scores.deltas.traditional} points
+`;
+  }
+
+  if (flags && flags.length > 0) {
+    text += `
+───────────────────────────────────────────────────────────
+
+BEHAVIORAL FLAGS
+
+${flags.map(f => `  • ${f}`).join('\n')}
+`;
+  }
+
+  text += `
+───────────────────────────────────────────────────────────
+
+WHAT THIS SCORE MEANS
+
+${overallSummary}
+
+───────────────────────────────────────────────────────────
+
+BEHAVIORAL PROFILE
+
+${mindsetInsight}
+
+───────────────────────────────────────────────────────────
+
+TIME HORIZON & GOALS
+
+${traditionalInsight}
+
+───────────────────────────────────────────────────────────
+
+ALIGNMENT CHECK
+
+${alignmentCheck}
+
+───────────────────────────────────────────────────────────
+
+Follow up with the client to discuss their results and
+investment strategy alignment.
+
+───────────────────────────────────────────────────────────
+
+Thank you,
+The Petra Team
+
+Petra Financial Advisors
+1880 Office Club Pointe, Suite 128
+Colorado Springs, CO 80920
+www.petrafinancial.com
+
+This assessment is for internal use only.
+
+═══════════════════════════════════════════════════════════
+`;
+
+  return text;
+}
+
 // Generate advisor PDF (text-based, internal use)
 function generateAdvisorPDFContent(payload) {
   const { client, scores, flags, answers, meta } = payload;
@@ -296,618 +946,74 @@ module.exports = async (req, res) => {
     const logoURL = `${baseURL}/assets/petra-email-logo.png`;
     console.log('[sendResults] Logo URL for email:', logoURL);
 
-    const clientHTMLBody = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Risk Alignment Assessment Results</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Crimson Pro', Georgia, serif; background-color: #F5F1EA;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA;">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <!-- Main Container -->
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
-                    <!-- Logo Header -->
-                    <tr>
-                        <td align="center" style="padding: 40px 40px 32px 40px;">
-                            <img src="${logoURL}" alt="Petra Financial Advisors" width="200" height="auto" style="max-width: 200px; width: 200px; height: auto; display: block; margin: 0 auto;" />
-                            <!--[if !mso]><!-->
-                            <div style="mso-hide: all; display: none; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 32px; font-weight: 700; color: #9A7611; letter-spacing: 2px; text-align: center; margin-top: 20px;">PETRA FINANCIAL ADVISORS</div>
-                            <!--<![endif]-->
-                        </td>
-                    </tr>
-
-                    <!-- Greeting -->
-                    <tr>
-                        <td style="padding: 0 40px 24px 40px;">
-                            <h1 style="margin: 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 28px; font-weight: 700; color: #25282A; text-align: center;">Thank You, ${payload.client.firstName}</h1>
-                        </td>
-                    </tr>
-
-                    <!-- Main Message -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #25282A; text-align: center;">We've received your Risk Alignment Assessment and your advisor will be in touch to discuss your results.</p>
-                        </td>
-                    </tr>
-
-                    <!-- Results Summary Card -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
-                                <tr>
-                                    <td style="padding: 32px 24px;">
-                                        <h2 style="margin: 0 0 24px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #25282A; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">Your Results Summary</h2>
-
-                                        <!-- Risk Band -->
-                                        <div align="center" style="margin-bottom: 24px;">
-                                            <table cellpadding="0" cellspacing="0">
-                                                <tr>
-                                                    <td style="padding: 14px 32px; background-color: ${riskBandColor}; color: #FFFFFF; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 50px; text-align: center;">
-                                                        ${payload.scores.band}
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-
-                                        <!-- Score -->
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td align="center" style="padding-bottom: 8px;">
-                                                    <div style="font-size: 56px; font-weight: 700; color: #9A7611; line-height: 1; font-family: 'Brandon Grotesque', Arial, sans-serif;">${payload.scores.overall}</div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td align="center" style="padding-bottom: 24px;">
-                                                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6B5B4F; font-weight: 700; font-family: 'Brandon Grotesque', Arial, sans-serif;">Risk Alignment Score</div>
-                                                </td>
-                                            </tr>
-                                        </table>
-
-                                        <!-- Component Scores -->
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td width="50%" style="padding-right: 8px;">
-                                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E5DFD2; border-radius: 8px;">
-                                                        <tr>
-                                                            <td style="padding: 20px; text-align: center;">
-                                                                <div style="font-size: 36px; font-weight: 700; color: #9A7611; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">${payload.scores.behavioral}</div>
-                                                                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #25282A; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">Behavioral (0-60)</div>
-                                                                <div style="font-size: 13px; line-height: 1.4; color: #6B5B4F;">How you think and feel about risk</div>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                                <td width="50%" style="padding-left: 8px;">
-                                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E5DFD2; border-radius: 8px;">
-                                                        <tr>
-                                                            <td style="padding: 20px; text-align: center;">
-                                                                <div style="font-size: 36px; font-weight: 700; color: #9A7611; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">${payload.scores.traditional}</div>
-                                                                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #25282A; margin-bottom: 8px; font-family: 'Brandon Grotesque', Arial, sans-serif;">Traditional (0-40)</div>
-                                                                <div style="font-size: 13px; line-height: 1.4; color: #6B5B4F;">Time horizon and goals</div>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- How to Read These Results -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A; font-style: italic; text-align: center;">This assessment helps organize our conversation, not define you. Your responses give us a starting point to frame the discussion and ask better questions. Your advisor will use these results to guide your work together, and your investment strategy will be built around who you are, not a score.</p>
-                        </td>
-                    </tr>
-
-                    <!-- Understanding the Scale -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; border: 1px solid #E5DFD2;">
-                                <tr>
-                                    <td style="padding: 24px;">
-                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #25282A;">Understanding the Scale</h3>
-                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">Scores closer to 0 typically reflect a preference for stability and capital preservation, where protecting what you have matters more than maximizing growth. Scores closer to 100 tend to indicate comfort with significant market volatility and a focus on long-term wealth accumulation, even when that means accepting substantial short-term fluctuations. Neither approach is better or worse. They represent different priorities, timeframes, and emotional relationships with uncertainty.</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Risk Scale Visualization -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td>
-                                        <h4 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 14px; font-weight: 700; color: #25282A; text-align: center;">Risk Profile Scale</h4>
-
-                                        <!-- Risk scale segments in table format -->
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                                            <tr>
-                                                <!-- Very Conservative -->
-                                                <td width="16.66%" style="background-color: ${payload.scores.overall <= 24 ? '#E8B84E' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall <= 24 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall <= 24 ? '#40434E' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Very Conservative</div>
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall <= 24 ? '#40434E' : '#6B5B4F'};">0-24</div>
-                                                </td>
-                                                <!-- Conservative -->
-                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#8B9DC3' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Conservative</div>
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 25 && payload.scores.overall <= 44 ? '#FFFFFF' : '#6B5B4F'};">25-44</div>
-                                                </td>
-                                                <!-- Balanced -->
-                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#7EADAD' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Balanced</div>
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 45 && payload.scores.overall <= 59 ? '#FFFFFF' : '#6B5B4F'};">45-59</div>
-                                                </td>
-                                                <!-- Balanced Growth -->
-                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#6B8E7F' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Balanced Growth</div>
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 60 && payload.scores.overall <= 74 ? '#FFFFFF' : '#6B5B4F'};">60-74</div>
-                                                </td>
-                                                <!-- Growth -->
-                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#976491' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#9A7611' : '#E5DFD2'}; border-right: none;">
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Growth</div>
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 75 && payload.scores.overall <= 89 ? '#FFFFFF' : '#6B5B4F'};">75-89</div>
-                                                </td>
-                                                <!-- Aggressive Growth -->
-                                                <td width="16.66%" style="background-color: ${payload.scores.overall >= 90 ? '#CD6969' : '#F5F1EA'}; padding: 12px 8px; text-align: center; border: 2px solid ${payload.scores.overall >= 90 ? '#9A7611' : '#E5DFD2'};">
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 10px; font-weight: 700; color: ${payload.scores.overall >= 90 ? '#FFFFFF' : '#6B5B4F'}; text-transform: uppercase; margin-bottom: 4px;">Aggressive Growth</div>
-                                                    <div style="font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 11px; color: ${payload.scores.overall >= 90 ? '#FFFFFF' : '#6B5B4F'};">90-100</div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Overall Summary Section -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
-                                <tr>
-                                    <td style="padding: 24px;">
-                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">What Your Score Means</h3>
-                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${overallSummary}</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Mindset Insight Section -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; border: 1px solid #E5DFD2;">
-                                <tr>
-                                    <td style="padding: 24px;">
-                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">Your Behavioral Profile</h3>
-                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${mindsetInsight}</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Traditional Insight Section -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
-                                <tr>
-                                    <td style="padding: 24px;">
-                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">Time Horizon & Goals</h3>
-                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${traditionalInsight}</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Alignment Check Section -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 8px; border: 1px solid #E5DFD2;">
-                                <tr>
-                                    <td style="padding: 24px;">
-                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">Alignment Check</h3>
-                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${alignmentCheck}</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Planning Relevance Section -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F1EA; border-radius: 8px; border: 1px solid #E5DFD2;">
-                                <tr>
-                                    <td style="padding: 24px;">
-                                        <h3 style="margin: 0 0 16px 0; font-family: 'Brandon Grotesque', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #9A7611; text-transform: uppercase; letter-spacing: 0.05em;">How We'll Use This</h3>
-                                        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #25282A;">${planningRelevance}</p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- Signature -->
-                    <tr>
-                        <td style="padding: 0 40px 32px 40px; border-top: 1px solid #E5DFD2;">
-                            <p style="margin: 24px 0 0 0; font-size: 15px; line-height: 1.7; color: #25282A;">
-                                Thank you,<br>
-                                <strong>The Petra Team</strong>
-                            </p>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 24px 40px; background-color: #F5F1EA; border-radius: 0 0 12px 12px;">
-                            <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #6B5B4F; text-align: center;">
-                                This assessment is for educational purposes only and should not be considered investment advice.
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>`;
-
-    const clientTextBody = `
-═══════════════════════════════════════════════════════════
-THANK YOU
-We've received your assessment
-═══════════════════════════════════════════════════════════
-
-Hi ${payload.client.firstName},
-
-Thank you for completing the Petra Risk Alignment Assessment.
-Your responses have been received and one of our advisors will
-review them shortly.
-
-───────────────────────────────────────────────────────────
-
-YOUR RISK ALIGNMENT SCORE
-
-Overall Score:  ${payload.scores.overall}/100
-Risk Band:      ${payload.scores.band}
-
-Component Breakdown:
-  • Behavioral:  ${payload.scores.behavioral}/60
-  • Traditional: ${payload.scores.traditional}/40
-
-───────────────────────────────────────────────────────────
-
-WHAT YOUR SCORE MEANS
-
-${overallSummary}
-
-───────────────────────────────────────────────────────────
-
-YOUR BEHAVIORAL PROFILE
-
-${mindsetInsight}
-
-───────────────────────────────────────────────────────────
-
-TIME HORIZON & GOALS
-
-${traditionalInsight}
-
-───────────────────────────────────────────────────────────
-
-ALIGNMENT CHECK
-
-${alignmentCheck}
-
-───────────────────────────────────────────────────────────
-
-HOW WE'LL USE THIS
-
-${planningRelevance}
-
-───────────────────────────────────────────────────────────
-
-We'll be in touch soon to discuss your results and next steps.
-
-Best regards,
-The Petra Team
-
-───────────────────────────────────────────────────────────
-
-Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
-www.petrafinancial.com
-
-═══════════════════════════════════════════════════════════
-`;
-
     // ========================================
-    // ADVISOR EMAIL (keep existing)
+    // GENERATE EMAILS USING SHARED LAYOUT
     // ========================================
 
-    const advisorHTMLBody = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Risk Assessment Received</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Crimson Pro', Georgia, serif; background-color: #f8f7f6; -webkit-font-smoothing: antialiased;">
+    // Client email using shared layout
+    const clientBodyHtml = renderClientBody({
+      scores: payload.scores,
+      riskBandColor,
+      overallSummary,
+      mindsetInsight,
+      traditionalInsight,
+      alignmentCheck,
+      planningRelevance,
+      baseURL
+    });
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f7f6; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; max-width: 600px; box-shadow: 0 4px 6px rgba(37, 40, 42, 0.06);">
+    const clientHTMLBody = renderEmailLayout({
+      title: `Thank You, ${payload.client.firstName}`,
+      subtitle: "We've received your Risk Alignment Assessment and your advisor will be in touch to discuss your results.",
+      bodyHtml: clientBodyHtml,
+      logoURL,
+      isAdvisor: false
+    });
 
-          <!-- Header -->
-          <tr>
-            <td style="background-color: #25282A; padding: 32px 40px; text-align: center; border-bottom: 3px solid #9A7611;">
-              <h1 style="margin: 0; color: #9A7611; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">RISK ASSESSMENT RECEIVED</h1>
-              <p style="margin: 8px 0 0 0; color: #F5F4F1; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; font-weight: 400;">Petra Financial Advisors</p>
-            </td>
-          </tr>
+    const clientTextBody = renderClientTextBody({
+      firstName: payload.client.firstName,
+      scores: payload.scores,
+      overallSummary,
+      mindsetInsight,
+      traditionalInsight,
+      alignmentCheck,
+      planningRelevance
+    });
 
-          <!-- Main Content -->
-          <tr>
-            <td style="padding: 48px 40px;">
+    // Advisor email using shared layout
+    const advisorBodyHtml = renderAdvisorBody({
+      client: payload.client,
+      scores: payload.scores,
+      flags: payload.flags,
+      couple: payload.couple,
+      meta: payload.meta,
+      overallSummary,
+      mindsetInsight,
+      traditionalInsight,
+      alignmentCheck,
+      riskBandColor
+    });
 
-              <!-- Client Information -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5EFE0; border-left: 3px solid #9A7611; margin-bottom: 32px; border-radius: 10px;">
-                <tr>
-                  <td style="padding: 20px 24px;">
-                    <p style="margin: 0 0 8px 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 15px; line-height: 1.6;">
-                      <strong style="font-weight: 600;">Client:</strong> ${payload.client.firstName} ${payload.client.lastName}
-                    </p>
-                    <p style="margin: 0 0 8px 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 15px; line-height: 1.6;">
-                      <strong style="font-weight: 600;">Email:</strong> ${payload.client.email}
-                    </p>
-                    <p style="margin: 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.6;">
-                      <strong style="font-weight: 600;">Submitted:</strong> ${payload.meta.timestamp}
-                    </p>
-                  </td>
-                </tr>
-              </table>
+    const advisorHTMLBody = renderEmailLayout({
+      title: 'New Risk Assessment Received',
+      subtitle: `${payload.client.firstName} ${payload.client.lastName} has completed their assessment.`,
+      bodyHtml: advisorBodyHtml,
+      logoURL,
+      isAdvisor: true
+    });
 
-              <!-- Score Section -->
-              <div style="text-align: center; margin-bottom: 40px;">
-                <p style="margin: 0 0 16px 0; color: #6B6862; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">Risk Alignment Score</p>
-                <p style="margin: 0 0 12px 0; color: #9A7611; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 72px; font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: -0.02em;">${payload.scores.overall}</p>
-                <span style="display: inline-block; background-color: ${riskBandColor}; color: #FFFFFF; padding: 10px 24px; border-radius: 9999px; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 24px;">${payload.scores.band}</span>
+    const advisorTextBody = renderAdvisorTextBody({
+      client: payload.client,
+      scores: payload.scores,
+      flags: payload.flags,
+      couple: payload.couple,
+      meta: payload.meta,
+      overallSummary,
+      mindsetInsight,
+      traditionalInsight,
+      alignmentCheck
+    });
 
-                <!-- Progress Bar -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
-                  <tr>
-                    <td style="padding: 0;">
-                      <div style="width: 100%; max-width: 600px; height: 6px; background: #E8E6E1; border-radius: 3px; overflow: hidden; margin: 0 auto;">
-                        <div style="width: ${payload.scores.overall}%; height: 100%; background: linear-gradient(90deg, #9A7611 0%, #B8904A 50%, #93A2BC 100%); border-radius: 3px;"></div>
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-
-              <!-- Component Scores -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 32px;">
-                <tr>
-                  <!-- Behavioral Component -->
-                  <td width="48%" style="vertical-align: top; background-color: #FFFFFF; border: 1px solid #E8E6E1; padding: 24px; border-radius: 16px; text-align: center;">
-                    <p style="margin: 0 0 12px 0; color: #9A7611; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 36px; font-weight: 700; line-height: 1; text-transform: uppercase;">${payload.scores.behavioral}</p>
-                    <p style="margin: 0 0 8px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Behavioral (0-60)</p>
-                    <p style="margin: 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 13px; line-height: 1.5;">How you tend to think and feel about risk</p>
-                  </td>
-                  <td width="4%"></td>
-                  <!-- Traditional Component -->
-                  <td width="48%" style="vertical-align: top; background-color: #FFFFFF; border: 1px solid #E8E6E1; padding: 24px; border-radius: 16px; text-align: center;">
-                    <p style="margin: 0 0 12px 0; color: #9A7611; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 36px; font-weight: 700; line-height: 1; text-transform: uppercase;">${payload.scores.traditional}</p>
-                    <p style="margin: 0 0 8px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Traditional (0-40)</p>
-                    <p style="margin: 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 13px; line-height: 1.5;">Time horizon, experience, and goals</p>
-                  </td>
-                </tr>
-              </table>
-
-              ${payload.couple ? `
-              <!-- Couple Comparison -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFF9E6; border-left: 3px solid #9A7611; margin-bottom: 32px; border-radius: 10px;">
-                <tr>
-                  <td style="padding: 20px 24px;">
-                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Couple Comparison</p>
-                    <p style="margin: 0 0 6px 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.6;">
-                      <strong>Overall Delta:</strong> ${payload.scores.deltas.overall} points
-                    </p>
-                    <p style="margin: 0 0 6px 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.6;">
-                      <strong>Behavioral Delta:</strong> ${payload.scores.deltas.behavioral} points
-                    </p>
-                    <p style="margin: 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.6;">
-                      <strong>Traditional Delta:</strong> ${payload.scores.deltas.traditional} points
-                    </p>
-                  </td>
-                </tr>
-              </table>
-              ` : ''}
-
-              ${payload.flags && payload.flags.length > 0 ? `
-              <!-- Behavioral Flags -->
-              <div style="margin-bottom: 32px;">
-                <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Behavioral Flags</p>
-                <div>
-                  ${payload.flags.map(flag => `
-                    <span style="display: inline-block; background-color: #F5EFE0; border: 1px solid #9A7611; color: #25282A; padding: 6px 14px; border-radius: 9999px; font-family: 'Crimson Pro', Georgia, serif; font-size: 13px; margin: 0 8px 8px 0;">${flag}</span>
-                  `).join('')}
-                </div>
-              </div>
-              ` : ''}
-
-              <!-- Overall Summary Section -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5EFE0; border-left: 3px solid #9A7611; margin-bottom: 24px; border-radius: 10px;">
-                <tr>
-                  <td style="padding: 20px 24px;">
-                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">What This Score Means</p>
-                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${overallSummary}</p>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Mindset Insight Section -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E8E6E1; margin-bottom: 24px; border-radius: 10px;">
-                <tr>
-                  <td style="padding: 20px 24px;">
-                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Behavioral Profile</p>
-                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${mindsetInsight}</p>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Traditional Insight Section -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5EFE0; border-left: 3px solid #9A7611; margin-bottom: 24px; border-radius: 10px;">
-                <tr>
-                  <td style="padding: 20px 24px;">
-                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Time Horizon & Goals</p>
-                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${traditionalInsight}</p>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Alignment Check Section -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 1px solid #E8E6E1; margin-bottom: 24px; border-radius: 10px;">
-                <tr>
-                  <td style="padding: 20px 24px;">
-                    <p style="margin: 0 0 12px 0; color: #25282A; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Alignment Check</p>
-                    <p style="margin: 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7;">${alignmentCheck}</p>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Attachment Notice -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F5F4F1; border-radius: 10px; margin-bottom: 24px; border: 1px solid #E8E6E1;">
-                <tr>
-                  <td style="padding: 20px 24px; text-align: center;">
-                    <p style="margin: 0 0 8px 0; color: #25282A; font-family: 'Crimson Pro', Georgia, serif; font-size: 15px; font-weight: 600;">📎 Complete Q&A Attached</p>
-                    <p style="margin: 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.6;">The attached document contains all client responses and detailed scoring breakdown.</p>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Next Steps -->
-              <p style="margin: 0; color: #6B6862; font-family: 'Crimson Pro', Georgia, serif; font-size: 14px; line-height: 1.7; text-align: center;">
-                This assessment is for internal use only. Follow up with the client to discuss their results and investment strategy alignment.
-              </p>
-
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #25282A; padding: 32px 40px; text-align: center; border-top: 3px solid #9A7611;">
-              <p style="margin: 0 0 4px 0; color: #9A7611; font-family: 'brandon-grotesque', Arial, sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">PETRA FINANCIAL ADVISORS</p>
-              <p style="margin: 0; color: #F5F4F1; font-family: 'Crimson Pro', Georgia, serif; font-size: 13px; line-height: 1.7;">
-                1880 Office Club Pointe, Suite 128<br>
-                Colorado Springs, CO 80920<br>
-                <a href="http://www.petrafinancial.com" style="color: #9A7611; text-decoration: none;">www.petrafinancial.com</a>
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-
-</body>
-</html>
-`;
-
-    const advisorTextBody = `
-═══════════════════════════════════════════════════════════
-RISK ASSESSMENT RECEIVED
-Petra Financial Advisors
-═══════════════════════════════════════════════════════════
-
-NEW CLIENT ASSESSMENT
-
-Client: ${payload.client.firstName} ${payload.client.lastName}
-Email: ${payload.client.email}
-Submitted: ${payload.meta.timestamp}
-
-───────────────────────────────────────────────────────────
-
-RISK ALIGNMENT SCORE
-
-Overall Score:  ${payload.scores.overall}/100
-Risk Band:      ${payload.scores.band}
-
-Component Breakdown:
-  • Behavioral:  ${payload.scores.behavioral}/60
-  • Traditional: ${payload.scores.traditional}/40
-
-${payload.couple ? `
-COUPLE COMPARISON
-  • Overall Delta:     ${payload.scores.deltas.overall} points
-  • Behavioral Delta:  ${payload.scores.deltas.behavioral} points
-  • Traditional Delta: ${payload.scores.deltas.traditional} points
-` : ''}
-
-${payload.flags && payload.flags.length > 0 ? `
-BEHAVIORAL FLAGS
-${payload.flags.map(f => `  • ${f}`).join('\n')}
-` : ''}
-
-───────────────────────────────────────────────────────────
-
-WHAT THIS SCORE MEANS
-
-${overallSummary}
-
-───────────────────────────────────────────────────────────
-
-BEHAVIORAL PROFILE
-
-${mindsetInsight}
-
-───────────────────────────────────────────────────────────
-
-TIME HORIZON & GOALS
-
-${traditionalInsight}
-
-───────────────────────────────────────────────────────────
-
-ALIGNMENT CHECK
-
-${alignmentCheck}
-
-───────────────────────────────────────────────────────────
-
-ATTACHMENT
-The attached document contains all client responses and
-detailed scoring breakdown.
-
-This assessment is for internal use only. Follow up with
-the client to discuss their results and investment strategy
-alignment.
-
-───────────────────────────────────────────────────────────
-
-Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
-www.petrafinancial.com
-
-═══════════════════════════════════════════════════════════
-`;
 
     // ========================================
     // SEND EMAILS VIA POSTMARK
@@ -917,6 +1023,48 @@ www.petrafinancial.com
     console.log('[sendResults] POSTMARK_SERVER_TOKEN exists:', !!process.env.POSTMARK_SERVER_TOKEN);
     console.log('[sendResults] POSTMARK_FROM:', process.env.POSTMARK_FROM);
     console.log('[sendResults] ADVISOR_EMAIL:', process.env.ADVISOR_EMAIL);
+
+    // Helper function to generate client email for a specific person (used in couple mode)
+    function generateClientEmailForPerson(personName, personScores, baseURL, logoURL) {
+      const personRiskBandColor = getRiskBandColor(personScores.overall);
+      const personOverallSummary = generateOverallSummary(personScores);
+      const personMindsetInsight = generateMindsetInsight(personScores);
+      const personTraditionalInsight = generateTraditionalInsight(personScores, {});
+      const personAlignmentCheck = generateAlignmentCheck(personScores);
+      const personPlanningRelevance = generatePlanningRelevance();
+
+      // Use shared layout for consistent branding
+      const personBodyHtml = renderClientBody({
+        scores: personScores,
+        riskBandColor: personRiskBandColor,
+        overallSummary: personOverallSummary,
+        mindsetInsight: personMindsetInsight,
+        traditionalInsight: personTraditionalInsight,
+        alignmentCheck: personAlignmentCheck,
+        planningRelevance: personPlanningRelevance,
+        baseURL
+      });
+
+      const html = renderEmailLayout({
+        title: `Thank You, ${personName}`,
+        subtitle: "We've received your Risk Alignment Assessment and your advisor will be in touch to discuss your results.",
+        bodyHtml: personBodyHtml,
+        logoURL,
+        isAdvisor: false
+      });
+
+      const text = renderClientTextBody({
+        firstName: personName,
+        scores: personScores,
+        overallSummary: personOverallSummary,
+        mindsetInsight: personMindsetInsight,
+        traditionalInsight: personTraditionalInsight,
+        alignmentCheck: personAlignmentCheck,
+        planningRelevance: personPlanningRelevance
+      });
+
+      return { html, text };
+    }
 
     if (process.env.POSTMARK_SERVER_TOKEN) {
       console.log('[sendResults] Initializing Postmark client...');
@@ -936,17 +1084,16 @@ www.petrafinancial.com
         // Send advisor email
         console.log('[sendResults] Sending advisor email...');
         try {
+          const advisorSubject = payload.couple
+            ? `Couple Risk Assessment – ${payload.client.person1Name} & ${payload.client.person2Name} (${payload.client.firstName} ${payload.client.lastName})`
+            : `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${payload.scores.overall} – ${payload.scores.band}`;
+
           const advisorMessage = await client.sendEmail({
             From: fromEmail,
             To: advisorEmail,
-            Subject: `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${payload.scores.overall} – ${payload.scores.band}`,
+            Subject: advisorSubject,
             HtmlBody: advisorHTMLBody,
-            TextBody: advisorTextBody,
-            Attachments: [{
-              Name: `petra-risk-assessment-${payload.client.lastName.toLowerCase()}-${Date.now()}.txt`,
-              Content: Buffer.from(advisorPDF).toString('base64'),
-              ContentType: 'text/plain'
-            }]
+            TextBody: advisorTextBody
           });
           console.log('[sendResults] ✓ Advisor email sent successfully:', advisorMessage.MessageID);
         } catch (emailError) {
@@ -954,22 +1101,93 @@ www.petrafinancial.com
           console.error('[sendResults] Full error:', emailError);
         }
 
-        // Send client email (if requested)
+        // Handle client emails
         console.log('[sendResults] Client wants copy:', payload.client.wantsCopy);
+        console.log('[sendResults] Is couple mode:', !!payload.couple);
+
         if (payload.client.wantsCopy) {
-          console.log('[sendResults] Sending client email to:', payload.client.email);
-          try {
-            const clientMessage = await client.sendEmail({
-              From: fromEmail,
-              To: payload.client.email,
-              Subject: 'Thank you — Your Petra risk assessment is complete',
-              HtmlBody: clientHTMLBody,
-              TextBody: clientTextBody
-            });
-            console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
-          } catch (emailError) {
-            console.error('[sendResults] ✗ Error sending client email:', emailError.message);
-            console.error('[sendResults] Full error:', emailError);
+          if (payload.couple && payload.person1Scores && payload.person2Scores) {
+            // COUPLE MODE: Handle email routing based on whether one or two emails provided
+            const partnerAEmail = payload.client.partnerAEmail;
+            const partnerBEmail = payload.client.partnerBEmail;
+            const person1Name = payload.client.person1Name || 'Partner A';
+            const person2Name = payload.client.person2Name || 'Partner B';
+
+            console.log('[sendResults] Couple mode - Partner A email:', partnerAEmail);
+            console.log('[sendResults] Couple mode - Partner B email:', partnerBEmail || '(not provided)');
+
+            // Generate individual emails for each partner
+            const person1Email = generateClientEmailForPerson(person1Name, payload.person1Scores, baseURL, logoURL);
+            const person2Email = generateClientEmailForPerson(person2Name, payload.person2Scores, baseURL, logoURL);
+
+            if (partnerBEmail && partnerBEmail.trim()) {
+              // TWO EMAILS PROVIDED: Send individual results to each partner
+              console.log('[sendResults] Two emails provided - sending individual results to each partner');
+
+              // Send Person 1 results to Partner A email
+              try {
+                const p1Message = await client.sendEmail({
+                  From: fromEmail,
+                  To: partnerAEmail,
+                  Subject: `Thank you, ${person1Name} — Your Petra risk assessment is complete`,
+                  HtmlBody: person1Email.html,
+                  TextBody: person1Email.text
+                });
+                console.log('[sendResults] ✓ Partner A (Person 1) email sent to', partnerAEmail, ':', p1Message.MessageID);
+              } catch (emailError) {
+                console.error('[sendResults] ✗ Error sending Partner A email:', emailError.message);
+              }
+
+              // Send Person 2 results to Partner B email
+              try {
+                const p2Message = await client.sendEmail({
+                  From: fromEmail,
+                  To: partnerBEmail,
+                  Subject: `Thank you, ${person2Name} — Your Petra risk assessment is complete`,
+                  HtmlBody: person2Email.html,
+                  TextBody: person2Email.text
+                });
+                console.log('[sendResults] ✓ Partner B (Person 2) email sent to', partnerBEmail, ':', p2Message.MessageID);
+              } catch (emailError) {
+                console.error('[sendResults] ✗ Error sending Partner B email:', emailError.message);
+              }
+            } else {
+              // ONE EMAIL PROVIDED: Send both results to the single email
+              console.log('[sendResults] One email provided - sending both results to:', partnerAEmail);
+
+              // Create a combined email with both partners' results
+              const combinedHtml = generateCombinedCoupleEmailHtml(person1Name, payload.person1Scores, person2Name, payload.person2Scores, baseURL, logoURL);
+              const combinedText = generateCombinedCoupleEmailText(person1Name, payload.person1Scores, person2Name, payload.person2Scores);
+
+              try {
+                const combinedMessage = await client.sendEmail({
+                  From: fromEmail,
+                  To: partnerAEmail,
+                  Subject: `Thank you — ${person1Name} & ${person2Name}'s Petra risk assessments are complete`,
+                  HtmlBody: combinedHtml,
+                  TextBody: combinedText
+                });
+                console.log('[sendResults] ✓ Combined couple email sent to', partnerAEmail, ':', combinedMessage.MessageID);
+              } catch (emailError) {
+                console.error('[sendResults] ✗ Error sending combined couple email:', emailError.message);
+              }
+            }
+          } else {
+            // SOLO MODE: Send single client email
+            console.log('[sendResults] Solo mode - Sending client email to:', payload.client.email);
+            try {
+              const clientMessage = await client.sendEmail({
+                From: fromEmail,
+                To: payload.client.email,
+                Subject: 'Thank you — Your Petra risk assessment is complete',
+                HtmlBody: clientHTMLBody,
+                TextBody: clientTextBody
+              });
+              console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
+            } catch (emailError) {
+              console.error('[sendResults] ✗ Error sending client email:', emailError.message);
+              console.error('[sendResults] Full error:', emailError);
+            }
           }
         } else {
           console.log('[sendResults] Skipping client email (wantsCopy = false)');
@@ -978,6 +1196,146 @@ www.petrafinancial.com
     } else {
       console.log('[sendResults] ⚠ Postmark not configured - emails would be sent here');
       console.log('[sendResults] Set POSTMARK_SERVER_TOKEN environment variable to enable emails');
+    }
+
+    // Helper function to generate combined couple email HTML (when only one email provided)
+    function generateCombinedCoupleEmailHtml(person1Name, person1Scores, person2Name, person2Scores, baseURL, logoURL) {
+      const p1Color = getRiskBandColor(person1Scores.overall);
+      const p2Color = getRiskBandColor(person2Scores.overall);
+
+      // Build the couple body content
+      const coupleBodyHtml = `
+        <!-- Person 1 Results Card -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 8px; margin-bottom: 20px;">
+            <tr>
+                <td style="padding: 24px;">
+                    <h2 style="margin: 0 0 16px 0; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-align: center;">${person1Name}'s Results</h2>
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom: 16px;">
+                        <tr>
+                            <td style="padding: 10px 24px; background-color: ${p1Color}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 50px;">
+                                ${person1Scores.band}
+                            </td>
+                        </tr>
+                    </table>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                            <td width="33%" style="text-align: center;">
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 700; color: ${EMAIL_COLORS.gold};">${person1Scores.overall}</div>
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Overall</div>
+                            </td>
+                            <td width="33%" style="text-align: center;">
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 22px; font-weight: 700; color: ${EMAIL_COLORS.gold};">${person1Scores.behavioral}</div>
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Behavioral</div>
+                            </td>
+                            <td width="33%" style="text-align: center;">
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 22px; font-weight: 700; color: ${EMAIL_COLORS.gold};">${person1Scores.traditional}</div>
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Traditional</div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Person 2 Results Card -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 8px; margin-bottom: 24px;">
+            <tr>
+                <td style="padding: 24px;">
+                    <h2 style="margin: 0 0 16px 0; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-align: center;">${person2Name}'s Results</h2>
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom: 16px;">
+                        <tr>
+                            <td style="padding: 10px 24px; background-color: ${p2Color}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 50px;">
+                                ${person2Scores.band}
+                            </td>
+                        </tr>
+                    </table>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                            <td width="33%" style="text-align: center;">
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 700; color: ${EMAIL_COLORS.gold};">${person2Scores.overall}</div>
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Overall</div>
+                            </td>
+                            <td width="33%" style="text-align: center;">
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 22px; font-weight: 700; color: ${EMAIL_COLORS.gold};">${person2Scores.behavioral}</div>
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Behavioral</div>
+                            </td>
+                            <td width="33%" style="text-align: center;">
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 22px; font-weight: 700; color: ${EMAIL_COLORS.gold};">${person2Scores.traditional}</div>
+                                <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Traditional</div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.7; color: ${EMAIL_COLORS.darkText}; font-style: italic; text-align: center;">
+            Your advisor will review both assessments and discuss how your individual risk profiles can inform your shared financial planning.
+        </p>
+
+        ${renderCTAButton(baseURL || 'https://www.petrafinancial.com', 'Visit PetraFinancial.com')}
+      `;
+
+      return renderEmailLayout({
+        title: 'Your Couple Assessment Results',
+        subtitle: `Both ${person1Name} and ${person2Name} have completed the Risk Alignment Assessment.`,
+        bodyHtml: coupleBodyHtml,
+        logoURL,
+        isAdvisor: false
+      });
+    }
+
+    function generateCombinedCoupleEmailText(person1Name, person1Scores, person2Name, person2Scores) {
+      return `
+═══════════════════════════════════════════════════════════
+PETRA FINANCIAL ADVISORS
+Risk Alignment Assessment
+═══════════════════════════════════════════════════════════
+
+Your Couple Assessment Results
+
+Both ${person1Name} and ${person2Name} have completed the
+Risk Alignment Assessment. Your advisor will be in touch to
+discuss your results.
+
+───────────────────────────────────────────────────────────
+
+${person1Name.toUpperCase()}'S RESULTS
+
+Overall Score:  ${person1Scores.overall}/100
+Risk Band:      ${person1Scores.band}
+Behavioral:     ${person1Scores.behavioral}/60
+Traditional:    ${person1Scores.traditional}/40
+
+───────────────────────────────────────────────────────────
+
+${person2Name.toUpperCase()}'S RESULTS
+
+Overall Score:  ${person2Scores.overall}/100
+Risk Band:      ${person2Scores.band}
+Behavioral:     ${person2Scores.behavioral}/60
+Traditional:    ${person2Scores.traditional}/40
+
+───────────────────────────────────────────────────────────
+
+Your advisor will review both assessments and discuss how your
+individual risk profiles can inform your shared financial planning.
+
+───────────────────────────────────────────────────────────
+
+Thank you,
+The Petra Team
+
+Petra Financial Advisors
+1880 Office Club Pointe, Suite 128
+Colorado Springs, CO 80920
+www.petrafinancial.com
+
+This assessment is for educational purposes only and should
+not be considered investment advice.
+
+═══════════════════════════════════════════════════════════
+`;
     }
 
     // Return success (always, even if email fails - results page should show)
