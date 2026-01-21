@@ -57,6 +57,16 @@ async function submitToBackend() {
             email: document.getElementById('clientEmail').value.trim(),
             wantsCopy: document.getElementById('wantsCopyCheckbox')?.checked || false
         };
+
+        // In couple mode, add partner-specific email info
+        if (isCoupleMode) {
+            clientInfo.partnerAEmail = partnerAEmail || '';
+            clientInfo.partnerBEmail = partnerBEmail || '';
+            clientInfo.person1Name = person1Name || '';
+            clientInfo.person2Name = person2Name || '';
+            // Always send emails in couple mode (we collected them for this purpose)
+            clientInfo.wantsCopy = true;
+        }
         
         // Prepare payload
         const payload = {
@@ -85,13 +95,26 @@ async function submitToBackend() {
             answers: []
         };
         
-        // Add couple deltas if applicable
+        // Add couple data if applicable
         if (isCoupleMode && person1Data && person2Data) {
             payload.couple = true;
             payload.scores.deltas = {
                 overall: Math.abs(person1Data.finalScore - person2Data.finalScore),
                 behavioral: Math.abs(person1Data.behavioralScore - person2Data.behavioralScore),
                 traditional: Math.abs(person1Data.traditionalScore - person2Data.traditionalScore)
+            };
+            // Include individual partner scores for separate email routing
+            payload.person1Scores = {
+                overall: person1Data.finalScore,
+                band: person1Data.riskBand,
+                behavioral: person1Data.behavioralScore,
+                traditional: person1Data.traditionalScore
+            };
+            payload.person2Scores = {
+                overall: person2Data.finalScore,
+                band: person2Data.riskBand,
+                behavioral: person2Data.behavioralScore,
+                traditional: person2Data.traditionalScore
             };
         }
         
@@ -177,23 +200,32 @@ function formatAnswerText(question, value) {
 function showConfirmation(wantsEmail, email, success) {
     const confirmationBar = document.getElementById('confirmationBar');
     const confirmationMessage = document.getElementById('confirmationMessage');
-    
+
     if (!confirmationBar || !confirmationMessage) {
         console.error('Confirmation elements not found');
         return;
     }
-    
+
     if (!success) {
         confirmationBar.classList.add('error');
         confirmationMessage.textContent = "We couldn't email your copy, but your results are displayed below.";
+    } else if (isCoupleMode) {
+        // Couple mode: explain where results were sent
+        if (partnerBEmail && partnerBEmail.trim()) {
+            // Both emails provided - individual results sent to each
+            confirmationMessage.textContent = `Results have been sent: ${person1Name}'s to ${partnerAEmail}, ${person2Name}'s to ${partnerBEmail}.`;
+        } else {
+            // Single email - both results sent to Partner A
+            confirmationMessage.textContent = `Both partners' results have been sent to ${partnerAEmail}.`;
+        }
     } else if (wantsEmail) {
         confirmationMessage.textContent = `Your results have been sent to ${email}.`;
     } else {
         confirmationMessage.textContent = "Your results have been submitted and are displayed below.";
     }
-    
+
     confirmationBar.style.display = 'block';
-    
+
     // Scroll to confirmation
     setTimeout(() => {
         confirmationBar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

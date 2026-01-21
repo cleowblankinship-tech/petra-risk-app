@@ -15,6 +15,8 @@ let person2Data = null;
 let currentPerson = 1;
 let person1Name = '';
 let person2Name = '';
+let partnerAEmail = '';
+let partnerBEmail = '';
 
 // Answer storage
 let answers = {};
@@ -238,7 +240,7 @@ const CORRECT_ANSWERS = {
 };
 
 const CORRECT_LABELS = {
-    kn_q1: 'Diversified portfolio of stocks',
+    kn_q1: 'A diversified portfolio',
     kn_q2: 'Spreads risk across investments',
     kn_q3: 'Higher risk',
     kn_q4: 'Large short-term swings are normal long term',
@@ -521,8 +523,8 @@ const questions = {
             q: "Over a 20-year period, which investment best protects purchasing power?",
             type: "radio",
             name: "kn_q1",
-            opts: ["Savings account paying 2%", "Diversified portfolio of stocks", "Cash kept in a safe", "Certificate of Deposit (CD)"],
-            vals: ["A", "B", "C", "D"],
+            opts: ["Savings account paying 2%", "A diversified portfolio", "Cash kept in a safe", "Certificate of Deposit (CD)", "Just stocks"],
+            vals: ["A", "B", "C", "D", "E"],
             correct: "B"
         },
         {
@@ -852,6 +854,48 @@ window.startCouple = function() {
     if (coupleNamesEl) {
         coupleNamesEl.style.display = 'block';
         console.log('[startCouple] Set display to block');
+
+        // Update email labels when names change
+        var person1NameInput = document.getElementById('person1Name');
+        var person2NameInput = document.getElementById('person2Name');
+        var partnerALabel = document.getElementById('partnerAEmailLabel');
+        var partnerBLabel = document.getElementById('partnerBEmailLabel');
+        var partnerBEmailInput = document.getElementById('partnerBEmail');
+        var singleEmailNotice = document.getElementById('singleEmailNotice');
+        var helperText = document.getElementById('coupleEmailHelperText');
+
+        function updateEmailLabels() {
+            var name1 = person1NameInput.value.trim() || 'Partner A';
+            var name2 = person2NameInput.value.trim() || 'Partner B';
+            if (partnerALabel) partnerALabel.textContent = name1;
+            if (partnerBLabel) partnerBLabel.textContent = name2;
+        }
+
+        function updateEmailNotice() {
+            var partnerBHasEmail = partnerBEmailInput && partnerBEmailInput.value.trim();
+            if (singleEmailNotice && helperText) {
+                if (partnerBHasEmail) {
+                    singleEmailNotice.style.display = 'none';
+                    helperText.style.display = 'block';
+                } else {
+                    singleEmailNotice.style.display = 'block';
+                    helperText.style.display = 'none';
+                }
+            }
+        }
+
+        if (person1NameInput) {
+            person1NameInput.addEventListener('input', updateEmailLabels);
+        }
+        if (person2NameInput) {
+            person2NameInput.addEventListener('input', updateEmailLabels);
+        }
+        if (partnerBEmailInput) {
+            partnerBEmailInput.addEventListener('input', updateEmailNotice);
+        }
+
+        // Initial state
+        updateEmailNotice();
     } else {
         console.error('[startCouple] coupleNames element not found!');
     }
@@ -870,22 +914,77 @@ window.beginCoupleAssessment = function() {
         return;
     }
 
+    // Validate and store partner emails
+    var partnerAEmailInput = document.getElementById('partnerAEmail');
+    var partnerBEmailInput = document.getElementById('partnerBEmail');
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    partnerAEmail = partnerAEmailInput ? partnerAEmailInput.value.trim() : '';
+    partnerBEmail = partnerBEmailInput ? partnerBEmailInput.value.trim() : '';
+
+    // Partner A email is required
+    if (!partnerAEmail) {
+        alert('Please enter an email address for ' + person1Name + '.');
+        if (partnerAEmailInput) partnerAEmailInput.focus();
+        return;
+    }
+
+    // Validate Partner A email format
+    if (!emailRegex.test(partnerAEmail)) {
+        alert('Please enter a valid email address for ' + person1Name + '.');
+        if (partnerAEmailInput) partnerAEmailInput.focus();
+        return;
+    }
+
+    // Partner B email is optional, but if provided must be valid
+    if (partnerBEmail && !emailRegex.test(partnerBEmail)) {
+        alert('Please enter a valid email address for ' + person2Name + ', or leave it blank.');
+        if (partnerBEmailInput) partnerBEmailInput.focus();
+        return;
+    }
+
     isCoupleMode = true;
     currentPerson = 1;
     document.getElementById('couplesSetup').style.display = 'none';
     document.getElementById('clientInfoSection').style.display = 'block';
 
+    // Pre-populate the client email with Partner A's email and hide the email field
+    var clientEmailField = document.getElementById('clientEmail');
+    var clientEmailContainer = clientEmailField ? clientEmailField.closest('.form-field') : null;
+    if (clientEmailField) {
+        clientEmailField.value = partnerAEmail;
+    }
+    if (clientEmailContainer) {
+        clientEmailContainer.style.display = 'none';
+    }
+
+    // Hide the "Email me my results" checkbox in couple mode (we handle this differently)
+    var wantsCopyContainer = document.getElementById('wantsCopyCheckbox');
+    if (wantsCopyContainer) {
+        var checkboxContainer = wantsCopyContainer.closest('.form-field');
+        if (checkboxContainer) {
+            checkboxContainer.style.display = 'none';
+        }
+        // In couple mode, always send results (we collected emails specifically for this)
+        wantsCopyContainer.checked = true;
+    }
+
+    // Update section subtitle for couple mode
+    var sectionSubtitle = document.querySelector('#clientInfoSection .section-subtitle');
+    if (sectionSubtitle) {
+        sectionSubtitle.textContent = 'Enter a household contact name for our records.';
+    }
+
     // Add continue button handler
     const continueBtn = document.getElementById('continueToQuestions');
     if (continueBtn) {
         continueBtn.onclick = function() {
-            // Validate client info
+            // Validate client info (only name fields in couple mode)
             const firstName = document.getElementById('clientFirstName').value.trim();
             const lastName = document.getElementById('clientLastName').value.trim();
-            const email = document.getElementById('clientEmail').value.trim();
 
-            if (!firstName || !lastName || !email) {
-                alert('Please fill in all required fields.');
+            if (!firstName || !lastName) {
+                alert('Please fill in the household contact name.');
                 return;
             }
 
