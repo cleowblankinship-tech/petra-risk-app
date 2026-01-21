@@ -244,8 +244,8 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
                                             <strong style="color: ${EMAIL_COLORS.gold};">The Petra Team</strong>
                                         </p>
                                         <p style="margin: 0 0 16px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: ${EMAIL_COLORS.footerText}; line-height: 1.5;">
-                                            1880 Office Club Pointe, Suite 128<br>
-                                            Colorado Springs, CO 80920<br>
+                                            2 N Nevada Ave, Suite 1300<br>
+                                            Colorado Springs, CO 80903<br>
                                             <a href="https://www.petrafinancial.com" style="color: ${EMAIL_COLORS.gold}; text-decoration: none;">www.petrafinancial.com</a>
                                         </p>
                                         <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #888888; line-height: 1.5;">
@@ -461,7 +461,7 @@ function renderClientBody({ scores, riskBandColor, overallSummary, mindsetInsigh
   });
 
   // CTA Button
-  bodyHtml += renderCTAButton(baseURL || 'https://www.petrafinancial.com', 'Visit PetraFinancial.com');
+  bodyHtml += renderCTAButton('https://www.petrafinancial.com', 'Visit PetraFinancial.com');
 
   return bodyHtml;
 }
@@ -682,8 +682,8 @@ Thank you,
 The Petra Team
 
 Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
+2 N Nevada Ave, Suite 1300
+Colorado Springs, CO 80903
 www.petrafinancial.com
 
 This assessment is for educational purposes only and should
@@ -777,8 +777,8 @@ Thank you,
 The Petra Team
 
 Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
+2 N Nevada Ave, Suite 1300
+Colorado Springs, CO 80903
 www.petrafinancial.com
 
 This assessment is for internal use only.
@@ -876,8 +876,8 @@ This assessment contains complete client responses and behavioral analysis.
 For advisor use only. Not for client distribution.
 
 © ${new Date().getFullYear()} Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
+2 N Nevada Ave, Suite 1300
+Colorado Springs, CO 80903
 www.petrafinancial.com
 
 ═══════════════════════════════════════════════════════════════════
@@ -1273,7 +1273,7 @@ module.exports = async (req, res) => {
             Your advisor will review both assessments and discuss how your individual risk profiles can inform your shared financial planning.
         </p>
 
-        ${renderCTAButton(baseURL || 'https://www.petrafinancial.com', 'Visit PetraFinancial.com')}
+        ${renderCTAButton('https://www.petrafinancial.com', 'Visit PetraFinancial.com')}
       `;
 
       return renderEmailLayout({
@@ -1327,8 +1327,8 @@ Thank you,
 The Petra Team
 
 Petra Financial Advisors
-1880 Office Club Pointe, Suite 128
-Colorado Springs, CO 80920
+2 N Nevada Ave, Suite 1300
+Colorado Springs, CO 80903
 www.petrafinancial.com
 
 This assessment is for educational purposes only and should
