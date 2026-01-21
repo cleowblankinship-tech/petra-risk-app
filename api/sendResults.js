@@ -155,43 +155,68 @@ const EMAIL_COLORS = {
   footerText: '#F5F4F1'
 };
 
-// Shared email layout wrapper
+// Shared email layout wrapper - OUTLOOK COMPATIBLE
 function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = false }) {
   const headerBg = isAdvisor ? EMAIL_COLORS.footerBg : EMAIL_COLORS.white;
   const headerTitleColor = isAdvisor ? EMAIL_COLORS.gold : EMAIL_COLORS.darkText;
+  const headerBorderBottom = isAdvisor ? `border-bottom: 3px solid ${EMAIL_COLORS.gold};` : '';
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
     <title>${title}</title>
     <!--[if mso]>
     <noscript>
         <xml>
             <o:OfficeDocumentSettings>
+                <o:AllowPNG/>
                 <o:PixelsPerInch>96</o:PixelsPerInch>
             </o:OfficeDocumentSettings>
         </xml>
     </noscript>
+    <style>
+        table { border-collapse: collapse; }
+        td { font-family: Arial, sans-serif; }
+    </style>
     <![endif]-->
+    <style type="text/css">
+        body { margin: 0 !important; padding: 0 !important; }
+        table { border-collapse: collapse !important; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: Georgia, 'Times New Roman', serif; background-color: ${EMAIL_COLORS.lightBg}; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+<body style="margin: 0; padding: 0; width: 100%; background-color: ${EMAIL_COLORS.lightBg}; font-family: Georgia, 'Times New Roman', Times, serif;">
     <!-- Full-width background wrapper -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg};">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
+            <td align="center" valign="top" style="padding: 40px 20px;">
+                <!--[if mso]>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" align="center">
+                <tr>
+                <td>
+                <![endif]-->
                 <!-- 600px centered container -->
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background-color: ${EMAIL_COLORS.white}; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; max-width: 600px; background-color: ${EMAIL_COLORS.white};">
 
                     <!-- Header with Logo -->
                     <tr>
-                        <td align="center" style="padding: 32px 40px 24px 40px; background-color: ${headerBg}; ${isAdvisor ? 'border-bottom: 3px solid ' + EMAIL_COLORS.gold + ';' : ''} border-radius: ${isAdvisor ? '8px 8px 0 0' : '8px 8px 0 0'};">
-                            <img src="${logoURL}" alt="Petra Financial Advisors" width="180" height="auto" style="max-width: 180px; width: 180px; height: auto; display: block; margin: 0 auto 16px auto;" />
-                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                        <td align="center" valign="top" style="padding: 32px 40px 24px 40px; background-color: ${headerBg}; ${headerBorderBottom}">
+                            <!-- Logo centered via table -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
                                 <tr>
-                                    <td style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${isAdvisor ? EMAIL_COLORS.footerText : EMAIL_COLORS.bodyText}; text-transform: uppercase; letter-spacing: 2px;">
+                                    <td align="center" style="padding-bottom: 16px;">
+                                        <img src="${logoURL}" alt="Petra Financial Advisors" width="180" height="54" border="0" style="display: block; width: 180px; height: 54px;" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Subtitle -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                                <tr>
+                                    <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: bold; color: ${isAdvisor ? EMAIL_COLORS.footerText : EMAIL_COLORS.bodyText}; text-transform: uppercase; letter-spacing: 2px;">
                                         Risk Alignment Assessment
                                     </td>
                                 </tr>
@@ -199,13 +224,13 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
                         </td>
                     </tr>
 
-                    <!-- Divider line (for non-advisor) -->
                     ${!isAdvisor ? `
+                    <!-- Divider line (for non-advisor) -->
                     <tr>
                         <td style="padding: 0 40px;">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
-                                    <td style="border-bottom: 1px solid ${EMAIL_COLORS.border};"></td>
+                                    <td style="border-bottom: 1px solid ${EMAIL_COLORS.border}; font-size: 1px; line-height: 1px;">&nbsp;</td>
                                 </tr>
                             </table>
                         </td>
@@ -214,43 +239,52 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
 
                     <!-- Title Section -->
                     <tr>
-                        <td style="padding: ${isAdvisor ? '32px' : '24px'} 40px 16px 40px;">
-                            <h1 style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: ${isAdvisor ? '22px' : '26px'}; font-weight: 700; color: ${headerTitleColor}; text-align: center; line-height: 1.3;">
-                                ${title}
-                            </h1>
-                            ${subtitle ? `
-                            <p style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 16px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText}; text-align: center;">
-                                ${subtitle}
-                            </p>
-                            ` : ''}
+                        <td align="center" valign="top" style="padding: ${isAdvisor ? '32px' : '24px'} 40px 16px 40px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: ${isAdvisor ? '22px' : '26px'}; font-weight: bold; color: ${headerTitleColor}; line-height: 1.3;">
+                                        ${title}
+                                    </td>
+                                </tr>
+                                ${subtitle ? `
+                                <tr>
+                                    <td align="center" style="padding-top: 12px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText};">
+                                        ${subtitle}
+                                    </td>
+                                </tr>
+                                ` : ''}
+                            </table>
                         </td>
                     </tr>
 
                     <!-- Main Body Content -->
                     <tr>
-                        <td style="padding: 0 40px 32px 40px;">
+                        <td valign="top" style="padding: 0 40px 32px 40px;">
                             ${bodyHtml}
                         </td>
                     </tr>
 
                     <!-- Footer -->
                     <tr>
-                        <td style="padding: 24px 40px; background-color: ${EMAIL_COLORS.footerBg}; border-radius: 0 0 8px 8px;">
+                        <td align="center" valign="top" style="padding: 24px 40px; background-color: ${EMAIL_COLORS.footerBg};">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
-                                    <td align="center">
-                                        <p style="margin: 0 0 8px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; color: ${EMAIL_COLORS.footerText};">
-                                            Thank you,<br>
-                                            <strong style="color: ${EMAIL_COLORS.gold};">The Petra Team</strong>
-                                        </p>
-                                        <p style="margin: 0 0 16px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: ${EMAIL_COLORS.footerText}; line-height: 1.5;">
-                                            2 N Nevada Ave, Suite 1300<br>
-                                            Colorado Springs, CO 80903<br>
-                                            <a href="https://www.petrafinancial.com" style="color: ${EMAIL_COLORS.gold}; text-decoration: none;">www.petrafinancial.com</a>
-                                        </p>
-                                        <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #888888; line-height: 1.5;">
-                                            ${isAdvisor ? 'This assessment is for internal use only.' : 'This assessment is for educational purposes only and should not be considered investment advice.'}
-                                        </p>
+                                    <td align="center" style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; color: ${EMAIL_COLORS.footerText};">
+                                        Thank you,<br>
+                                        <strong style="color: ${EMAIL_COLORS.gold};">The Petra Team</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 16px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: ${EMAIL_COLORS.footerText}; line-height: 1.5;">
+                                        Petra Financial Advisors<br>
+                                        2 N Nevada Ave, Suite 1300<br>
+                                        Colorado Springs, CO 80903<br>
+                                        <a href="https://www.petrafinancial.com" style="color: ${EMAIL_COLORS.gold}; text-decoration: none;">www.petrafinancial.com</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #888888; line-height: 1.5;">
+                                        ${isAdvisor ? 'This assessment is for internal use only.' : 'This assessment is for educational purposes only and should not be considered investment advice.'}
                                     </td>
                                 </tr>
                             </table>
@@ -258,6 +292,11 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
                     </tr>
 
                 </table>
+                <!--[if mso]>
+                </td>
+                </tr>
+                </table>
+                <![endif]-->
             </td>
         </tr>
     </table>
@@ -265,37 +304,53 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
 </html>`;
 }
 
-// Render risk scale visualization (shared between client and advisor)
+// Render risk scale visualization - OUTLOOK COMPATIBLE
 function renderRiskScale(score) {
   const bands = [
-    { name: 'Very Conservative', range: '0-24', min: 0, max: 24, color: '#E8B84E', textColor: '#40434E' },
+    { name: 'Very Conserv.', range: '0-24', min: 0, max: 24, color: '#E8B84E', textColor: '#40434E' },
     { name: 'Conservative', range: '25-44', min: 25, max: 44, color: '#8B9DC3', textColor: '#FFFFFF' },
     { name: 'Balanced', range: '45-59', min: 45, max: 59, color: '#7EADAD', textColor: '#FFFFFF' },
-    { name: 'Balanced Growth', range: '60-74', min: 60, max: 74, color: '#6B8E7F', textColor: '#FFFFFF' },
+    { name: 'Bal. Growth', range: '60-74', min: 60, max: 74, color: '#6B8E7F', textColor: '#FFFFFF' },
     { name: 'Growth', range: '75-89', min: 75, max: 89, color: '#976491', textColor: '#FFFFFF' },
-    { name: 'Aggressive Growth', range: '90-100', min: 90, max: 100, color: '#CD6969', textColor: '#FFFFFF' }
+    { name: 'Aggr. Growth', range: '90-100', min: 90, max: 100, color: '#CD6969', textColor: '#FFFFFF' }
   ];
 
   const cells = bands.map((band, idx) => {
     const isActive = score >= band.min && score <= band.max;
-    const isFirst = idx === 0;
-    const isLast = idx === bands.length - 1;
+    const bgColor = isActive ? band.color : EMAIL_COLORS.lightBg;
+    const textColor = isActive ? band.textColor : EMAIL_COLORS.bodyText;
+    const borderColor = isActive ? EMAIL_COLORS.gold : EMAIL_COLORS.border;
+    const fontWeight = isActive ? 'bold' : 'normal';
 
     return `
-      <td width="16.66%" style="background-color: ${isActive ? band.color : EMAIL_COLORS.lightBg}; padding: 10px 4px; text-align: center; border: 2px solid ${isActive ? EMAIL_COLORS.gold : EMAIL_COLORS.border}; ${!isLast ? 'border-right: none;' : ''} ${isFirst ? 'border-radius: 4px 0 0 4px;' : ''} ${isLast ? 'border-radius: 0 4px 4px 0;' : ''}">
-          <div style="font-family: Arial, Helvetica, sans-serif; font-size: 9px; font-weight: 700; color: ${isActive ? band.textColor : EMAIL_COLORS.bodyText}; text-transform: uppercase; margin-bottom: 2px; line-height: 1.2;">${band.name}</div>
-          <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; color: ${isActive ? band.textColor : EMAIL_COLORS.bodyText};">${band.range}</div>
-          ${isActive ? `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 8px; color: ${band.textColor}; margin-top: 4px;">&#9650; You</div>` : ''}
+      <td width="80" valign="top" align="center" style="background-color: ${bgColor}; padding: 12px 4px; border: 2px solid ${borderColor}; border-right: ${idx < bands.length - 1 ? 'none' : '2px solid ' + borderColor};">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+              <tr>
+                  <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 9px; font-weight: ${fontWeight}; color: ${textColor}; text-transform: uppercase; line-height: 1.3; padding-bottom: 4px;">${band.name}</td>
+              </tr>
+              <tr>
+                  <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: ${fontWeight}; color: ${textColor};">${band.range}</td>
+              </tr>
+              ${isActive ? `
+              <tr>
+                  <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 9px; color: ${textColor}; padding-top: 6px;">&#9650;</td>
+              </tr>
+              ` : ''}
+          </table>
       </td>
     `;
   }).join('');
 
   return `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px; margin-bottom: 24px;">
         <tr>
-            <td>
-                <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-align: center; text-transform: uppercase; letter-spacing: 1px;">Risk Profile Scale</p>
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+            <td align="center" style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px;">
+                Risk Profile Scale
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
                     <tr>${cells}</tr>
                 </table>
             </td>
@@ -304,35 +359,53 @@ function renderRiskScale(score) {
   `;
 }
 
-// Render a narrative section card
+// Render a narrative section card - OUTLOOK COMPATIBLE
 function renderNarrativeCard({ title, content, isHighlighted = false }) {
   const bgColor = isHighlighted ? EMAIL_COLORS.lightBg : EMAIL_COLORS.white;
-  const borderStyle = isHighlighted ? `border-left: 3px solid ${EMAIL_COLORS.gold};` : `border: 1px solid ${EMAIL_COLORS.border};`;
+  const borderLeft = isHighlighted ? `border-left: 3px solid ${EMAIL_COLORS.gold};` : '';
+  const border = !isHighlighted ? `border: 1px solid ${EMAIL_COLORS.border};` : '';
 
   return `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
         <tr>
-            <td style="background-color: ${bgColor}; ${borderStyle} border-radius: 6px; padding: 20px;">
-                <h3 style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: ${EMAIL_COLORS.gold}; text-transform: uppercase; letter-spacing: 0.5px;">${title}</h3>
-                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.7; color: ${EMAIL_COLORS.darkText};">${content}</p>
+            <td style="background-color: ${bgColor}; ${borderLeft} ${border} padding: 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: bold; color: ${EMAIL_COLORS.gold}; text-transform: uppercase; letter-spacing: 0.5px;">
+                            ${title}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.7; color: ${EMAIL_COLORS.darkText};">
+                            ${content}
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>
   `;
 }
 
-// Render results summary card (scores display)
+// Render results summary card (scores display) - OUTLOOK COMPATIBLE
 function renderResultsSummary({ overall, band, behavioral, traditional, riskBandColor }) {
   return `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 8px; margin-bottom: 24px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.border}; margin-bottom: 24px;">
         <tr>
             <td style="padding: 28px 24px;">
-                <p style="margin: 0 0 20px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px; text-align: center;">Your Results Summary</p>
+                <!-- Title -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 20px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px;">
+                            Your Results Summary
+                        </td>
+                    </tr>
+                </table>
 
-                <!-- Risk Band Pill -->
+                <!-- Risk Band Badge - table-based for Outlook -->
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-bottom: 20px;">
                     <tr>
-                        <td style="padding: 12px 28px; background-color: ${riskBandColor}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 50px; text-align: center;">
+                        <td align="center" style="padding: 12px 28px; background-color: ${riskBandColor}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                             ${band}
                         </td>
                     </tr>
@@ -341,39 +414,55 @@ function renderResultsSummary({ overall, band, behavioral, traditional, riskBand
                 <!-- Overall Score -->
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
-                        <td align="center" style="padding-bottom: 6px;">
-                            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 48px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${overall}</span>
+                        <td align="center" style="padding-bottom: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 48px; font-weight: bold; color: ${EMAIL_COLORS.gold}; line-height: 1;">
+                            ${overall}
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" style="padding-bottom: 20px;">
-                            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: ${EMAIL_COLORS.bodyText};">Risk Alignment Score</span>
+                        <td align="center" style="padding-bottom: 20px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: ${EMAIL_COLORS.bodyText};">
+                            Risk Alignment Score
                         </td>
                     </tr>
                 </table>
 
-                <!-- Component Scores -->
+                <!-- Component Scores - two column table -->
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
-                        <td width="48%" style="vertical-align: top;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 6px;">
+                        <td width="48%" valign="top">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border};">
                                 <tr>
-                                    <td style="padding: 16px; text-align: center;">
-                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; margin-bottom: 6px;">${behavioral}</div>
-                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: ${EMAIL_COLORS.darkText}; margin-bottom: 6px;">Behavioral (0-60)</div>
-                                        <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">How you think and feel about risk</div>
+                                    <td align="center" style="padding: 16px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td align="center" style="padding-bottom: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${behavioral}</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="padding-bottom: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: ${EMAIL_COLORS.darkText};">Behavioral (0-60)</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">How you think and feel about risk</td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
                         </td>
-                        <td width="4%"></td>
-                        <td width="48%" style="vertical-align: top;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; border-radius: 6px;">
+                        <td width="4%">&nbsp;</td>
+                        <td width="48%" valign="top">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border};">
                                 <tr>
-                                    <td style="padding: 16px; text-align: center;">
-                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; margin-bottom: 6px;">${traditional}</div>
-                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: ${EMAIL_COLORS.darkText}; margin-bottom: 6px;">Traditional (0-40)</div>
-                                        <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">Time horizon and goals</div>
+                                    <td align="center" style="padding: 16px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td align="center" style="padding-bottom: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${traditional}</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="padding-bottom: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: ${EMAIL_COLORS.darkText};">Traditional (0-40)</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">Time horizon and goals</td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
@@ -386,13 +475,21 @@ function renderResultsSummary({ overall, band, behavioral, traditional, riskBand
   `;
 }
 
-// Render CTA button
+// Render CTA button - OUTLOOK COMPATIBLE
 function renderCTAButton(url, text) {
   return `
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 24px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin-top: 24px; margin-bottom: 24px;">
         <tr>
-            <td style="background-color: ${EMAIL_COLORS.gold}; border-radius: 6px;">
-                <a href="${url}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; color: #FFFFFF; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">${text}</a>
+            <td align="center" style="background-color: ${EMAIL_COLORS.gold}; padding: 14px 32px;">
+                <!--[if mso]>
+                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${url}" style="height:44px;v-text-anchor:middle;width:220px;" arcsize="0%" strokecolor="${EMAIL_COLORS.gold}" fillcolor="${EMAIL_COLORS.gold}">
+                <w:anchorlock/>
+                <center style="color:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;">${text}</center>
+                </v:roundrect>
+                <![endif]-->
+                <!--[if !mso]><!-->
+                <a href="${url}" target="_blank" style="display: block; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; color: #FFFFFF; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">${text}</a>
+                <!--<![endif]-->
             </td>
         </tr>
     </table>
@@ -466,24 +563,32 @@ function renderClientBody({ scores, riskBandColor, overallSummary, mindsetInsigh
   return bodyHtml;
 }
 
-// ADVISOR EMAIL BODY BUILDER
+// ADVISOR EMAIL BODY BUILDER - OUTLOOK COMPATIBLE
 function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck, riskBandColor }) {
   let bodyHtml = '';
 
   // Client Information Card
   bodyHtml += `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border-left: 3px solid ${EMAIL_COLORS.gold}; border-radius: 6px; margin-bottom: 24px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border-left: 3px solid ${EMAIL_COLORS.gold}; margin-bottom: 24px;">
         <tr>
             <td style="padding: 20px;">
-                <p style="margin: 0 0 8px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
-                    <strong>Client:</strong> ${client.firstName} ${client.lastName}
-                </p>
-                <p style="margin: 0 0 8px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
-                    <strong>Email:</strong> ${client.email}
-                </p>
-                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
-                    <strong>Submitted:</strong> ${meta.timestamp}
-                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                            <strong>Client:</strong> ${client.firstName} ${client.lastName}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                            <strong>Email:</strong> ${client.email}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                            <strong>Submitted:</strong> ${meta.timestamp}
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>
@@ -494,12 +599,26 @@ function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
         <tr>
             <td align="center">
-                <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${EMAIL_COLORS.bodyText}; text-transform: uppercase; letter-spacing: 1px;">Risk Alignment Score</p>
-                <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 56px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.overall}</p>
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                     <tr>
-                        <td style="padding: 10px 24px; background-color: ${riskBandColor}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 50px;">
-                            ${scores.band}
+                        <td align="center" style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: bold; color: ${EMAIL_COLORS.bodyText}; text-transform: uppercase; letter-spacing: 1px;">
+                            Risk Alignment Score
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 56px; font-weight: bold; color: ${EMAIL_COLORS.gold}; line-height: 1;">
+                            ${scores.overall}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                                <tr>
+                                    <td align="center" style="padding: 10px 24px; background-color: ${riskBandColor}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                                        ${scores.band}
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
@@ -512,16 +631,32 @@ function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary
   bodyHtml += `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
         <tr>
-            <td width="48%" style="vertical-align: top; background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; padding: 20px; border-radius: 6px; text-align: center;">
-                <p style="margin: 0 0 8px 0; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.behavioral}</p>
-                <p style="margin: 0 0 6px 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral (0-60)</p>
-                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">How they think and feel about risk</p>
+            <td width="48%" valign="top" align="center" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; padding: 20px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 8px; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: bold; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.behavioral}</td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral (0-60)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">How they think and feel about risk</td>
+                    </tr>
+                </table>
             </td>
-            <td width="4%"></td>
-            <td width="48%" style="vertical-align: top; background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; padding: 20px; border-radius: 6px; text-align: center;">
-                <p style="margin: 0 0 8px 0; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.traditional}</p>
-                <p style="margin: 0 0 6px 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Traditional (0-40)</p>
-                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">Time horizon, experience, and goals</p>
+            <td width="4%">&nbsp;</td>
+            <td width="48%" valign="top" align="center" style="background-color: ${EMAIL_COLORS.white}; border: 1px solid ${EMAIL_COLORS.border}; padding: 20px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 8px; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: bold; color: ${EMAIL_COLORS.gold}; line-height: 1;">${scores.traditional}</td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Traditional (0-40)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">Time horizon, experience, and goals</td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>
@@ -530,37 +665,58 @@ function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary
   // Couple Comparison (if applicable)
   if (couple && scores.deltas) {
     bodyHtml += `
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF9E6; border-left: 3px solid ${EMAIL_COLORS.gold}; margin-bottom: 24px; border-radius: 6px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF9E6; border-left: 3px solid ${EMAIL_COLORS.gold}; margin-bottom: 24px;">
           <tr>
               <td style="padding: 20px;">
-                  <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Couple Comparison</p>
-                  <p style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
-                      <strong>Overall Delta:</strong> ${scores.deltas.overall} points
-                  </p>
-                  <p style="margin: 0 0 6px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
-                      <strong>Behavioral Delta:</strong> ${scores.deltas.behavioral} points
-                  </p>
-                  <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
-                      <strong>Traditional Delta:</strong> ${scores.deltas.traditional} points
-                  </p>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                          <td style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Couple Comparison</td>
+                      </tr>
+                      <tr>
+                          <td style="padding-bottom: 6px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                              <strong>Overall Delta:</strong> ${scores.deltas.overall} points
+                          </td>
+                      </tr>
+                      <tr>
+                          <td style="padding-bottom: 6px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                              <strong>Behavioral Delta:</strong> ${scores.deltas.behavioral} points
+                          </td>
+                      </tr>
+                      <tr>
+                          <td style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                              <strong>Traditional Delta:</strong> ${scores.deltas.traditional} points
+                          </td>
+                      </tr>
+                  </table>
               </td>
           </tr>
       </table>
     `;
   }
 
-  // Behavioral Flags (if any)
+  // Behavioral Flags (if any) - OUTLOOK COMPATIBLE table-based layout
   if (flags && flags.length > 0) {
-    const flagPills = flags.map(flag => `
-      <span style="display: inline-block; background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.gold}; color: ${EMAIL_COLORS.darkText}; padding: 6px 12px; border-radius: 50px; font-family: Georgia, 'Times New Roman', serif; font-size: 12px; margin: 0 6px 6px 0;">${flag}</span>
+    const flagRows = flags.map(flag => `
+      <tr>
+          <td style="padding: 6px 12px; background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.gold}; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 12px; color: ${EMAIL_COLORS.darkText}; margin-bottom: 6px;">
+              ${flag}
+          </td>
+      </tr>
+      <tr><td style="height: 6px; font-size: 1px; line-height: 1px;">&nbsp;</td></tr>
     `).join('');
 
     bodyHtml += `
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
           <tr>
               <td>
-                  <p style="margin: 0 0 12px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral Flags</p>
-                  <div>${flagPills}</div>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                          <td style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral Flags</td>
+                      </tr>
+                  </table>
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      ${flagRows}
+                  </table>
               </td>
           </tr>
       </table>
@@ -599,10 +755,8 @@ function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary
   bodyHtml += `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 8px;">
         <tr>
-            <td style="text-align: center;">
-                <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText};">
-                    Follow up with the client to discuss their results and investment strategy alignment.
-                </p>
+            <td align="center" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText};">
+                Follow up with the client to discuss their results and investment strategy alignment.
             </td>
         </tr>
     </table>
