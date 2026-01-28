@@ -116,30 +116,38 @@ async function submitToBackend() {
                 behavioral: person2Data.behavioralScore,
                 traditional: person2Data.traditionalScore
             };
+            // Include both partners' answers (captured separately during assessment)
+            payload.person1Answers = person1Answers || [];
+            payload.person2Answers = person2Answers || [];
+            // Include both partners' flags
+            payload.person1Flags = person1Flags || [];
+            payload.person2Flags = person2Flags || [];
         }
-        
-        // Add flags
-        if (lastComputed.flags && lastComputed.flags.longevity) {
-            payload.flags.push('Longevity Planning');
+
+        // Add flags (for solo mode, or as a fallback)
+        if (!isCoupleMode) {
+            if (lastComputed.flags && lastComputed.flags.longevity) {
+                payload.flags.push('Longevity Planning');
+            }
+            if (lastComputed.flags && lastComputed.flags.caregiving) {
+                payload.flags.push('Caregiving Consideration');
+            }
+            if (lastComputed.knowledge && lastComputed.knowledge.flag === 'overconfidence') {
+                payload.flags.push('Knowledge: Overconfident');
+            }
+            if (lastComputed.knowledge && lastComputed.knowledge.flag === 'underconfidence') {
+                payload.flags.push('Knowledge: Underconfident');
+            }
         }
-        if (lastComputed.flags && lastComputed.flags.caregiving) {
-            payload.flags.push('Caregiving Consideration');
-        }
-        if (lastComputed.knowledge && lastComputed.knowledge.flag === 'overconfidence') {
-            payload.flags.push('Knowledge: Overconfident');
-        }
-        if (lastComputed.knowledge && lastComputed.knowledge.flag === 'underconfidence') {
-            payload.flags.push('Knowledge: Underconfident');
-        }
-        
-        // Gather all answers
+
+        // Gather all answers (for solo mode, or as fallback for the submitter in couple mode)
         const allQuestions = questions.behavioral.concat(questions.traditional).concat(questions.knowledge);
         allQuestions.forEach(q => {
             const value = q.type === "radio" ? getRadioValue(q.name) : getLikertValue(q.name);
             if (value !== null) {
                 const answer = {
                     id: q.name,
-                    section: q.section || (questions.behavioral.includes(q) ? 'Behavioral' : 
+                    section: q.section || (questions.behavioral.includes(q) ? 'Behavioral' :
                              questions.traditional.includes(q) ? 'Traditional' : 'Knowledge'),
                     text: q.q,
                     selectedOption: formatAnswerText(q, value),

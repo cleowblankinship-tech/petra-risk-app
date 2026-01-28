@@ -80,7 +80,7 @@ function generateMindsetInsight(data) {
   if (normalized >= 0.75) {
     insight += 'Your responses suggest you stay calm during market turbulence. If the market dropped 20% over a few months, you\'d probably see it as part of the process, not a reason to change course. You likely don\'t obsess over your portfolio, and when you do check and see red numbers, they don\'t create an urgent need to act. You might even view weak periods as a chance to buy more of what you already believe in. This mindset works well with equity-heavy portfolios, where the path to long-term growth always includes short-term pain.';
   } else if (normalized >= 0.55) {
-    insight += 'Your responses point to a thoughtful, measured approach. You don\'t panic when markets fall, but you don\'t shrug it off either. If your portfolio dropped 15% during a rough quarter, you\'d want to know why and whether anything fundamental changed. You might feel uneasy, but you probably wouldn\'t act on it, especially if your advisor confirmed the decline was normal market behavior. You want strategies that balance growth with some downside awareness, and you appreciate communication that keeps you steady when things get uncertain.';
+    insight += 'Your responses point to a thoughtful, measured approach. You don\'t panic when markets fall, but you don\'t shrug it off either. If your portfolio dropped 15% during a rough quarter, you\'d want to know why and whether anything fundamental changed. You might feel uneasy, but you probably wouldn\'t act on it, especially if Petra confirmed the decline was normal market behavior. You want strategies that balance growth with some downside awareness, and you appreciate communication that keeps you steady when things get uncertain.';
   } else if (normalized >= 0.35) {
     insight += 'Your responses show a more cautious relationship with risk. You feel losses more sharply than gains, and market declines can rattle you even when you know they\'re temporary. If your portfolio fell 10% over a few weeks, you\'d want reassurance that the plan still holds. You might not sell right away, but you\'d think hard about it. That doesn\'t mean you can\'t invest successfully, it just means your portfolio shouldn\'t test your limits too often. Lower volatility strategies, clear downside rules, or more conservative positioning might fit you better.';
   } else {
@@ -102,13 +102,13 @@ function generateTraditionalInsight(data, scores) {
   if (timeHorizon >= 0.75 && drawdown >= 0.75) {
     insight += 'You have a long time horizon and say you can stay invested through major declines. That\'s a powerful combination. It means you can ride out the bad stretches without being forced to sell at the wrong time. You probably don\'t need your portfolio to work every quarter or even every year. You\'re thinking in decades, not months, and that gives you room to pursue strategies that might look awful short-term but make sense long-term. This kind of mindset supports equity-heavy portfolios, concentrated positions, or approaches that need patience to pay off.';
   } else if (timeHorizon >= 0.75 && drawdown < 0.75) {
-    insight += 'You have a long time horizon, which gives you flexibility on paper, but your responses suggest you aren\'t totally comfortable with severe drawdowns. That\'s worth noting. Just because you don\'t need the money for 20 years doesn\'t mean you\'ll sleep well if your portfolio drops 30%. Your advisor can help find a middle path: enough risk to meet your goals without making you miserable during the down cycles.';
+    insight += 'You have a long time horizon, which gives you flexibility on paper, but your responses suggest you aren\'t totally comfortable with severe drawdowns. That\'s worth noting. Just because you don\'t need the money for 20 years doesn\'t mean you\'ll sleep well if your portfolio drops 30%. Petra can help find a middle path: enough risk to meet your goals without making you miserable during the down cycles.';
   } else if (timeHorizon < 0.5 && drawdown >= 0.75) {
-    insight += 'Your time horizon is shorter, but you say you can handle declines. That\'s an interesting mix. You may have near-term needs, but you also don\'t panic when markets drop. Your advisor will probably build your portfolio with both realities in mind: keeping enough stable for what\'s coming while still letting you participate in growth where it fits.';
+    insight += 'Your time horizon is shorter, but you say you can handle declines. That\'s an interesting mix. You may have near-term needs, but you also don\'t panic when markets drop. Petra will probably build your portfolio with both realities in mind: keeping enough stable for what\'s coming while still letting you participate in growth where it fits.';
   } else if (timeHorizon < 0.5) {
     insight += 'Your time horizon is relatively short, which naturally leans toward more conservative positioning. You probably need part of your portfolio to be stable and available, and you may not have the luxury of waiting through long recoveries if the market tanks. That doesn\'t mean zero risk, but it does mean your strategy should reflect that you might need this money sooner, not later.';
   } else {
-    insight += 'You have a moderate time horizon and a measured take on market stress. You\'re not super aggressive, but you\'re also not avoiding all volatility. You probably want growth without recklessness, and you value portfolios that balance upside with some downside protection. Your advisor will help dial in that balance based on what you\'re actually trying to do.';
+    insight += 'You have a moderate time horizon and a measured take on market stress. You\'re not super aggressive, but you\'re also not avoiding all volatility. You probably want growth without recklessness, and you value portfolios that balance upside with some downside protection. Petra will help dial in that balance based on what you\'re actually trying to do.';
   }
 
   return insight;
@@ -125,9 +125,9 @@ function generateAlignmentCheck(data) {
   let alignment = '';
 
   if (diff < 0.15) {
-    alignment = `Your emotional approach to risk and your practical circumstances line up well. Your behavioral score (${behavioral}) and traditional score (${traditional}) tell a consistent story. That makes it easier to build a portfolio that feels right both intellectually and emotionally. You\'re not fighting yourself. Your instincts about what you can handle match your goals and timeline. That consistency is valuable, it means your advisor can focus on execution instead of reconciling mixed signals.`;
+    alignment = `Your emotional approach to risk and your practical circumstances line up well. Your behavioral score (${behavioral}) and traditional score (${traditional}) tell a consistent story. That makes it easier to build a portfolio that feels right both intellectually and emotionally. You\'re not fighting yourself. Your instincts about what you can handle match your goals and timeline. That consistency is valuable, it means Petra can focus on execution instead of reconciling mixed signals.`;
   } else if (diff < 0.30) {
-    alignment = `There\'s some gap between your emotional comfort with risk (behavioral: ${behavioral}) and your practical capacity for it (traditional: ${traditional}). That\'s common, and not a problem, just something to talk through. You might have the time and goals to support more risk than feels comfortable, or you might feel braver than your situation allows. Your advisor will help close that gap. The goal isn\'t to force you into something that feels wrong, it\'s to find an approach that works on both levels.`;
+    alignment = `There\'s some gap between your emotional comfort with risk (behavioral: ${behavioral}) and your practical capacity for it (traditional: ${traditional}). That\'s common, and not a problem, just something to talk through. You might have the time and goals to support more risk than feels comfortable, or you might feel braver than your situation allows. Petra will help close that gap. The goal isn\'t to force you into something that feels wrong, it\'s to find an approach that works on both levels.`;
   } else {
     alignment = `Your behavioral score (${behavioral}) and traditional score (${traditional}) show some real divergence. Maybe you have a long timeline but hate losing money, or maybe you\'re emotionally fine with volatility but need cash soon. These mismatches aren\'t failures, they\'re just realities to work with. The portfolio that comes out of this won\'t be a simple plug-and-play from your score. It\'ll be a thoughtful blend of what you need, what you can handle, and what actually makes sense for your life.`;
   }
@@ -136,7 +136,7 @@ function generateAlignmentCheck(data) {
 }
 
 function generatePlanningRelevance() {
-  return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Your advisor will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Your advisor will talk through these decisions with you, not for you.';
+  return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Petra will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Petra will talk through these decisions with you, not for you.';
 }
 
 // ============================================================================
@@ -210,7 +210,7 @@ function renderEmailLayout({ title, subtitle, bodyHtml, logoURL, isAdvisor = fal
                             <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
                                 <tr>
                                     <td align="center" style="padding-bottom: 16px;">
-                                        <img src="${logoURL}" alt="Petra Financial Advisors" width="180" height="54" border="0" style="display: block; width: 180px; height: 54px;" />
+                                        <img src="${logoURL}" alt="Petra Financial Advisors" width="180" border="0" style="display: block; width: 180px; height: auto;" />
                                     </td>
                                 </tr>
                             </table>
@@ -789,6 +789,288 @@ function renderAdvisorBody({ client, scores, flags, couple, meta, overallSummary
   return bodyHtml;
 }
 
+// COUPLE ADVISOR EMAIL BODY BUILDER - Shows both partners' results
+function renderCoupleAdvisorBody({ client, person1Scores, person2Scores, person1Flags, person2Flags, meta }) {
+  let bodyHtml = '';
+
+  const p1Color = getRiskBandColor(person1Scores.overall);
+  const p2Color = getRiskBandColor(person2Scores.overall);
+  const scoreDelta = Math.abs(person1Scores.overall - person2Scores.overall);
+
+  // Determine alignment interpretation
+  let alignmentText = '';
+  let alignmentColor = '';
+  if (scoreDelta <= 10) {
+    alignmentText = 'Well Aligned';
+    alignmentColor = '#22c55e'; // green
+  } else if (scoreDelta <= 25) {
+    alignmentText = 'Moderately Aligned';
+    alignmentColor = '#f59e0b'; // amber
+  } else {
+    alignmentText = 'Significantly Misaligned';
+    alignmentColor = '#ef4444'; // red
+  }
+
+  // Client Information Card
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.lightBg}; border-left: 3px solid ${EMAIL_COLORS.gold}; margin-bottom: 24px;">
+        <tr>
+            <td style="padding: 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                            <strong>Couple Assessment</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                            <strong>Account Holder:</strong> ${client.firstName} ${client.lastName}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                            <strong>Partner 1:</strong> ${client.person1Name || 'Partner A'} (${client.partnerAEmail || client.email})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
+                            <strong>Partner 2:</strong> ${client.person2Name || 'Partner B'} ${client.partnerBEmail ? `(${client.partnerBEmail})` : ''}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                            <strong>Submitted:</strong> ${meta.timestamp}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  // Partner 1 Results Card
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 2px solid ${p1Color}; margin-bottom: 16px;">
+        <tr>
+            <td style="padding: 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px;">
+                            ${client.person1Name || 'Partner A'}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 8px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                                <tr>
+                                    <td align="center" style="padding: 8px 20px; background-color: ${p1Color}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                                        ${person1Scores.band}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding: 8px 16px;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 36px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${person1Scores.overall}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Overall</div>
+                                    </td>
+                                    <td align="center" style="padding: 8px 16px;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 24px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${person1Scores.behavioral}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Behavioral</div>
+                                    </td>
+                                    <td align="center" style="padding: 8px 16px;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 24px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${person1Scores.traditional}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Traditional</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  // Partner 1 Flags (if any)
+  if (person1Flags && person1Flags.length > 0) {
+    bodyHtml += renderFlagsSection(person1Flags, `${client.person1Name || 'Partner A'}'s Behavioral Flags`);
+  }
+
+  // Partner 2 Results Card
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: ${EMAIL_COLORS.white}; border: 2px solid ${p2Color}; margin-bottom: 16px; margin-top: 24px;">
+        <tr>
+            <td style="padding: 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px;">
+                            ${client.person2Name || 'Partner B'}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 8px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                                <tr>
+                                    <td align="center" style="padding: 8px 20px; background-color: ${p2Color}; color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                                        ${person2Scores.band}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding: 8px 16px;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 36px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${person2Scores.overall}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Overall</div>
+                                    </td>
+                                    <td align="center" style="padding: 8px 16px;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 24px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${person2Scores.behavioral}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Behavioral</div>
+                                    </td>
+                                    <td align="center" style="padding: 8px 16px;">
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 24px; font-weight: bold; color: ${EMAIL_COLORS.gold};">${person2Scores.traditional}</div>
+                                        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-transform: uppercase; color: ${EMAIL_COLORS.bodyText};">Traditional</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  // Partner 2 Flags (if any)
+  if (person2Flags && person2Flags.length > 0) {
+    bodyHtml += renderFlagsSection(person2Flags, `${client.person2Name || 'Partner B'}'s Behavioral Flags`);
+  }
+
+  // Couple Comparison Section
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFF9E6; border: 2px solid ${EMAIL_COLORS.gold}; margin-top: 24px; margin-bottom: 24px;">
+        <tr>
+            <td style="padding: 24px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 16px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px;">
+                            Couple Comparison
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding-bottom: 12px;">
+                            <span style="font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: bold; color: ${alignmentColor};">${alignmentText}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                            <strong>Overall Score Delta:</strong> ${scoreDelta} points
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                            <strong>Behavioral Delta:</strong> ${Math.abs(person1Scores.behavioral - person2Scores.behavioral)} points
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 16px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.5; color: ${EMAIL_COLORS.bodyText};">
+                            <strong>Traditional Delta:</strong> ${Math.abs(person1Scores.traditional - person2Scores.traditional)} points
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 13px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText}; font-style: italic;">
+                            ${getAlignmentInterpretation(scoreDelta, person1Scores, person2Scores)}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+
+  // Next Steps Notice
+  bodyHtml += `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 8px;">
+        <tr>
+            <td align="center" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; line-height: 1.6; color: ${EMAIL_COLORS.bodyText};">
+                Review the attached Q&A document for complete responses from both partners. Follow up with the couple to discuss their individual profiles and how they can work together in financial planning.
+            </td>
+        </tr>
+    </table>
+  `;
+
+  return bodyHtml;
+}
+
+// Helper to render flags section
+function renderFlagsSection(flags, title) {
+  const flagExplanations = {
+    'Longevity Planning': 'Indicated concerns about outliving their savings or has longevity factors that may require extended planning horizons.',
+    'Caregiving Consideration': 'Has or anticipates caregiving responsibilities that may impact financial planning needs and risk capacity.',
+    'Knowledge: Overconfident': 'Self-rated investment knowledge higher than quiz performance suggests. May benefit from education before making complex decisions.',
+    'Knowledge: Underconfident': 'Self-rated investment knowledge lower than quiz performance indicates. May have more capability than they realize.'
+  };
+
+  const flagRows = flags.map(flag => {
+    const explanation = flagExplanations[flag] || '';
+    return `
+    <tr>
+        <td style="padding: 10px; background-color: ${EMAIL_COLORS.lightBg}; border: 1px solid ${EMAIL_COLORS.gold}; font-family: Georgia, 'Times New Roman', Times, serif;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="font-size: 13px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; padding-bottom: 4px;">
+                        ${flag}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px; line-height: 1.4; color: ${EMAIL_COLORS.bodyText};">
+                        ${explanation}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr><td style="height: 6px; font-size: 1px; line-height: 1px;">&nbsp;</td></tr>
+  `;
+  }).join('');
+
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;">
+        <tr>
+            <td>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="padding-bottom: 8px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 0.5px;">${title}</td>
+                    </tr>
+                </table>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    ${flagRows}
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+}
+
+// Helper to get alignment interpretation text
+function getAlignmentInterpretation(delta, p1Scores, p2Scores) {
+  if (delta <= 10) {
+    return 'Both partners show similar risk profiles. This alignment can simplify joint financial planning, as both are likely comfortable with similar investment strategies and risk levels.';
+  } else if (delta <= 25) {
+    return 'There is a moderate difference in risk tolerance between partners. This is common and manageable. Consider discussing how to structure accounts and strategies that accommodate both perspectives—perhaps with a blend of approaches or separate allocations that respect individual comfort levels.';
+  } else {
+    return 'The partners show significantly different approaches to risk. This divergence is worth addressing directly in planning conversations. Consider whether separate investment strategies might reduce household tension, or whether one partner\'s perspective should take priority based on specific goals or timelines.';
+  }
+}
+
 // Plain-text email builder for client
 function renderClientTextBody({ firstName, scores, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck, planningRelevance }) {
   return `
@@ -799,7 +1081,7 @@ Risk Alignment Assessment
 
 Thank you, ${firstName}
 
-We've received your Risk Alignment Assessment and your advisor
+We've received your Risk Alignment Assessment and Petra
 will be in touch to discuss your results.
 
 ───────────────────────────────────────────────────────────
@@ -872,7 +1154,13 @@ not be considered investment advice.
 }
 
 // Plain-text email builder for advisor
-function renderAdvisorTextBody({ client, scores, flags, couple, meta, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck }) {
+function renderAdvisorTextBody({ client, scores, flags, couple, meta, overallSummary, mindsetInsight, traditionalInsight, alignmentCheck, person1Scores, person2Scores, person1Flags, person2Flags }) {
+  // For couple assessments with both partners' data, use the couple-specific format
+  if (couple && person1Scores && person2Scores) {
+    return renderCoupleAdvisorTextBody({ client, meta, person1Scores, person2Scores, person1Flags, person2Flags, scores });
+  }
+
+  // Solo assessment format
   let text = `
 ═══════════════════════════════════════════════════════════
 RISK ASSESSMENT RECEIVED
@@ -896,18 +1184,6 @@ Component Breakdown:
   • Behavioral:  ${scores.behavioral}/60
   • Traditional: ${scores.traditional}/40
 `;
-
-  if (couple && scores.deltas) {
-    text += `
-───────────────────────────────────────────────────────────
-
-COUPLE COMPARISON
-
-  • Overall Delta:     ${scores.deltas.overall} points
-  • Behavioral Delta:  ${scores.deltas.behavioral} points
-  • Traditional Delta: ${scores.deltas.traditional} points
-`;
-  }
 
   if (flags && flags.length > 0) {
     const flagExplanations = {
@@ -973,26 +1249,103 @@ This assessment is for internal use only.
   return text;
 }
 
+// Couple-specific text body for advisor email
+function renderCoupleAdvisorTextBody({ client, meta, person1Scores, person2Scores, person1Flags, person2Flags, scores }) {
+  const person1Name = client.person1Name || 'Partner A';
+  const person2Name = client.person2Name || 'Partner B';
+  const scoreDelta = Math.abs(person1Scores.overall - person2Scores.overall);
+
+  let alignmentText = '';
+  if (scoreDelta <= 10) {
+    alignmentText = 'WELL ALIGNED';
+  } else if (scoreDelta <= 25) {
+    alignmentText = 'MODERATELY ALIGNED';
+  } else {
+    alignmentText = 'SIGNIFICANTLY MISALIGNED';
+  }
+
+  let text = `
+═══════════════════════════════════════════════════════════
+COUPLE RISK ASSESSMENT RECEIVED
+Petra Financial Advisors
+═══════════════════════════════════════════════════════════
+
+COUPLE ASSESSMENT
+
+Account Holder: ${client.firstName} ${client.lastName}
+Partner 1: ${person1Name} (${client.partnerAEmail || client.email})
+Partner 2: ${person2Name} ${client.partnerBEmail ? `(${client.partnerBEmail})` : ''}
+Submitted: ${meta.timestamp}
+
+───────────────────────────────────────────────────────────
+
+${person1Name.toUpperCase()}'S RESULTS
+
+Overall Score:  ${person1Scores.overall}/100
+Risk Band:      ${person1Scores.band}
+Behavioral:     ${person1Scores.behavioral}/60
+Traditional:    ${person1Scores.traditional}/40
+${person1Flags && person1Flags.length > 0 ? `Flags: ${person1Flags.join(', ')}` : ''}
+
+───────────────────────────────────────────────────────────
+
+${person2Name.toUpperCase()}'S RESULTS
+
+Overall Score:  ${person2Scores.overall}/100
+Risk Band:      ${person2Scores.band}
+Behavioral:     ${person2Scores.behavioral}/60
+Traditional:    ${person2Scores.traditional}/40
+${person2Flags && person2Flags.length > 0 ? `Flags: ${person2Flags.join(', ')}` : ''}
+
+───────────────────────────────────────────────────────────
+
+COUPLE COMPARISON
+
+Alignment Status: ${alignmentText}
+
+Score Deltas:
+  • Overall:     ${scoreDelta} points
+  • Behavioral:  ${Math.abs(person1Scores.behavioral - person2Scores.behavioral)} points
+  • Traditional: ${Math.abs(person1Scores.traditional - person2Scores.traditional)} points
+
+───────────────────────────────────────────────────────────
+
+See the attached document for complete Q&A responses from
+both partners and detailed analysis.
+
+Follow up with the couple to discuss their individual
+profiles and how they can work together in financial
+planning.
+
+───────────────────────────────────────────────────────────
+
+Thank you,
+The Petra Team
+
+Petra Financial Advisors
+2 N Nevada Ave, Suite 1300
+Colorado Springs, CO 80903
+www.petrafinancial.com
+
+This assessment is for internal use only.
+
+═══════════════════════════════════════════════════════════
+`;
+
+  return text;
+}
+
 // Generate advisor PDF (text-based, internal use)
 function generateAdvisorPDFContent(payload) {
   const { client, scores, flags, answers, meta } = payload;
 
-  let interpretationText = '';
-  const score = scores.overall;
-
-  if (score <= 24) {
-    interpretationText = 'This profile reflects high loss aversion and strong stability preference, favoring capital preservation and reliability over growth.';
-  } else if (score <= 44) {
-    interpretationText = 'Moderate loss sensitivity with a measured approach to uncertainty. Comfortable with calculated risk when there is clear rationale.';
-  } else if (score <= 59) {
-    interpretationText = 'Risk-aware without being risk-averse. Accepts market fluctuation as part of progress and makes decisions based on information rather than emotion.';
-  } else if (score <= 74) {
-    interpretationText = 'Growth-oriented with adaptive emotional control. Displays confidence under uncertainty and interprets volatility as data rather than danger.';
-  } else if (score <= 89) {
-    interpretationText = 'Low loss aversion with high return motivation. Demonstrates resilience during drawdowns and comfortable with conviction-based positions.';
-  } else {
-    interpretationText = 'High risk tolerance with analytical independence. Thrives in complex, uncertain environments where decisions depend on conviction and long-range perspective.';
+  // Check if this is a couple assessment
+  if (payload.couple && payload.person1Scores && payload.person2Scores) {
+    return generateCoupleAdvisorPDFContent(payload);
   }
+
+  // Solo assessment
+  let interpretationText = getInterpretationText(scores.overall);
 
   let content = `
 ═══════════════════════════════════════════════════════════════════
@@ -1019,15 +1372,6 @@ Component Breakdown:
   • Behavioral Component:  ${scores.behavioral}/60
   • Traditional Component: ${scores.traditional}/40
 
-${payload.couple ? `
-COUPLE COMPARISON
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Overall Delta:      ${scores.deltas.overall} points
-Behavioral Delta:   ${scores.deltas.behavioral} points
-Traditional Delta:  ${scores.deltas.traditional} points
-
-` : ''}
 
 RISK PROFILE INTERPRETATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1038,28 +1382,14 @@ ${interpretationText}
 BEHAVIORAL FLAGS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${flags && flags.length > 0 ? flags.map(f => {
-    const explanations = {
-      'Longevity Planning': 'Client indicated concerns about outliving their savings or has longevity factors that may require extended planning horizons.',
-      'Caregiving Consideration': 'Client has or anticipates caregiving responsibilities that may impact their financial planning needs and risk capacity.',
-      'Knowledge: Overconfident': 'Client self-rated their investment knowledge higher than their quiz performance suggests. May benefit from education before making complex decisions.',
-      'Knowledge: Underconfident': 'Client self-rated their investment knowledge lower than their quiz performance indicates. May have more capability than they realize.'
-    };
-    return `  • ${f}\n    ${explanations[f] || ''}`;
-  }).join('\n\n') : '  None identified'}
+${formatFlagsForPDF(flags)}
 
 
 ═══════════════════════════════════════════════════════════════════
    COMPLETE QUESTION & ANSWER SUMMARY
 ═══════════════════════════════════════════════════════════════════
 
-${answers && answers.length > 0 ? answers.map((a, i) => `
-${i + 1}. ${a.section ? `[${a.section}] ` : ''}${a.text}
-
-   Response: ${a.selectedOption}
-   ${a.numericValue !== undefined ? `Value: ${a.numericValue}` : ''}
-
-`).join('─────────────────────────────────────────────────────────────────\n') : 'No detailed responses recorded'}
+${formatAnswersForPDF(answers)}
 
 ═══════════════════════════════════════════════════════════════════
 
@@ -1076,6 +1406,212 @@ www.petrafinancial.com
 `;
 
   return content;
+}
+
+// Generate couple advisor PDF content
+function generateCoupleAdvisorPDFContent(payload) {
+  const { client, meta, person1Scores, person2Scores, person1Answers, person2Answers, person1Flags, person2Flags, scores } = payload;
+
+  const person1Name = client.person1Name || 'Partner A';
+  const person2Name = client.person2Name || 'Partner B';
+  const scoreDelta = Math.abs(person1Scores.overall - person2Scores.overall);
+
+  // Determine alignment
+  let alignmentText = '';
+  if (scoreDelta <= 10) {
+    alignmentText = 'WELL ALIGNED - Both partners show similar risk profiles.';
+  } else if (scoreDelta <= 25) {
+    alignmentText = 'MODERATELY ALIGNED - There is a moderate difference in risk tolerance.';
+  } else {
+    alignmentText = 'SIGNIFICANTLY MISALIGNED - Partners show notably different risk approaches.';
+  }
+
+  let content = `
+═══════════════════════════════════════════════════════════════════
+   PETRA FINANCIAL ADVISORS — COUPLE RISK ASSESSMENT REPORT
+   Internal Advisor Document
+═══════════════════════════════════════════════════════════════════
+
+COUPLE INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Account Holder:     ${client.firstName} ${client.lastName}
+Partner 1:          ${person1Name} (${client.partnerAEmail || client.email})
+Partner 2:          ${person2Name} ${client.partnerBEmail ? `(${client.partnerBEmail})` : ''}
+Submitted:          ${meta.timestamp}
+Session ID:         ${meta.sessionId || 'N/A'}
+
+
+═══════════════════════════════════════════════════════════════════
+   ${person1Name.toUpperCase()}'S ASSESSMENT
+═══════════════════════════════════════════════════════════════════
+
+RISK ALIGNMENT SCORE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Overall Score:  ${person1Scores.overall}/100
+Risk Band:      ${person1Scores.band}
+
+Component Breakdown:
+  • Behavioral Component:  ${person1Scores.behavioral}/60
+  • Traditional Component: ${person1Scores.traditional}/40
+
+RISK PROFILE INTERPRETATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${getInterpretationText(person1Scores.overall)}
+
+BEHAVIORAL FLAGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${formatFlagsForPDF(person1Flags)}
+
+COMPLETE QUESTION & ANSWER SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${formatAnswersForPDF(person1Answers)}
+
+
+═══════════════════════════════════════════════════════════════════
+   ${person2Name.toUpperCase()}'S ASSESSMENT
+═══════════════════════════════════════════════════════════════════
+
+RISK ALIGNMENT SCORE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Overall Score:  ${person2Scores.overall}/100
+Risk Band:      ${person2Scores.band}
+
+Component Breakdown:
+  • Behavioral Component:  ${person2Scores.behavioral}/60
+  • Traditional Component: ${person2Scores.traditional}/40
+
+RISK PROFILE INTERPRETATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${getInterpretationText(person2Scores.overall)}
+
+BEHAVIORAL FLAGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${formatFlagsForPDF(person2Flags)}
+
+COMPLETE QUESTION & ANSWER SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${formatAnswersForPDF(person2Answers)}
+
+
+═══════════════════════════════════════════════════════════════════
+   COUPLE COMPARISON & ALIGNMENT
+═══════════════════════════════════════════════════════════════════
+
+SCORE COMPARISON
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                        ${person1Name.padEnd(20)} ${person2Name.padEnd(20)} Delta
+Overall Score:          ${String(person1Scores.overall).padEnd(20)} ${String(person2Scores.overall).padEnd(20)} ${scoreDelta} points
+Risk Band:              ${person1Scores.band.padEnd(20)} ${person2Scores.band.padEnd(20)}
+Behavioral:             ${String(person1Scores.behavioral).padEnd(20)} ${String(person2Scores.behavioral).padEnd(20)} ${Math.abs(person1Scores.behavioral - person2Scores.behavioral)} points
+Traditional:            ${String(person1Scores.traditional).padEnd(20)} ${String(person2Scores.traditional).padEnd(20)} ${Math.abs(person1Scores.traditional - person2Scores.traditional)} points
+
+
+ALIGNMENT ASSESSMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${alignmentText}
+
+${getCoupleAlignmentNarrative(scoreDelta, person1Scores, person2Scores, person1Name, person2Name)}
+
+
+═══════════════════════════════════════════════════════════════════
+
+CONFIDENTIAL — Internal Advisor Document
+This assessment contains complete client responses and behavioral analysis
+for both partners. For advisor use only. Not for client distribution.
+
+© ${new Date().getFullYear()} Petra Financial Advisors
+2 N Nevada Ave, Suite 1300
+Colorado Springs, CO 80903
+www.petrafinancial.com
+
+═══════════════════════════════════════════════════════════════════
+`;
+
+  return content;
+}
+
+// Helper: Get interpretation text based on score
+function getInterpretationText(score) {
+  if (score <= 24) {
+    return 'This profile reflects high loss aversion and strong stability preference, favoring capital preservation and reliability over growth.';
+  } else if (score <= 44) {
+    return 'Moderate loss sensitivity with a measured approach to uncertainty. Comfortable with calculated risk when there is clear rationale.';
+  } else if (score <= 59) {
+    return 'Risk-aware without being risk-averse. Accepts market fluctuation as part of progress and makes decisions based on information rather than emotion.';
+  } else if (score <= 74) {
+    return 'Growth-oriented with adaptive emotional control. Displays confidence under uncertainty and interprets volatility as data rather than danger.';
+  } else if (score <= 89) {
+    return 'Low loss aversion with high return motivation. Demonstrates resilience during drawdowns and comfortable with conviction-based positions.';
+  } else {
+    return 'High risk tolerance with analytical independence. Thrives in complex, uncertain environments where decisions depend on conviction and long-range perspective.';
+  }
+}
+
+// Helper: Format flags for PDF
+function formatFlagsForPDF(flags) {
+  if (!flags || flags.length === 0) {
+    return '  None identified';
+  }
+
+  const explanations = {
+    'Longevity Planning': 'Indicated concerns about outliving their savings or has longevity factors that may require extended planning horizons.',
+    'Caregiving Consideration': 'Has or anticipates caregiving responsibilities that may impact financial planning needs and risk capacity.',
+    'Knowledge: Overconfident': 'Self-rated investment knowledge higher than quiz performance suggests. May benefit from education before making complex decisions.',
+    'Knowledge: Underconfident': 'Self-rated investment knowledge lower than quiz performance indicates. May have more capability than they realize.'
+  };
+
+  return flags.map(f => `  • ${f}\n    ${explanations[f] || ''}`).join('\n\n');
+}
+
+// Helper: Format answers for PDF
+function formatAnswersForPDF(answers) {
+  if (!answers || answers.length === 0) {
+    return 'No detailed responses recorded';
+  }
+
+  return answers.map((a, i) => `
+${i + 1}. ${a.section ? `[${a.section}] ` : ''}${a.text}
+
+   Response: ${a.selectedOption}
+   ${a.numericValue !== undefined ? `Value: ${a.numericValue}` : ''}
+
+`).join('─────────────────────────────────────────────────────────────────\n');
+}
+
+// Helper: Get couple alignment narrative
+function getCoupleAlignmentNarrative(delta, p1Scores, p2Scores, p1Name, p2Name) {
+  let narrative = '';
+
+  if (delta <= 10) {
+    narrative = `${p1Name} and ${p2Name} demonstrate very similar risk tolerance profiles. This alignment can simplify joint financial planning, as both partners are likely comfortable with similar investment strategies and risk levels. They may be able to share a unified investment approach without significant compromise.`;
+  } else if (delta <= 25) {
+    narrative = `There is a moderate difference in risk tolerance between ${p1Name} (${p1Scores.overall}) and ${p2Name} (${p2Scores.overall}). This is common and manageable in couples. Consider discussing how to structure accounts and strategies that accommodate both perspectives—perhaps with a blend of approaches or separate allocations that respect individual comfort levels.`;
+  } else {
+    const higherRisk = p1Scores.overall > p2Scores.overall ? p1Name : p2Name;
+    const lowerRisk = p1Scores.overall > p2Scores.overall ? p2Name : p1Name;
+    narrative = `${p1Name} and ${p2Name} show significantly different approaches to risk. ${higherRisk} has a notably higher risk tolerance, while ${lowerRisk} prefers a more conservative approach. This divergence is worth addressing directly in planning conversations. Consider whether separate investment strategies might reduce household tension, or whether one partner's perspective should take priority based on specific goals or timelines.`;
+  }
+
+  // Add behavioral comparison if there's significant difference
+  const behavDelta = Math.abs(p1Scores.behavioral - p2Scores.behavioral);
+  if (behavDelta > 15) {
+    const behavHigher = p1Scores.behavioral > p2Scores.behavioral ? p1Name : p2Name;
+    const behavLower = p1Scores.behavioral > p2Scores.behavioral ? p2Name : p1Name;
+    narrative += `\n\nNotably, ${behavHigher} shows significantly higher behavioral risk tolerance than ${behavLower}. This means they may react quite differently to market volatility—${behavHigher} may want to stay the course or even increase positions during downturns, while ${behavLower} may feel anxious and want to reduce exposure.`;
+  }
+
+  return narrative;
 }
 
 // Main handler
@@ -1156,7 +1692,7 @@ module.exports = async (req, res) => {
 
     const clientHTMLBody = renderEmailLayout({
       title: `Thank You, ${payload.client.firstName}`,
-      subtitle: "We've received your Risk Alignment Assessment and your Petra advisor will be in touch soon to discuss your results.",
+      subtitle: "We've received your Risk Alignment Assessment and Petra will be in touch soon to discuss your results.",
       bodyHtml: clientBodyHtml,
       logoURL,
       isAdvisor: false
@@ -1173,22 +1709,41 @@ module.exports = async (req, res) => {
     });
 
     // Advisor email using shared layout
-    const advisorBodyHtml = renderAdvisorBody({
-      client: payload.client,
-      scores: payload.scores,
-      flags: payload.flags,
-      couple: payload.couple,
-      meta: payload.meta,
-      overallSummary,
-      mindsetInsight,
-      traditionalInsight,
-      alignmentCheck,
-      riskBandColor
-    });
+    // Check if this is a couple assessment with both partners' data
+    let advisorBodyHtml;
+    let advisorSubtitle;
+
+    if (payload.couple && payload.person1Scores && payload.person2Scores) {
+      // Couple assessment: use the couple-specific advisor body
+      advisorBodyHtml = renderCoupleAdvisorBody({
+        client: payload.client,
+        person1Scores: payload.person1Scores,
+        person2Scores: payload.person2Scores,
+        person1Flags: payload.person1Flags || [],
+        person2Flags: payload.person2Flags || [],
+        meta: payload.meta
+      });
+      advisorSubtitle = `${payload.client.person1Name || 'Partner A'} & ${payload.client.person2Name || 'Partner B'} have completed their couple assessment.`;
+    } else {
+      // Solo assessment: use the standard advisor body
+      advisorBodyHtml = renderAdvisorBody({
+        client: payload.client,
+        scores: payload.scores,
+        flags: payload.flags,
+        couple: payload.couple,
+        meta: payload.meta,
+        overallSummary,
+        mindsetInsight,
+        traditionalInsight,
+        alignmentCheck,
+        riskBandColor
+      });
+      advisorSubtitle = `${payload.client.firstName} ${payload.client.lastName} has completed their assessment.`;
+    }
 
     const advisorHTMLBody = renderEmailLayout({
-      title: 'New Risk Assessment Received',
-      subtitle: `${payload.client.firstName} ${payload.client.lastName} has completed their assessment.`,
+      title: payload.couple ? 'New Couple Risk Assessment' : 'New Risk Assessment Received',
+      subtitle: advisorSubtitle,
       bodyHtml: advisorBodyHtml,
       logoURL,
       isAdvisor: true
@@ -1203,7 +1758,12 @@ module.exports = async (req, res) => {
       overallSummary,
       mindsetInsight,
       traditionalInsight,
-      alignmentCheck
+      alignmentCheck,
+      // Include couple-specific data for couple assessments
+      person1Scores: payload.person1Scores,
+      person2Scores: payload.person2Scores,
+      person1Flags: payload.person1Flags,
+      person2Flags: payload.person2Flags
     });
 
 
@@ -1239,7 +1799,7 @@ module.exports = async (req, res) => {
 
       const html = renderEmailLayout({
         title: `Thank You, ${personName}`,
-        subtitle: "We've received your Risk Alignment Assessment and your Petra advisor will be in touch soon to discuss your results.",
+        subtitle: "We've received your Risk Alignment Assessment and Petra will be in touch soon to discuss your results.",
         bodyHtml: personBodyHtml,
         logoURL,
         isAdvisor: false
@@ -1473,7 +2033,7 @@ module.exports = async (req, res) => {
         </table>
 
         <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 15px; line-height: 1.7; color: ${EMAIL_COLORS.darkText}; font-style: italic; text-align: center;">
-            Your advisor will review both assessments and discuss how your individual risk profiles can inform your shared financial planning.
+            Petra will review both assessments and discuss how your individual risk profiles can inform your shared financial planning.
         </p>
 
         ${renderCTAButton('https://www.petrafinancial.com', 'Visit PetraFinancial.com')}
@@ -1498,7 +2058,7 @@ Risk Alignment Assessment
 Your Couple Assessment Results
 
 Both ${person1Name} and ${person2Name} have completed the
-Risk Alignment Assessment. Your advisor will be in touch to
+Risk Alignment Assessment. Petra will be in touch to
 discuss your results.
 
 ───────────────────────────────────────────────────────────
@@ -1521,7 +2081,7 @@ Traditional:    ${person2Scores.traditional}/40
 
 ───────────────────────────────────────────────────────────
 
-Your advisor will review both assessments and discuss how your
+Petra will review both assessments and discuss how your
 individual risk profiles can inform your shared financial planning.
 
 ───────────────────────────────────────────────────────────

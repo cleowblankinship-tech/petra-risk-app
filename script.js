@@ -12,6 +12,10 @@ let lastComputed = null;
 let isCoupleMode = false;
 let person1Data = null;
 let person2Data = null;
+let person1Answers = null;  // Store person 1's answers before form reset
+let person2Answers = null;  // Store person 2's answers
+let person1Flags = null;    // Store person 1's flags
+let person2Flags = null;    // Store person 2's flags
 let currentPerson = 1;
 let person1Name = '';
 let person2Name = '';
@@ -1232,6 +1236,57 @@ function getAllValues() {
     return values;
 }
 
+// Helper to gather current answers for storage (used in couple mode)
+function gatherCurrentAnswers() {
+    var answersArray = [];
+    var allQuestions = questions.behavioral.concat(questions.traditional).concat(questions.knowledge);
+    allQuestions.forEach(function(q) {
+        var value = q.type === "radio" ? getRadioValue(q.name) : getLikertValue(q.name);
+        if (value !== null) {
+            var answer = {
+                id: q.name,
+                section: q.section || (questions.behavioral.includes(q) ? 'Behavioral' :
+                         questions.traditional.includes(q) ? 'Traditional' : 'Knowledge'),
+                text: q.q,
+                selectedOption: formatAnswerTextLocal(q, value),
+                numericValue: value
+            };
+            answersArray.push(answer);
+        }
+    });
+    return answersArray;
+}
+
+// Local version of formatAnswerText for use in script.js
+function formatAnswerTextLocal(question, value) {
+    if (question.type === 'radio') {
+        var index = question.vals.indexOf(value);
+        return question.opts[index] || value;
+    } else if (question.type === 'likert') {
+        var scaleIndex = Math.round(value * 4); // Convert 0-1 to 0-4
+        return question.labels[scaleIndex] || value.toString();
+    }
+    return value.toString();
+}
+
+// Helper to gather current flags
+function gatherCurrentFlags(computed) {
+    var flagsArray = [];
+    if (computed.flags && computed.flags.longevity) {
+        flagsArray.push('Longevity Planning');
+    }
+    if (computed.flags && computed.flags.caregiving) {
+        flagsArray.push('Caregiving Consideration');
+    }
+    if (computed.knowledge && computed.knowledge.flag === 'overconfidence') {
+        flagsArray.push('Knowledge: Overconfident');
+    }
+    if (computed.knowledge && computed.knowledge.flag === 'underconfidence') {
+        flagsArray.push('Knowledge: Underconfident');
+    }
+    return flagsArray;
+}
+
 // ============================================================================
 // SCORE CALCULATION
 // ============================================================================
@@ -1289,10 +1344,16 @@ function calculateScore() {
     if (isCoupleMode) {
         if (currentPerson === 1) {
             person1Data = JSON.parse(JSON.stringify(lastComputed));
+            // Capture person 1's answers and flags BEFORE form is reset for person 2
+            person1Answers = gatherCurrentAnswers();
+            person1Flags = gatherCurrentFlags(lastComputed);
             showPartnerTransition();
             return;
         } else {
             person2Data = JSON.parse(JSON.stringify(lastComputed));
+            // Capture person 2's answers and flags
+            person2Answers = gatherCurrentAnswers();
+            person2Flags = gatherCurrentFlags(lastComputed);
             // Display couple results with tabbed interface
             displayCoupleResults();
             // Show splash screen for 6 seconds (skip if recalculating after edit)
@@ -1546,7 +1607,7 @@ function displayPersonalizedInsights() {
 }
 
 function generateResultsIntroduction() {
-    return 'These results are a starting point, not a label. Risk tolerance is personal, nuanced, and influenced by real-life experiences that no questionnaire can fully capture. This assessment helps us organize our discussion and ask better questions, but the most important insights come from talking together.\n\nWe want to understand your goals, your circumstances, and what you truly need from your portfolio, both financially and emotionally. Your advisor will use these results to inform our work, but your investment strategy will always be built around you, not a score.';
+    return 'These results are a starting point, not a label. Risk tolerance is personal, nuanced, and influenced by real-life experiences that no questionnaire can fully capture. This assessment helps us organize our discussion and ask better questions, but the most important insights come from talking together.\n\nWe want to understand your goals, your circumstances, and what you truly need from your portfolio, both financially and emotionally. Petra will use these results to inform our work, but your investment strategy will always be built around you, not a score.';
 }
 
 function generateOverallSummary(data) {
@@ -1585,7 +1646,7 @@ function generateMindsetInsight(data) {
     if (normalized >= 0.75) {
         insight += 'Your responses suggest you stay calm during market turbulence. If the market dropped 20% over a few months, you\'d probably see it as part of the process, not a reason to change course. You likely don\'t obsess over your portfolio, and when you do check and see red numbers, they don\'t create an urgent need to act. You might even view weak periods as a chance to buy more of what you already believe in. This mindset works well with equity-heavy portfolios, where the path to long-term growth always includes short-term pain.';
     } else if (normalized >= 0.55) {
-        insight += 'Your responses point to a thoughtful, measured approach. You don\'t panic when markets fall, but you don\'t shrug it off either. If your portfolio dropped 15% during a rough quarter, you\'d want to know why and whether anything fundamental changed. You might feel uneasy, but you probably wouldn\'t act on it, especially if your advisor confirmed the decline was normal market behavior. You want strategies that balance growth with some downside awareness, and you appreciate communication that keeps you steady when things get uncertain.';
+        insight += 'Your responses point to a thoughtful, measured approach. You don\'t panic when markets fall, but you don\'t shrug it off either. If your portfolio dropped 15% during a rough quarter, you\'d want to know why and whether anything fundamental changed. You might feel uneasy, but you probably wouldn\'t act on it, especially if Petra confirmed the decline was normal market behavior. You want strategies that balance growth with some downside awareness, and you appreciate communication that keeps you steady when things get uncertain.';
     } else if (normalized >= 0.35) {
         insight += 'Your responses show a more cautious relationship with risk. You feel losses more sharply than gains, and market declines can rattle you even when you know they\'re temporary. If your portfolio fell 10% over a few weeks, you\'d want reassurance that the plan still holds. You might not sell right away, but you\'d think hard about it. That doesn\'t mean you can\'t invest successfully, it just means your portfolio shouldn\'t test your limits too often. Lower volatility strategies, clear downside rules, or more conservative positioning might fit you better.';
     } else {
@@ -1635,13 +1696,13 @@ function generateTraditionalInsight(data) {
     if (timeHorizon >= 0.75 && drawdown >= 0.75) {
         insight += 'You have a long time horizon and say you can stay invested through major declines. That\'s a powerful combination. It means you can ride out the bad stretches without being forced to sell at the wrong time. You probably don\'t need your portfolio to work every quarter or even every year. You\'re thinking in decades, not months, and that gives you room to pursue strategies that might look awful short-term but make sense long-term. This kind of mindset supports equity-heavy portfolios, concentrated positions, or approaches that need patience to pay off.';
     } else if (timeHorizon >= 0.75 && drawdown < 0.75) {
-        insight += 'You have a long time horizon, which gives you flexibility on paper, but your responses suggest you aren\'t totally comfortable with severe drawdowns. That\'s worth noting. Just because you don\'t need the money for 20 years doesn\'t mean you\'ll sleep well if your portfolio drops 30%. Your advisor can help find a middle path: enough risk to meet your goals without making you miserable during the down cycles.';
+        insight += 'You have a long time horizon, which gives you flexibility on paper, but your responses suggest you aren\'t totally comfortable with severe drawdowns. That\'s worth noting. Just because you don\'t need the money for 20 years doesn\'t mean you\'ll sleep well if your portfolio drops 30%. Petra can help find a middle path: enough risk to meet your goals without making you miserable during the down cycles.';
     } else if (timeHorizon < 0.5 && drawdown >= 0.75) {
-        insight += 'Your time horizon is shorter, but you say you can handle declines. That\'s an interesting mix. You may have near-term needs, but you also don\'t panic when markets drop. Your advisor will probably build your portfolio with both realities in mind: keeping enough stable for what\'s coming while still letting you participate in growth where it fits.';
+        insight += 'Your time horizon is shorter, but you say you can handle declines. That\'s an interesting mix. You may have near-term needs, but you also don\'t panic when markets drop. Petra will probably build your portfolio with both realities in mind: keeping enough stable for what\'s coming while still letting you participate in growth where it fits.';
     } else if (timeHorizon < 0.5) {
         insight += 'Your time horizon is relatively short, which naturally leans toward more conservative positioning. You probably need part of your portfolio to be stable and available, and you may not have the luxury of waiting through long recoveries if the market tanks. That doesn\'t mean zero risk, but it does mean your strategy should reflect that you might need this money sooner, not later.';
     } else {
-        insight += 'You have a moderate time horizon and a measured take on market stress. You\'re not super aggressive, but you\'re also not avoiding all volatility. You probably want growth without recklessness, and you value portfolios that balance upside with some downside protection. Your advisor will help dial in that balance based on what you\'re actually trying to do.';
+        insight += 'You have a moderate time horizon and a measured take on market stress. You\'re not super aggressive, but you\'re also not avoiding all volatility. You probably want growth without recklessness, and you value portfolios that balance upside with some downside protection. Petra will help dial in that balance based on what you\'re actually trying to do.';
     }
 
     return insight;
@@ -1658,9 +1719,9 @@ function generateAlignmentCheck(data) {
     var alignment = '';
 
     if (diff < 0.15) {
-        alignment = 'Your emotional approach to risk and your practical circumstances line up well. Your behavioral score (' + behavioral + ') and traditional score (' + traditional + ') tell a consistent story. That makes it easier to build a portfolio that feels right both intellectually and emotionally. You\'re not fighting yourself. Your instincts about what you can handle match your goals and timeline. That consistency is valuable, it means your advisor can focus on execution instead of reconciling mixed signals.';
+        alignment = 'Your emotional approach to risk and your practical circumstances line up well. Your behavioral score (' + behavioral + ') and traditional score (' + traditional + ') tell a consistent story. That makes it easier to build a portfolio that feels right both intellectually and emotionally. You\'re not fighting yourself. Your instincts about what you can handle match your goals and timeline. That consistency is valuable, it means Petra can focus on execution instead of reconciling mixed signals.';
     } else if (diff < 0.30) {
-        alignment = 'There\'s some gap between your emotional comfort with risk (behavioral: ' + behavioral + ') and your practical capacity for it (traditional: ' + traditional + '). That\'s common, and not a problem, just something to talk through. You might have the time and goals to support more risk than feels comfortable, or you might feel braver than your situation allows. Your advisor will help close that gap. The goal isn\'t to force you into something that feels wrong, it\'s to find an approach that works on both levels.';
+        alignment = 'There\'s some gap between your emotional comfort with risk (behavioral: ' + behavioral + ') and your practical capacity for it (traditional: ' + traditional + '). That\'s common, and not a problem, just something to talk through. You might have the time and goals to support more risk than feels comfortable, or you might feel braver than your situation allows. Petra will help close that gap. The goal isn\'t to force you into something that feels wrong, it\'s to find an approach that works on both levels.';
     } else {
         alignment = 'Your behavioral score (' + behavioral + ') and traditional score (' + traditional + ') show some real divergence. Maybe you have a long timeline but hate losing money, or maybe you\'re emotionally fine with volatility but need cash soon. These mismatches aren\'t failures, they\'re just realities to work with. The portfolio that comes out of this won\'t be a simple plug-and-play from your score. It\'ll be a thoughtful blend of what you need, what you can handle, and what actually makes sense for your life.';
     }
@@ -1669,7 +1730,7 @@ function generateAlignmentCheck(data) {
 }
 
 function generatePlanningRelevance(data) {
-    return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Your advisor will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Your advisor will talk through these decisions with you, not for you.';
+    return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Petra will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Petra will talk through these decisions with you, not for you.';
 }
 
 function displayKnowledgeOverlay() {
