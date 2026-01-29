@@ -75,24 +75,41 @@
                     <strong style="color: #4f46e5;">Important:</strong>
                     <p style="margin: 8px 0 0 0; color: #3730a3; font-size: 0.9rem;">Each partner will answer the questions independently. Please don't discuss your answers or try to influence each other. Honest individual responses give the most accurate results.</p>
                 </div>
-                <h4 style="color: var(--petra-charcoal); margin-bottom: 15px;">Enter both names:</h4>
-                <div style="margin-bottom: 15px;">
-                    <label class="input-label">Person 1:</label>
-                    <input type="text" id="person1Name" placeholder="Your name" class="name-input">
+
+                <!-- Partner 1 Full Name -->
+                <h4 style="color: var(--petra-charcoal); margin-bottom: 15px;">Partner 1</h4>
+                <div class="form-grid" style="margin-bottom: 20px;">
+                    <div class="form-field">
+                        <label class="input-label" for="person1FirstName">First Name *</label>
+                        <input type="text" id="person1FirstName" placeholder="First name" class="name-input" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="input-label" for="person1LastName">Last Name *</label>
+                        <input type="text" id="person1LastName" placeholder="Last name" class="name-input" required>
+                    </div>
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <label class="input-label">Person 2:</label>
-                    <input type="text" id="person2Name" placeholder="Partner's name" class="name-input">
+
+                <!-- Partner 2 Full Name -->
+                <h4 style="color: var(--petra-charcoal); margin-bottom: 15px;">Partner 2</h4>
+                <div class="form-grid" style="margin-bottom: 20px;">
+                    <div class="form-field">
+                        <label class="input-label" for="person2FirstName">First Name *</label>
+                        <input type="text" id="person2FirstName" placeholder="First name" class="name-input" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="input-label" for="person2LastName">Last Name *</label>
+                        <input type="text" id="person2LastName" placeholder="Last name" class="name-input" required>
+                    </div>
                 </div>
 
                 <!-- Partner Email Inputs -->
                 <h4 style="color: var(--petra-charcoal); margin-bottom: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e5e7eb;">Where should we send results?</h4>
                 <div style="margin-bottom: 15px;">
-                    <label class="input-label" for="partnerAEmail"><span id="partnerAEmailLabel">Partner A</span> Email *</label>
+                    <label class="input-label" for="partnerAEmail"><span id="partnerAEmailLabel">Partner 1</span> Email *</label>
                     <input type="email" id="partnerAEmail" placeholder="partner1@example.com" class="name-input" required>
                 </div>
                 <div style="margin-bottom: 10px;">
-                    <label class="input-label" for="partnerBEmail"><span id="partnerBEmailLabel">Partner B</span> Email (optional)</label>
+                    <label class="input-label" for="partnerBEmail"><span id="partnerBEmailLabel">Partner 2</span> Email (optional)</label>
                     <input type="email" id="partnerBEmail" placeholder="partner2@example.com" class="name-input">
                 </div>
                 <p id="coupleEmailHelperText" class="couple-email-helper" style="font-size: 0.85rem; color: #6b7280; margin-bottom: 20px; line-height: 1.4;">
@@ -173,12 +190,6 @@
                 <p>Both partners have completed the assessment. Below you'll see each person's results, followed by a comparison of how you align.</p>
             </div>
 
-            <!-- How to Think About These Results (shown above tabs in both modes) -->
-            <div id="resultsIntroduction" class="insight-section results-intro" style="display: none;">
-                <h3>How to Think About These Results</h3>
-                <p id="resultsIntroText"></p>
-            </div>
-
             <!-- Couple Mode: Partner Selector with Label -->
             <div id="coupleTabsWrapper" class="couple-tabs-wrapper" style="display: none;">
                 <p class="viewing-results-label">Viewing results for:</p>
@@ -190,6 +201,12 @@
                         <span id="tab2Name">Person 2</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- How to Think About These Results -->
+            <div id="resultsIntroduction" class="insight-section results-intro" style="display: none;">
+                <h3>How to Think About These Results</h3>
+                <p id="resultsIntroText"></p>
             </div>
 
             <!-- Couple Mode: Tab Content Containers -->

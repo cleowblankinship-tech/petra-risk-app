@@ -824,17 +824,12 @@ function renderCoupleAdvisorBody({ client, person1Scores, person2Scores, person1
                     </tr>
                     <tr>
                         <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
-                            <strong>Account Holder:</strong> ${client.firstName} ${client.lastName}
+                            <strong>Partner 1:</strong> ${client.person1FullName || client.person1Name || 'Partner A'} (${client.partnerAEmail || client.email})
                         </td>
                     </tr>
                     <tr>
                         <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
-                            <strong>Partner 1:</strong> ${client.person1Name || 'Partner A'} (${client.partnerAEmail || client.email})
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding-bottom: 8px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.5; color: ${EMAIL_COLORS.darkText};">
-                            <strong>Partner 2:</strong> ${client.person2Name || 'Partner B'} ${client.partnerBEmail ? `(${client.partnerBEmail})` : ''}
+                            <strong>Partner 2:</strong> ${client.person2FullName || client.person2Name || 'Partner B'} ${client.partnerBEmail ? `(${client.partnerBEmail})` : '(${client.partnerAEmail || client.email})'}
                         </td>
                     </tr>
                     <tr>
@@ -856,7 +851,7 @@ function renderCoupleAdvisorBody({ client, person1Scores, person2Scores, person1
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                         <td align="center" style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px;">
-                            ${client.person1Name || 'Partner A'}
+                            ${client.person1FullName || client.person1Name || 'Partner A'}
                         </td>
                     </tr>
                     <tr>
@@ -898,7 +893,7 @@ function renderCoupleAdvisorBody({ client, person1Scores, person2Scores, person1
 
   // Partner 1 Flags (if any)
   if (person1Flags && person1Flags.length > 0) {
-    bodyHtml += renderFlagsSection(person1Flags, `${client.person1Name || 'Partner A'}'s Behavioral Flags`);
+    bodyHtml += renderFlagsSection(person1Flags, `${client.person1FullName || client.person1Name || 'Partner A'}'s Behavioral Flags`);
   }
 
   // Partner 2 Results Card
@@ -909,7 +904,7 @@ function renderCoupleAdvisorBody({ client, person1Scores, person2Scores, person1
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                         <td align="center" style="padding-bottom: 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; color: ${EMAIL_COLORS.darkText}; text-transform: uppercase; letter-spacing: 1px;">
-                            ${client.person2Name || 'Partner B'}
+                            ${client.person2FullName || client.person2Name || 'Partner B'}
                         </td>
                     </tr>
                     <tr>
@@ -951,7 +946,7 @@ function renderCoupleAdvisorBody({ client, person1Scores, person2Scores, person1
 
   // Partner 2 Flags (if any)
   if (person2Flags && person2Flags.length > 0) {
-    bodyHtml += renderFlagsSection(person2Flags, `${client.person2Name || 'Partner B'}'s Behavioral Flags`);
+    bodyHtml += renderFlagsSection(person2Flags, `${client.person2FullName || client.person2Name || 'Partner B'}'s Behavioral Flags`);
   }
 
   // Couple Comparison Section
@@ -1251,6 +1246,8 @@ This assessment is for internal use only.
 
 // Couple-specific text body for advisor email
 function renderCoupleAdvisorTextBody({ client, meta, person1Scores, person2Scores, person1Flags, person2Flags, scores }) {
+  const person1FullName = client.person1FullName || client.person1Name || 'Partner A';
+  const person2FullName = client.person2FullName || client.person2Name || 'Partner B';
   const person1Name = client.person1Name || 'Partner A';
   const person2Name = client.person2Name || 'Partner B';
   const scoreDelta = Math.abs(person1Scores.overall - person2Scores.overall);
@@ -1272,9 +1269,8 @@ Petra Financial Advisors
 
 COUPLE ASSESSMENT
 
-Account Holder: ${client.firstName} ${client.lastName}
-Partner 1: ${person1Name} (${client.partnerAEmail || client.email})
-Partner 2: ${person2Name} ${client.partnerBEmail ? `(${client.partnerBEmail})` : ''}
+Partner 1: ${person1FullName} (${client.partnerAEmail || client.email})
+Partner 2: ${person2FullName} ${client.partnerBEmail ? `(${client.partnerBEmail})` : `(${client.partnerAEmail || client.email})`}
 Submitted: ${meta.timestamp}
 
 ───────────────────────────────────────────────────────────
@@ -1412,6 +1408,8 @@ www.petrafinancial.com
 function generateCoupleAdvisorPDFContent(payload) {
   const { client, meta, person1Scores, person2Scores, person1Answers, person2Answers, person1Flags, person2Flags, scores } = payload;
 
+  const person1FullName = client.person1FullName || client.person1Name || 'Partner A';
+  const person2FullName = client.person2FullName || client.person2Name || 'Partner B';
   const person1Name = client.person1Name || 'Partner A';
   const person2Name = client.person2Name || 'Partner B';
   const scoreDelta = Math.abs(person1Scores.overall - person2Scores.overall);
@@ -1435,15 +1433,14 @@ function generateCoupleAdvisorPDFContent(payload) {
 COUPLE INFORMATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Account Holder:     ${client.firstName} ${client.lastName}
-Partner 1:          ${person1Name} (${client.partnerAEmail || client.email})
-Partner 2:          ${person2Name} ${client.partnerBEmail ? `(${client.partnerBEmail})` : ''}
+Partner 1:          ${person1FullName} (${client.partnerAEmail || client.email})
+Partner 2:          ${person2FullName} ${client.partnerBEmail ? `(${client.partnerBEmail})` : `(${client.partnerAEmail || client.email})`}
 Submitted:          ${meta.timestamp}
 Session ID:         ${meta.sessionId || 'N/A'}
 
 
 ═══════════════════════════════════════════════════════════════════
-   ${person1Name.toUpperCase()}'S ASSESSMENT
+   ${person1FullName.toUpperCase()}'S ASSESSMENT
 ═══════════════════════════════════════════════════════════════════
 
 RISK ALIGNMENT SCORE
@@ -1473,7 +1470,7 @@ ${formatAnswersForPDF(person1Answers)}
 
 
 ═══════════════════════════════════════════════════════════════════
-   ${person2Name.toUpperCase()}'S ASSESSMENT
+   ${person2FullName.toUpperCase()}'S ASSESSMENT
 ═══════════════════════════════════════════════════════════════════
 
 RISK ALIGNMENT SCORE
@@ -1723,7 +1720,7 @@ module.exports = async (req, res) => {
         person2Flags: payload.person2Flags || [],
         meta: payload.meta
       });
-      advisorSubtitle = `${payload.client.person1Name || 'Partner A'} & ${payload.client.person2Name || 'Partner B'} have completed their couple assessment.`;
+      advisorSubtitle = `${payload.client.person1FullName || payload.client.person1Name || 'Partner A'} & ${payload.client.person2FullName || payload.client.person2Name || 'Partner B'} have completed their couple assessment.`;
     } else {
       // Solo assessment: use the standard advisor body
       advisorBodyHtml = renderAdvisorBody({
@@ -1837,7 +1834,7 @@ module.exports = async (req, res) => {
         console.log('[sendResults] Sending advisor email...');
         try {
           const advisorSubject = payload.couple
-            ? `Couple Risk Assessment – ${payload.client.person1Name} & ${payload.client.person2Name} (${payload.client.firstName} ${payload.client.lastName})`
+            ? `Couple Risk Assessment – ${payload.client.person1FullName || payload.client.person1Name} & ${payload.client.person2FullName || payload.client.person2Name}`
             : `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${payload.scores.overall} – ${payload.scores.band}`;
 
           // Generate the detailed Q&A attachment content

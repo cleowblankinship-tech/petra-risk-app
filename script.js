@@ -19,6 +19,10 @@ let person2Flags = null;    // Store person 2's flags
 let currentPerson = 1;
 let person1Name = '';
 let person2Name = '';
+let person1FirstName = '';
+let person1LastName = '';
+let person2FirstName = '';
+let person2LastName = '';
 let partnerAEmail = '';
 let partnerBEmail = '';
 
@@ -468,7 +472,7 @@ const questions = {
             weight: 0.20
         },
         {
-            q: "Choose between: A) 6% avg return with a 20% worst year; B) 9% avg return with a 35% worst year. How likely are you to choose B?",
+            q: "Choose between: A) 6% average annual return with a −20% worst year; B) 9% average annual return with a −35% worst year. How likely are you to choose B?",
             type: "likert",
             name: "rewardStability",
             labels: ["Definitely A", "Probably A", "Unsure", "Probably B", "Definitely B"],
@@ -524,7 +528,7 @@ const questions = {
             labels: ["Not confident", "Slightly", "Moderately", "Confident", "Very confident"]
         },
         {
-            q: "Over a 20-year period, which investment best protects purchasing power?",
+            q: "Over a 20-year period, which approach has historically been most effective at protecting purchasing power for most investors?",
             type: "radio",
             name: "kn_q1",
             opts: ["Savings account paying 2%", "A diversified portfolio", "Cash kept in a safe", "Certificate of Deposit (CD)", "Just stocks"],
@@ -553,7 +557,7 @@ const questions = {
             name: "kn_q4",
             opts: [
                 "Sell quickly before more losses",
-                "Large short-term swings are normal long term",
+                "Market volatility, including sharp short-term declines, is a normal part of long-term investing",
                 "Market won't recover",
                 "Do what most investors are doing"
             ],
@@ -859,9 +863,9 @@ window.startCouple = function() {
         coupleNamesEl.style.display = 'block';
         console.log('[startCouple] Set display to block');
 
-        // Update email labels when names change
-        var person1NameInput = document.getElementById('person1Name');
-        var person2NameInput = document.getElementById('person2Name');
+        // Update email labels when first names change
+        var p1FirstInput = document.getElementById('person1FirstName');
+        var p2FirstInput = document.getElementById('person2FirstName');
         var partnerALabel = document.getElementById('partnerAEmailLabel');
         var partnerBLabel = document.getElementById('partnerBEmailLabel');
         var partnerBEmailInput = document.getElementById('partnerBEmail');
@@ -869,8 +873,8 @@ window.startCouple = function() {
         var helperText = document.getElementById('coupleEmailHelperText');
 
         function updateEmailLabels() {
-            var name1 = person1NameInput.value.trim() || 'Partner A';
-            var name2 = person2NameInput.value.trim() || 'Partner B';
+            var name1 = p1FirstInput.value.trim() || 'Partner 1';
+            var name2 = p2FirstInput.value.trim() || 'Partner 2';
             if (partnerALabel) partnerALabel.textContent = name1;
             if (partnerBLabel) partnerBLabel.textContent = name2;
         }
@@ -888,11 +892,11 @@ window.startCouple = function() {
             }
         }
 
-        if (person1NameInput) {
-            person1NameInput.addEventListener('input', updateEmailLabels);
+        if (p1FirstInput) {
+            p1FirstInput.addEventListener('input', updateEmailLabels);
         }
-        if (person2NameInput) {
-            person2NameInput.addEventListener('input', updateEmailLabels);
+        if (p2FirstInput) {
+            p2FirstInput.addEventListener('input', updateEmailLabels);
         }
         if (partnerBEmailInput) {
             partnerBEmailInput.addEventListener('input', updateEmailNotice);
@@ -910,13 +914,24 @@ window.startCouple = function() {
 // ============================================================================
 
 window.beginCoupleAssessment = function() {
-    person1Name = document.getElementById('person1Name').value.trim();
-    person2Name = document.getElementById('person2Name').value.trim();
+    // Collect full legal names for both partners
+    person1FirstName = document.getElementById('person1FirstName').value.trim();
+    person1LastName = document.getElementById('person1LastName').value.trim();
+    person2FirstName = document.getElementById('person2FirstName').value.trim();
+    person2LastName = document.getElementById('person2LastName').value.trim();
 
-    if (!person1Name || !person2Name) {
-        alert('Please enter both names to continue.');
+    if (!person1FirstName || !person1LastName) {
+        alert('Please enter Partner 1\'s full name (first and last).');
         return;
     }
+    if (!person2FirstName || !person2LastName) {
+        alert('Please enter Partner 2\'s full name (first and last).');
+        return;
+    }
+
+    // Set display names (first name only for UI, full names stored separately)
+    person1Name = person1FirstName;
+    person2Name = person2FirstName;
 
     // Validate and store partner emails
     var partnerAEmailInput = document.getElementById('partnerAEmail');
@@ -928,74 +943,42 @@ window.beginCoupleAssessment = function() {
 
     // Partner A email is required
     if (!partnerAEmail) {
-        alert('Please enter an email address for ' + person1Name + '.');
+        alert('Please enter an email address for ' + person1FirstName + '.');
         if (partnerAEmailInput) partnerAEmailInput.focus();
         return;
     }
 
     // Validate Partner A email format
     if (!emailRegex.test(partnerAEmail)) {
-        alert('Please enter a valid email address for ' + person1Name + '.');
+        alert('Please enter a valid email address for ' + person1FirstName + '.');
         if (partnerAEmailInput) partnerAEmailInput.focus();
         return;
     }
 
     // Partner B email is optional, but if provided must be valid
     if (partnerBEmail && !emailRegex.test(partnerBEmail)) {
-        alert('Please enter a valid email address for ' + person2Name + ', or leave it blank.');
+        alert('Please enter a valid email address for ' + person2FirstName + ', or leave it blank.');
         if (partnerBEmailInput) partnerBEmailInput.focus();
         return;
     }
 
     isCoupleMode = true;
     currentPerson = 1;
-    document.getElementById('couplesSetup').style.display = 'none';
-    document.getElementById('clientInfoSection').style.display = 'block';
 
-    // Pre-populate the client email with Partner A's email and hide the email field
+    // Auto-populate hidden client info fields from partner data (no household name page)
+    var clientFirstNameField = document.getElementById('clientFirstName');
+    var clientLastNameField = document.getElementById('clientLastName');
     var clientEmailField = document.getElementById('clientEmail');
-    var clientEmailContainer = clientEmailField ? clientEmailField.closest('.form-field') : null;
-    if (clientEmailField) {
-        clientEmailField.value = partnerAEmail;
-    }
-    if (clientEmailContainer) {
-        clientEmailContainer.style.display = 'none';
-    }
+    var wantsCopyCheckbox = document.getElementById('wantsCopyCheckbox');
 
-    // Hide the "Email me my results" checkbox in couple mode (we handle this differently)
-    var wantsCopyContainer = document.getElementById('wantsCopyCheckbox');
-    if (wantsCopyContainer) {
-        var checkboxContainer = wantsCopyContainer.closest('.form-field');
-        if (checkboxContainer) {
-            checkboxContainer.style.display = 'none';
-        }
-        // In couple mode, always send results (we collected emails specifically for this)
-        wantsCopyContainer.checked = true;
-    }
+    if (clientFirstNameField) clientFirstNameField.value = person1FirstName;
+    if (clientLastNameField) clientLastNameField.value = person1LastName;
+    if (clientEmailField) clientEmailField.value = partnerAEmail;
+    if (wantsCopyCheckbox) wantsCopyCheckbox.checked = true;
 
-    // Update section subtitle for couple mode
-    var sectionSubtitle = document.querySelector('#clientInfoSection .section-subtitle');
-    if (sectionSubtitle) {
-        sectionSubtitle.textContent = 'Enter a household contact name for our records.';
-    }
-
-    // Add continue button handler
-    const continueBtn = document.getElementById('continueToQuestions');
-    if (continueBtn) {
-        continueBtn.onclick = function() {
-            // Validate client info (only name fields in couple mode)
-            const firstName = document.getElementById('clientFirstName').value.trim();
-            const lastName = document.getElementById('clientLastName').value.trim();
-
-            if (!firstName || !lastName) {
-                alert('Please fill in the household contact name.');
-                return;
-            }
-
-            // Start questionnaire
-            startQuestionnaire();
-        };
-    }
+    // Skip clientInfoSection entirely — go straight to questionnaire
+    document.getElementById('couplesSetup').style.display = 'none';
+    startQuestionnaire();
 };
 
 window.startPerson2 = function() {
@@ -1816,12 +1799,6 @@ function generateIndividualResultsHTML(personData, personName) {
 
     var html = '';
 
-    // Results Introduction
-    html += '<div class="insight-section results-intro" style="display: block;">';
-    html += '<h3>How to Think About These Results</h3>';
-    html += '<p>' + generateResultsIntroduction() + '</p>';
-    html += '</div>';
-
     // Main Score Display
     html += '<div class="score-display">';
     html += '<div class="risk-band ' + rbClass + '">' + riskBand + '</div>';
@@ -1949,6 +1926,14 @@ function displayCoupleResults() {
     if (coupleTabsWrapper) coupleTabsWrapper.style.display = 'block';
     document.getElementById('coupleTabs').style.display = 'flex';
     document.getElementById('coupleTabContent').style.display = 'block';
+
+    // Show shared "How to Think About These Results" between tabs and content
+    var resultsIntro = document.getElementById('resultsIntroduction');
+    if (resultsIntro) {
+        resultsIntro.style.display = 'block';
+        var introText = document.getElementById('resultsIntroText');
+        if (introText) introText.textContent = generateResultsIntroduction();
+    }
 
     // Set tab names
     document.getElementById('tab1Name').textContent = person1Name;

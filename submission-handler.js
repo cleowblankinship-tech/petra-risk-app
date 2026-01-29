@@ -58,12 +58,23 @@ async function submitToBackend() {
             wantsCopy: document.getElementById('wantsCopyCheckbox')?.checked || false
         };
 
-        // In couple mode, add partner-specific email info
+        // In couple mode, add partner-specific info with full legal names
         if (isCoupleMode) {
             clientInfo.partnerAEmail = partnerAEmail || '';
             clientInfo.partnerBEmail = partnerBEmail || '';
-            clientInfo.person1Name = person1Name || '';
-            clientInfo.person2Name = person2Name || '';
+            clientInfo.person1Name = person1FirstName || '';
+            clientInfo.person2Name = person2FirstName || '';
+            clientInfo.person1FullName = (person1FirstName + ' ' + person1LastName).trim() || '';
+            clientInfo.person2FullName = (person2FirstName + ' ' + person2LastName).trim() || '';
+            // Derive household label from both partners' last names
+            if (person1LastName === person2LastName) {
+                clientInfo.firstName = person1FirstName + ' & ' + person2FirstName;
+                clientInfo.lastName = person1LastName;
+            } else {
+                clientInfo.firstName = person1FirstName;
+                clientInfo.lastName = person1LastName + ' & ' + person2FirstName + ' ' + person2LastName;
+            }
+            clientInfo.email = partnerAEmail;
             // Always send emails in couple mode (we collected them for this purpose)
             clientInfo.wantsCopy = true;
         }
