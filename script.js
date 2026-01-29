@@ -528,7 +528,7 @@ const questions = {
             labels: ["Not confident", "Slightly", "Moderately", "Confident", "Very confident"]
         },
         {
-            q: "Over a 20-year period, which approach has historically been most effective at protecting purchasing power for most investors?",
+            q: "Over a 20-year period, which approach has historically been most effective at protecting purchasing power for most investors in practice?",
             type: "radio",
             name: "kn_q1",
             opts: ["Savings account paying 2%", "A diversified portfolio", "Cash kept in a safe", "Certificate of Deposit (CD)", "Just stocks"],
@@ -557,7 +557,7 @@ const questions = {
             name: "kn_q4",
             opts: [
                 "Sell quickly before more losses",
-                "Market volatility, including sharp short-term declines, is a normal part of long-term investing",
+                "Market swings are expected over the long term",
                 "Market won't recover",
                 "Do what most investors are doing"
             ],
