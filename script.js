@@ -528,7 +528,7 @@ const questions = {
             labels: ["Not confident", "Slightly", "Moderately", "Confident", "Very confident"]
         },
         {
-            q: "Over a 20-year period, which approach has historically been most effective at protecting purchasing power for most investors in practice?",
+            q: "Over a 20-year period, which approach has historically been most effective at protecting purchasing power?",
             type: "radio",
             name: "kn_q1",
             opts: ["Savings account paying 2%", "Gold", "Cash kept in a safe", "Certificate of Deposit (CD)", "Just stocks"],
