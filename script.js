@@ -531,9 +531,9 @@ const questions = {
             q: "Over a 20-year period, which approach has historically been most effective at protecting purchasing power for most investors in practice?",
             type: "radio",
             name: "kn_q1",
-            opts: ["Savings account paying 2%", "A diversified portfolio", "Cash kept in a safe", "Certificate of Deposit (CD)", "Just stocks"],
+            opts: ["Savings account paying 2%", "Gold", "Cash kept in a safe", "Certificate of Deposit (CD)", "Just stocks"],
             vals: ["A", "B", "C", "D", "E"],
-            correct: "B"
+            correct: "E"
         },
         {
             q: "Which best describes diversification?",
