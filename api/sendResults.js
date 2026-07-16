@@ -147,7 +147,7 @@ function generatePlanningRelevance() {
 // Build a Postmark attachment object containing the polished results PDF for a
 // single person. Returns null if PDF generation fails so callers can fall back
 // to the plain-text summary (the email itself is never blocked by a PDF error).
-async function buildResultsPdfAttachment(fullName, personScores, personAnswers, traditionalScores) {
+async function buildResultsPdfAttachment(fullName, personScores, personAnswers, traditionalScores, includeAnswers) {
   try {
     const narratives = {
       overallSummary: generateOverallSummary(personScores),
@@ -162,11 +162,15 @@ async function buildResultsPdfAttachment(fullName, personScores, personAnswers, 
       riskBandColor: getRiskBandColor(personScores.overall),
       riskBandTextColor: getRiskBandTextColor(personScores.overall),
       narratives,
-      answers: personAnswers || []
+      answers: personAnswers || [],
+      includeAnswers: includeAnswers !== false
     });
 
+    // Advisor copy (with full Q&A) is labeled to distinguish it from the
+    // client-facing summary they may forward.
     const nameSafe = String(fullName || 'Client').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const filename = `Petra_Risk_Assessment_${nameSafe}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const suffix = includeAnswers === false ? '' : '_Advisor';
+    const filename = `Petra_Risk_Assessment_${nameSafe}${suffix}_${new Date().toISOString().split('T')[0]}.pdf`;
 
     return {
       Name: filename,
@@ -1874,23 +1878,25 @@ module.exports = async (req, res) => {
         // Generate the polished, client-ready results PDF(s) once, then reuse
         // the same attachment(s) across the advisor and client emails.
         // ====================================================================
+        // Two variants per person:
+        //   - Advisor copy: full analysis + complete client answers.
+        //   - Client copy:  analysis only (no answers).
         console.log('[sendResults] Generating polished results PDF(s)...');
-        let soloPdfAttachment = null;
-        let person1PdfAttachment = null;
-        let person2PdfAttachment = null;
+        let soloAdvisorPdf = null, soloClientPdf = null;
+        let p1AdvisorPdf = null, p1ClientPdf = null;
+        let p2AdvisorPdf = null, p2ClientPdf = null;
 
         if (payload.couple && payload.person1Scores && payload.person2Scores) {
           const p1Name = payload.client.person1FullName || payload.client.person1Name || 'Partner A';
           const p2Name = payload.client.person2FullName || payload.client.person2Name || 'Partner B';
-          person1PdfAttachment = await buildResultsPdfAttachment(p1Name, payload.person1Scores, payload.person1Answers, {});
-          person2PdfAttachment = await buildResultsPdfAttachment(p2Name, payload.person2Scores, payload.person2Answers, {});
+          p1AdvisorPdf = await buildResultsPdfAttachment(p1Name, payload.person1Scores, payload.person1Answers, {}, true);
+          p2AdvisorPdf = await buildResultsPdfAttachment(p2Name, payload.person2Scores, payload.person2Answers, {}, true);
+          p1ClientPdf = await buildResultsPdfAttachment(p1Name, payload.person1Scores, payload.person1Answers, {}, false);
+          p2ClientPdf = await buildResultsPdfAttachment(p2Name, payload.person2Scores, payload.person2Answers, {}, false);
         } else {
-          soloPdfAttachment = await buildResultsPdfAttachment(
-            `${payload.client.firstName} ${payload.client.lastName}`,
-            payload.scores,
-            payload.answers,
-            payload.traditionalScores
-          );
+          const soloName = `${payload.client.firstName} ${payload.client.lastName}`;
+          soloAdvisorPdf = await buildResultsPdfAttachment(soloName, payload.scores, payload.answers, payload.traditionalScores, true);
+          soloClientPdf = await buildResultsPdfAttachment(soloName, payload.scores, payload.answers, payload.traditionalScores, false);
         }
 
         // Send advisor email
@@ -1904,10 +1910,10 @@ module.exports = async (req, res) => {
           // so the advisor always receives the full detail even if a PDF fails.
           const advisorAttachments = [];
           if (payload.couple) {
-            if (person1PdfAttachment) advisorAttachments.push(person1PdfAttachment);
-            if (person2PdfAttachment) advisorAttachments.push(person2PdfAttachment);
-          } else if (soloPdfAttachment) {
-            advisorAttachments.push(soloPdfAttachment);
+            if (p1AdvisorPdf) advisorAttachments.push(p1AdvisorPdf);
+            if (p2AdvisorPdf) advisorAttachments.push(p2AdvisorPdf);
+          } else if (soloAdvisorPdf) {
+            advisorAttachments.push(soloAdvisorPdf);
           }
 
           if (advisorAttachments.length === 0) {
@@ -1966,7 +1972,7 @@ module.exports = async (req, res) => {
                   Subject: `Thank you, ${person1Name} — Your Petra risk assessment is complete`,
                   HtmlBody: person1Email.html,
                   TextBody: person1Email.text,
-                  Attachments: person1PdfAttachment ? [person1PdfAttachment] : undefined
+                  Attachments: p1ClientPdf ? [p1ClientPdf] : undefined
                 });
                 console.log('[sendResults] ✓ Partner A (Person 1) email sent to', partnerAEmail, ':', p1Message.MessageID);
               } catch (emailError) {
@@ -1981,7 +1987,7 @@ module.exports = async (req, res) => {
                   Subject: `Thank you, ${person2Name} — Your Petra risk assessment is complete`,
                   HtmlBody: person2Email.html,
                   TextBody: person2Email.text,
-                  Attachments: person2PdfAttachment ? [person2PdfAttachment] : undefined
+                  Attachments: p2ClientPdf ? [p2ClientPdf] : undefined
                 });
                 console.log('[sendResults] ✓ Partner B (Person 2) email sent to', partnerBEmail, ':', p2Message.MessageID);
               } catch (emailError) {
@@ -1996,7 +2002,7 @@ module.exports = async (req, res) => {
               const combinedText = generateCombinedCoupleEmailText(person1Name, payload.person1Scores, person2Name, payload.person2Scores);
 
               try {
-                const combinedAttachments = [person1PdfAttachment, person2PdfAttachment].filter(Boolean);
+                const combinedAttachments = [p1ClientPdf, p2ClientPdf].filter(Boolean);
                 const combinedMessage = await client.sendEmail({
                   From: fromEmail,
                   To: partnerAEmail,
@@ -2020,7 +2026,7 @@ module.exports = async (req, res) => {
                 Subject: 'Thank you — Your Petra risk assessment is complete',
                 HtmlBody: clientHTMLBody,
                 TextBody: clientTextBody,
-                Attachments: soloPdfAttachment ? [soloPdfAttachment] : undefined
+                Attachments: soloClientPdf ? [soloClientPdf] : undefined
               });
               console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
             } catch (emailError) {

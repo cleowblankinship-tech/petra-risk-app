@@ -67,6 +67,26 @@ function hexToRgb(hex) {
   return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : COLOR.charcoal;
 }
 
+// Blend an RGB color toward white by t (0..1) — used to dim inactive segments.
+function mixWhite(c, t) {
+  return [
+    Math.round(c[0] + (255 - c[0]) * t),
+    Math.round(c[1] + (255 - c[1]) * t),
+    Math.round(c[2] + (255 - c[2]) * t)
+  ];
+}
+
+// Friendly display names for assessment sections.
+const SECTION_LABELS = {
+  behavioral: 'Investment Mindset',
+  traditional: 'Traditional Risk Assessment',
+  knowledge: 'Investment Knowledge'
+};
+function sectionLabel(section) {
+  const key = String(section || '').toLowerCase();
+  return SECTION_LABELS[key] || section;
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -77,7 +97,8 @@ function generateResultsPDF(opts) {
     riskBandTextColor,
     narratives = {},
     answers = [],
-    introText
+    introText,
+    includeAnswers = true
   } = opts;
 
   const doc = new jsPDF({ unit: 'pt', format: 'letter', compress: true });
@@ -272,12 +293,21 @@ function generateResultsPDF(opts) {
     SCALE.forEach((seg, i) => {
       const isActive = scores.overall >= seg.min && scores.overall <= seg.max;
       const sx = M.left + i * (segW + gap);
-      setFill(isActive ? seg.active : seg.fill);
-      if (isActive) { setDraw(COLOR.gold); doc.setLineWidth(2); }
-      else { setDraw(seg.fill); doc.setLineWidth(0.5); }
-      doc.roundedRect(sx, y, segW, segH, 4, 4, isActive ? 'FD' : 'F');
+      if (isActive) {
+        setFill(seg.fill);
+        setDraw(COLOR.gold);
+        doc.setLineWidth(2);
+        doc.roundedRect(sx, y, segW, segH, 4, 4, 'FD');
+      } else {
+        const dim = mixWhite(seg.fill, 0.62);
+        setFill(dim);
+        setDraw(dim);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(sx, y, segW, segH, 4, 4, 'F');
+      }
       // labels
-      setText(seg.text);
+      const nameColor = isActive ? seg.text : COLOR.muted;
+      setText(nameColor);
       doc.setFont('helvetica', 'bold'); doc.setFontSize(6.3);
       const nameLines = seg.name.split('\n');
       let ny = y + 9;
@@ -302,8 +332,8 @@ function generateResultsPDF(opts) {
     paragraph(body, { gapAfter: 14 });
   });
 
-  // -- Q&A appendix ---------------------------------------------------------
-  if (Array.isArray(answers) && answers.length > 0) {
+  // -- Q&A appendix (advisor copy only) ------------------------------------
+  if (includeAnswers && Array.isArray(answers) && answers.length > 0) {
     doc.addPage();
     y = M.top;
     label('Assessment Detail', { align: 'center', color: COLOR.gold, size: 9, charSpace: 2.5, gapAfter: 6 });
@@ -312,42 +342,51 @@ function generateResultsPDF(opts) {
     y += 26;
     setDraw(COLOR.border); doc.setLineWidth(0.75);
     doc.line(M.left, y, PW - M.right, y);
-    y += 16;
+    y += 18;
 
+    // Draws a section group header (once when the section changes).
+    function sectionGroupHeader(section) {
+      ensureSpace(32);
+      y += 4;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); setText(COLOR.gold);
+      doc.setCharSpace(0.8);
+      doc.text(sectionLabel(section).toUpperCase(), M.left, y, { baseline: 'top' });
+      doc.setCharSpace(0);
+      y += 15;
+      setDraw(COLOR.gold); doc.setLineWidth(1);
+      doc.line(M.left, y, PW - M.right, y);
+      y += 12;
+    }
+
+    let currentSection = null;
     answers.forEach((a, idx) => {
+      const section = a.section ? String(a.section) : '';
       const qText = `${idx + 1}. ${a.text || a.question || 'Question'}`;
       const ansText = a.selectedOption != null ? String(a.selectedOption) : 'No answer provided';
-      const section = a.section ? String(a.section) : '';
 
-      // measure block height for a clean page break
+      if (section && section !== currentSection) {
+        currentSection = section;
+        sectionGroupHeader(section);
+      }
+
+      // measure question + answer for a clean page break
       doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
-      const qLines = doc.splitTextToSize(qText, CW - (section ? 0 : 0));
+      const qLines = doc.splitTextToSize(qText, CW);
       doc.setFont('times', 'normal'); doc.setFontSize(9.5);
       const aLines = doc.splitTextToSize(ansText, CW - 14);
-      const blockH = (section ? 14 : 0) + qLines.length * (9.5 * 1.32) + 4 + aLines.length * (9.5 * 1.4) + 14;
+      const blockH = qLines.length * (9.5 * 1.32) + 4 + aLines.length * (9.5 * 1.4) + 12;
       ensureSpace(blockH);
 
-      if (section) {
-        // section badge
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setCharSpace(0.5);
-        const bw = doc.getTextWidth(section.toUpperCase()) + 12;
-        setFill(COLOR.gold);
-        doc.roundedRect(M.left, y, bw, 12, 2, 2, 'F');
-        setText(COLOR.white);
-        doc.text(section.toUpperCase(), M.left + bw / 2, y + 6, { baseline: 'middle', align: 'center' });
-        doc.setCharSpace(0);
-        y += 18;
-      }
       doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); setText(COLOR.charcoal);
       qLines.forEach((line) => { doc.text(line, M.left, y, { baseline: 'top' }); y += 9.5 * 1.32; });
       y += 4;
       // answer with gold left rule
-      setDraw(COLOR.gold); doc.setLineWidth(2);
       const aStartY = y;
       doc.setFont('times', 'normal'); doc.setFontSize(9.5); setText(COLOR.body);
       aLines.forEach((line) => { doc.text(line, M.left + 14, y, { baseline: 'top' }); y += 9.5 * 1.4; });
-      doc.line(M.left, aStartY, M.left, y - 9.5 * 0.4);
-      y += 14;
+      setDraw(COLOR.gold); doc.setLineWidth(2);
+      doc.line(M.left, aStartY + 1, M.left, y - 9.5 * 0.4);
+      y += 12;
     });
   }
 
