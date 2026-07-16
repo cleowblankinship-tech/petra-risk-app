@@ -9,12 +9,7 @@
   ],
   "functions": {
     "api/sendResults.js": {
-      "maxDuration": 60,
-      "memory": 1024
-    },
-    "api/pdfHealth.js": {
-      "maxDuration": 60,
-      "memory": 1024
+      "maxDuration": 30
     }
   }
 }

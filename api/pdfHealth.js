@@ -14,19 +14,12 @@ module.exports = async (req, res) => {
   const info = {
     node: process.version,
     platform: process.platform,
-    arch: process.arch
+    arch: process.arch,
+    generator: 'jspdf'
   };
 
-  // Report how the Chromium executable path resolves (a common failure point).
   try {
-    const chromium = require('@sparticuz/chromium');
-    info.chromiumExecutablePath = await chromium.executablePath();
-  } catch (e) {
-    info.chromiumResolveError = e.message;
-  }
-
-  try {
-    const buf = await generateResultsPDF({
+    const buf = generateResultsPDF({
       scores: { overall: 50, band: 'Balanced', behavioral: 30, traditional: 20 },
       riskBandColor: '#7EADAD',
       riskBandTextColor: '#FFFFFF',
