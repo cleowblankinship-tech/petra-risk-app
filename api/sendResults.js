@@ -4,6 +4,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { generateResultsPDF } = require('./generatePDF');
 
 // Helper to generate a secure token
 function generateToken() {
@@ -137,6 +138,45 @@ function generateAlignmentCheck(data) {
 
 function generatePlanningRelevance() {
   return 'We don\'t build portfolios by plugging your score into a formula. This assessment gives us insight into how you think, what matters to you, and where friction might show up between your goals and your comfort level. Petra will use these results to frame conversations about portfolio structure: not just what you should own, but why, and how it works in different market conditions. It also helps calibrate communication. Some clients want detailed explanations when markets drop. Others prefer to trust the plan and not hear much. Some need reassurance during volatility. Others want to talk about opportunities. Knowing your tendencies helps us support you the right way at the right time. This also shapes practical calls: how much cash to keep accessible, when to rebalance, how to set up accounts for tax efficiency, and when to revisit your strategy as life shifts. But none of this is automatic. Petra will talk through these decisions with you, not for you.';
+}
+
+// ============================================================================
+// POLISHED PDF ATTACHMENT (client-ready, rendered from HTML template)
+// ============================================================================
+
+// Build a Postmark attachment object containing the polished results PDF for a
+// single person. Returns null if PDF generation fails so callers can fall back
+// to the plain-text summary (the email itself is never blocked by a PDF error).
+async function buildResultsPdfAttachment(fullName, personScores, personAnswers, traditionalScores) {
+  try {
+    const narratives = {
+      overallSummary: generateOverallSummary(personScores),
+      mindsetInsight: generateMindsetInsight(personScores),
+      traditionalInsight: generateTraditionalInsight(personScores, traditionalScores || {}),
+      alignmentCheck: generateAlignmentCheck(personScores),
+      planningRelevance: generatePlanningRelevance()
+    };
+
+    const pdfBuffer = await generateResultsPDF({
+      scores: personScores,
+      riskBandColor: getRiskBandColor(personScores.overall),
+      riskBandTextColor: getRiskBandTextColor(personScores.overall),
+      narratives,
+      answers: personAnswers || []
+    });
+
+    const nameSafe = String(fullName || 'Client').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filename = `Petra_Risk_Assessment_${nameSafe}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    return {
+      Name: filename,
+      Content: pdfBuffer.toString('base64'),
+      ContentType: 'application/pdf'
+    };
+  } catch (err) {
+    console.error('[sendResults] ✗ PDF generation failed:', err.message);
+    return null;
+  }
 }
 
 // ============================================================================
@@ -1830,6 +1870,29 @@ module.exports = async (req, res) => {
         if (!advisorEmail) console.error('[sendResults]   - ADVISOR_EMAIL is not set');
         console.log('[sendResults] ⚠ Skipping email sending due to missing configuration');
       } else {
+        // ====================================================================
+        // Generate the polished, client-ready results PDF(s) once, then reuse
+        // the same attachment(s) across the advisor and client emails.
+        // ====================================================================
+        console.log('[sendResults] Generating polished results PDF(s)...');
+        let soloPdfAttachment = null;
+        let person1PdfAttachment = null;
+        let person2PdfAttachment = null;
+
+        if (payload.couple && payload.person1Scores && payload.person2Scores) {
+          const p1Name = payload.client.person1FullName || payload.client.person1Name || 'Partner A';
+          const p2Name = payload.client.person2FullName || payload.client.person2Name || 'Partner B';
+          person1PdfAttachment = await buildResultsPdfAttachment(p1Name, payload.person1Scores, payload.person1Answers, {});
+          person2PdfAttachment = await buildResultsPdfAttachment(p2Name, payload.person2Scores, payload.person2Answers, {});
+        } else {
+          soloPdfAttachment = await buildResultsPdfAttachment(
+            `${payload.client.firstName} ${payload.client.lastName}`,
+            payload.scores,
+            payload.answers,
+            payload.traditionalScores
+          );
+        }
+
         // Send advisor email
         console.log('[sendResults] Sending advisor email...');
         try {
@@ -1837,11 +1900,26 @@ module.exports = async (req, res) => {
             ? `Couple Risk Assessment – ${payload.client.person1FullName || payload.client.person1Name} & ${payload.client.person2FullName || payload.client.person2Name}`
             : `Risk Assessment – ${payload.client.firstName} ${payload.client.lastName} – ${payload.scores.overall} – ${payload.scores.band}`;
 
-          // Generate the detailed Q&A attachment content
-          const attachmentContent = generateAdvisorPDFContent(payload);
-          const attachmentBase64 = Buffer.from(attachmentContent, 'utf-8').toString('base64');
-          const clientNameSafe = `${payload.client.firstName}_${payload.client.lastName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-          const attachmentFilename = `Risk_Assessment_${clientNameSafe}_${new Date().toISOString().split('T')[0]}.txt`;
+          // Prefer the polished PDF(s); fall back to the plain-text Q&A summary
+          // so the advisor always receives the full detail even if a PDF fails.
+          const advisorAttachments = [];
+          if (payload.couple) {
+            if (person1PdfAttachment) advisorAttachments.push(person1PdfAttachment);
+            if (person2PdfAttachment) advisorAttachments.push(person2PdfAttachment);
+          } else if (soloPdfAttachment) {
+            advisorAttachments.push(soloPdfAttachment);
+          }
+
+          if (advisorAttachments.length === 0) {
+            console.log('[sendResults] ⚠ Falling back to text attachment (PDF unavailable)');
+            const attachmentContent = generateAdvisorPDFContent(payload);
+            const clientNameSafe = `${payload.client.firstName}_${payload.client.lastName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+            advisorAttachments.push({
+              Name: `Risk_Assessment_${clientNameSafe}_${new Date().toISOString().split('T')[0]}.txt`,
+              Content: Buffer.from(attachmentContent, 'utf-8').toString('base64'),
+              ContentType: 'text/plain'
+            });
+          }
 
           const advisorMessage = await client.sendEmail({
             From: fromEmail,
@@ -1849,11 +1927,7 @@ module.exports = async (req, res) => {
             Subject: advisorSubject,
             HtmlBody: advisorHTMLBody,
             TextBody: advisorTextBody,
-            Attachments: [{
-              Name: attachmentFilename,
-              Content: attachmentBase64,
-              ContentType: 'text/plain'
-            }]
+            Attachments: advisorAttachments
           });
           console.log('[sendResults] ✓ Advisor email sent successfully:', advisorMessage.MessageID);
         } catch (emailError) {
@@ -1891,7 +1965,8 @@ module.exports = async (req, res) => {
                   To: partnerAEmail,
                   Subject: `Thank you, ${person1Name} — Your Petra risk assessment is complete`,
                   HtmlBody: person1Email.html,
-                  TextBody: person1Email.text
+                  TextBody: person1Email.text,
+                  Attachments: person1PdfAttachment ? [person1PdfAttachment] : undefined
                 });
                 console.log('[sendResults] ✓ Partner A (Person 1) email sent to', partnerAEmail, ':', p1Message.MessageID);
               } catch (emailError) {
@@ -1905,7 +1980,8 @@ module.exports = async (req, res) => {
                   To: partnerBEmail,
                   Subject: `Thank you, ${person2Name} — Your Petra risk assessment is complete`,
                   HtmlBody: person2Email.html,
-                  TextBody: person2Email.text
+                  TextBody: person2Email.text,
+                  Attachments: person2PdfAttachment ? [person2PdfAttachment] : undefined
                 });
                 console.log('[sendResults] ✓ Partner B (Person 2) email sent to', partnerBEmail, ':', p2Message.MessageID);
               } catch (emailError) {
@@ -1920,12 +1996,14 @@ module.exports = async (req, res) => {
               const combinedText = generateCombinedCoupleEmailText(person1Name, payload.person1Scores, person2Name, payload.person2Scores);
 
               try {
+                const combinedAttachments = [person1PdfAttachment, person2PdfAttachment].filter(Boolean);
                 const combinedMessage = await client.sendEmail({
                   From: fromEmail,
                   To: partnerAEmail,
                   Subject: `Thank you — ${person1Name} & ${person2Name}'s Petra risk assessments are complete`,
                   HtmlBody: combinedHtml,
-                  TextBody: combinedText
+                  TextBody: combinedText,
+                  Attachments: combinedAttachments.length ? combinedAttachments : undefined
                 });
                 console.log('[sendResults] ✓ Combined couple email sent to', partnerAEmail, ':', combinedMessage.MessageID);
               } catch (emailError) {
@@ -1941,7 +2019,8 @@ module.exports = async (req, res) => {
                 To: payload.client.email,
                 Subject: 'Thank you — Your Petra risk assessment is complete',
                 HtmlBody: clientHTMLBody,
-                TextBody: clientTextBody
+                TextBody: clientTextBody,
+                Attachments: soloPdfAttachment ? [soloPdfAttachment] : undefined
               });
               console.log('[sendResults] ✓ Client email sent successfully:', clientMessage.MessageID);
             } catch (emailError) {

@@ -10,7 +10,7 @@
   "functions": {
     "api/sendResults.js": {
       "maxDuration": 60,
-      "memory": 1024
+      "memory": 2048
     }
   }
 }
