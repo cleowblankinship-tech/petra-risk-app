@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "postmark": "^4.0.0",
-    "puppeteer-core": "^21.0.0",
-    "@sparticuz/chromium": "^119.0.0"
+    "puppeteer-core": "^23.11.1",
+    "@sparticuz/chromium": "^131.0.1"
   },
   "devDependencies": {
     "@vercel/node": "^3.0.0"
   },
   "engines": {
-    "node": ">=18.x"
+    "node": "22.x"
   }
 }
