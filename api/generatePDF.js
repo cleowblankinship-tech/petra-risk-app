@@ -49,7 +49,7 @@ let LOGO_CACHE = null; // { dataUri, w, h } or false
 function loadLogo() {
   if (LOGO_CACHE === null) {
     try {
-      const buf = fs.readFileSync(path.join(__dirname, '..', 'assets', 'petra-email-logo.png'));
+      const buf = fs.readFileSync(path.join(__dirname, '..', 'assets', 'petra-logo-wordmark.png'));
       LOGO_CACHE = {
         dataUri: `data:image/png;base64,${buf.toString('base64')}`,
         w: buf.readUInt32BE(16),
@@ -146,16 +146,31 @@ function generateResultsPDF(opts) {
     y += gapAfter;
   }
 
+  // Horizontally center letter-spaced text at cx. jsPDF's align:'center' does
+  // not account for setCharSpace, so spaced caps drift right; compute the true
+  // spaced width and place with a left origin instead. Caller sets font/color.
+  function centeredText(text, cx, yTop, charSpace = 0, baseline = 'top') {
+    const base = doc.getTextWidth(text);
+    const total = base + Math.max(0, text.length - 1) * charSpace;
+    if (charSpace) doc.setCharSpace(charSpace);
+    doc.text(text, cx - total / 2, yTop, { baseline });
+    if (charSpace) doc.setCharSpace(0);
+  }
+
   // Uppercase, letter-spaced label (Helvetica). Advances y.
   function label(text, { size = 8, color = COLOR.muted, align = 'left', x = M.left, width = CW, charSpace = 1.2, gapAfter = 0 } = {}) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(size);
     setText(color);
-    doc.setCharSpace(charSpace);
-    const tx = align === 'center' ? x + width / 2 : x;
     ensureSpace(size * 1.3);
-    doc.text(String(text).toUpperCase(), tx, y, { baseline: 'top', align });
-    doc.setCharSpace(0);
+    const up = String(text).toUpperCase();
+    if (align === 'center') {
+      centeredText(up, x + width / 2, y, charSpace);
+    } else {
+      doc.setCharSpace(charSpace);
+      doc.text(up, x, y, { baseline: 'top' });
+      doc.setCharSpace(0);
+    }
     y += size * 1.3 + gapAfter;
   }
 
@@ -177,7 +192,7 @@ function generateResultsPDF(opts) {
   // -- header ---------------------------------------------------------------
   const logo = loadLogo();
   if (logo) {
-    const lw = 132;
+    const lw = 162;
     const lh = (logo.h / logo.w) * lw;
     try {
       doc.addImage(logo.dataUri, 'PNG', CX - lw / 2, y, lw, lh);
@@ -224,22 +239,22 @@ function generateResultsPDF(opts) {
     // band badge (centered pill)
     doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
     const bandText = String(scores.band).toUpperCase();
-    doc.setCharSpace(1);
-    const bw = doc.getTextWidth(bandText) + 40;
+    const bandCS = 1;
+    const bandTextW = doc.getTextWidth(bandText) + Math.max(0, bandText.length - 1) * bandCS;
+    const bw = bandTextW + 44;
     const bh = 30;
     ensureSpace(bh + 78);
     setFill(bandRgb);
     doc.roundedRect(CX - bw / 2, y, bw, bh, 15, 15, 'F');
     setText(bandTextRgb);
-    doc.text(bandText, CX, y + bh / 2, { baseline: 'middle', align: 'center' });
-    doc.setCharSpace(0);
+    centeredText(bandText, CX, y + bh / 2, bandCS, 'middle');
     y += bh + 16;
 
     // big score
     doc.setFont('helvetica', 'bold'); doc.setFontSize(46); setText(COLOR.gold);
     doc.text(String(scores.overall), CX, y, { baseline: 'top', align: 'center' });
     y += 50;
-    label('Risk Alignment Score', { align: 'center', color: COLOR.muted, size: 8.5, charSpace: 1.5, gapAfter: 20 });
+    label('Risk Alignment Score', { align: 'center', color: COLOR.muted, size: 8.5, charSpace: 1.5, gapAfter: 14 });
   }
 
   // -- component score boxes ------------------------------------------------
@@ -260,15 +275,14 @@ function generateResultsPDF(opts) {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(26); setText(COLOR.gold);
       doc.text(String(b.v), bx + bw / 2, iy, { baseline: 'top', align: 'center' });
       iy += 32;
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); setText(COLOR.charcoal); doc.setCharSpace(0.5);
-      doc.text(b.l.toUpperCase(), bx + bw / 2, iy, { baseline: 'top', align: 'center' });
-      doc.setCharSpace(0);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); setText(COLOR.charcoal);
+      centeredText(b.l.toUpperCase(), bx + bw / 2, iy, 0.5);
       iy += 13;
       doc.setFont('times', 'normal'); doc.setFontSize(8.5); setText(COLOR.muted);
       const dl = doc.splitTextToSize(b.d, bw - 24);
       dl.forEach((line) => { doc.text(line, bx + bw / 2, iy, { baseline: 'top', align: 'center' }); iy += 8.5 * 1.3; });
     });
-    y += bh + 22;
+    y += bh + 16;
   }
 
   // -- understanding the scale ---------------------------------------------
@@ -280,16 +294,17 @@ function generateResultsPDF(opts) {
     'accumulation, even when that means accepting substantial short-term fluctuations. Neither ' +
     'approach is better or worse. They represent different priorities, timeframes, and emotional ' +
     'relationships with uncertainty.',
-    { gapAfter: 18 }
+    { gapAfter: 12 }
   );
 
   // -- risk profile scale ---------------------------------------------------
   {
-    label('Risk Profile Scale', { align: 'center', color: COLOR.charcoal, size: 9, charSpace: 1.5, gapAfter: 10 });
     const gap = 5;
     const segW = (CW - gap * 5) / 6;
     const segH = 52;
-    ensureSpace(segH + 8);
+    // Keep the label and the colored bar together on the same page.
+    ensureSpace(9 * 1.3 + 10 + segH + 8);
+    label('Risk Profile Scale', { align: 'center', color: COLOR.charcoal, size: 9, charSpace: 1.5, gapAfter: 10 });
     SCALE.forEach((seg, i) => {
       const isActive = scores.overall >= seg.min && scores.overall <= seg.max;
       const sx = M.left + i * (segW + gap);
